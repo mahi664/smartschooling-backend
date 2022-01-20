@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -213,8 +214,35 @@ public class StudentService {
 		if(studentDetails!=null && studentDetails.size()>0) {
 			populateStudentAcademicDetails(studentDetails);
 			populateStudentFeesDetails(studentDetails);
+			populateStudentTransportDetails(studentDetails);
 		}
 		return new ArrayList<StudentDetailsBO>(studentDetails.values());
+	}
+
+	private void populateStudentTransportDetails(Map<String, StudentDetailsBO> studentDetails) {
+		// TODO Auto-generated method stub
+		String query = "select A.*, B.source,B.destination,B.distance " + 
+				"from student_transport_details A, routes B " + 
+				"where A.route_id = B.route_id";
+		jdbcTemplate.query(query, new ResultSetExtractor<Void>() {
+
+			@Override
+			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
+				// TODO Auto-generated method stub
+				while(rs.next()) {
+					String studentId = getFormattedStudentId(Integer.parseInt(rs.getString("STUD_ID")));
+					StudentDetailsBO studentDetailsBO = studentDetails.get(studentId);
+					if(studentDetailsBO.getRouteDetailsBO()==null)
+						studentDetailsBO.setRouteDetailsBO(new RouteDetailsBO());
+					RouteDetailsBO routeDetailsBO = studentDetailsBO.getRouteDetailsBO();
+					routeDetailsBO.setRouteId(rs.getString("ROUTE_ID"));
+					routeDetailsBO.setSource(rs.getString("SOURCE"));
+					routeDetailsBO.setDestination(rs.getString("DESTINATION"));
+					routeDetailsBO.setDistance(rs.getDouble("DISTANCE"));
+				}
+				return null;
+			}
+		});
 	}
 
 	private void populateStudentFeesDetails(Map<String, StudentDetailsBO> studentDetails) {
@@ -295,9 +323,11 @@ public class StudentService {
 
 	private Map<String, StudentDetailsBO> getStudentBasicDetails() {
 		// TODO Auto-generated method stub
-		String query = "select A.* , B.route_id, C.source, C.destination, C.distance " + 
-				"from student_details A, student_transport_details B, routes C " + 
-				"where A.stud_id = B.stud_id and B.route_id = C.route_id";
+//		String query = "select A.* , B.route_id, C.source, C.destination, C.distance " + 
+//				"from student_details A, student_transport_details B, routes C " + 
+//				"where A.stud_id = B.stud_id and B.route_id = C.route_id";
+		
+		String query = "SELECT * FROM STUDENT_DETAILS";
 		return jdbcTemplate.query(query, new ResultSetExtractor<Map<String, StudentDetailsBO>>() {
 
 			@Override
@@ -328,13 +358,13 @@ public class StudentService {
 					studentDetailsBO.setTransportOpted(Constants.YES.equals(rs.getString("TRANSPORT"))?true:false);
 					studentDetailsBO.setNationality(rs.getString("NATIONALITY"));
 					
-					if(studentDetailsBO.getRouteDetailsBO()==null)
-						studentDetailsBO.setRouteDetailsBO(new RouteDetailsBO());
-					RouteDetailsBO routeDetailsBO = studentDetailsBO.getRouteDetailsBO();
-					routeDetailsBO.setRouteId(rs.getString("ROUTE_ID"));
-					routeDetailsBO.setSource(rs.getString("SOURCE"));
-					routeDetailsBO.setDestination(rs.getString("DESTINATION"));
-					routeDetailsBO.setDistance(rs.getDouble("DISTANCE"));
+//					if(studentDetailsBO.getRouteDetailsBO()==null)
+//						studentDetailsBO.setRouteDetailsBO(new RouteDetailsBO());
+//					RouteDetailsBO routeDetailsBO = studentDetailsBO.getRouteDetailsBO();
+//					routeDetailsBO.setRouteId(rs.getString("ROUTE_ID"));
+//					routeDetailsBO.setSource(rs.getString("SOURCE"));
+//					routeDetailsBO.setDestination(rs.getString("DESTINATION"));
+//					routeDetailsBO.setDistance(rs.getDouble("DISTANCE"));
 				}
 				return studentDetails;
 			}
