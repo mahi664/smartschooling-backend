@@ -64,7 +64,7 @@ public class FeesService {
 	}
 
 	private int getMaxFeeId() {
-		String query = "SELECT MAX(FEE_ID) AS MAX_FEE_ID FROM FEE_TYPES";
+		String query = "SELECT COUNT(FEE_ID) AS MAX_FEE_ID FROM FEE_TYPES";
 		int maxFeeId = jdbcTemplate.query(query, new ResultSetExtractor<Integer>() {
 
 			@Override
