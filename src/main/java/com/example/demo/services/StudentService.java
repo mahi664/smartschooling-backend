@@ -194,7 +194,7 @@ public class StudentService {
 	}
 
 	private int getMaxStudentId() {
-		String query = "SELECT MAX(STUD_ID) as MAX_STUDENT_ID FROM STUDENT_DETAILS";
+		String query = "SELECT COUNT(STUD_ID) as MAX_STUDENT_ID FROM STUDENT_DETAILS";
 		int maxStudId = jdbcTemplate.query(query, new ResultSetExtractor<Integer>() {
 
 			@Override
