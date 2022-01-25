@@ -11,11 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.bo.FeesDetailsBO;
+import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
 
 @Service
@@ -131,7 +133,10 @@ public class FeesService {
 					ps.setString(3, feesDetailsBOs.get(i).getRouteId()!=null ? feesDetailsBOs.get(i).getRouteId() : "");
 					ps.setDouble(4, feesDetailsBOs.get(i).getAmount());
 					ps.setDate(5, DateUtils.getSqlDate(new Date()));
-					ps.setDate(6, DateUtils.getSqlDate(new Date(2099, 11, 30)));
+					ps.setDate(6, DateUtils.getSqlDate(Constants.MAX_DATE));
+					
+					feesDetailsBOs.get(i).setEffDate(new Date());
+					feesDetailsBOs.get(i).setEndDate(Constants.MAX_DATE);
 				}
 				
 				@Override
@@ -149,6 +154,42 @@ public class FeesService {
 			System.out.println("Error while adding fee details");
 			throw e;
 		}
+	}
+
+	public List<FeesDetailsBO> getFeeDetails(String feeId) {
+		// TODO Auto-generated method stub
+		String query = "SELECT * FROM FEE_DETAILS ";
+		if(feeId!=null) {
+			query += "WHERE FEE_ID = ?";
+		}
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				// TODO Auto-generated method stub
+				if(feeId!=null)
+					ps.setString(1, feeId);
+			}
+		}, new ResultSetExtractor<List<FeesDetailsBO>>() {
+
+			@Override
+			public List<FeesDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				// TODO Auto-generated method stub
+				List<FeesDetailsBO> feeDetailsList = new ArrayList<>();
+				while(rs.next()) {
+					FeesDetailsBO feesDetailsBO = new FeesDetailsBO();
+					feesDetailsBO.setFeeId(rs.getString("FEE_ID"));
+					feesDetailsBO.setClassId(rs.getString("CLASS_ID"));
+					feesDetailsBO.setRouteId(rs.getString("ROUTE_ID"));
+					feesDetailsBO.setAmount(rs.getDouble("AMOUNT"));
+					feesDetailsBO.setEffDate(DateUtils.getDate(rs.getDate("EFF_DATE")));
+					feesDetailsBO.setEndDate(DateUtils.getDate(rs.getDate("END_DATE")));
+					
+					feeDetailsList.add(feesDetailsBO);
+				}
+				return feeDetailsList;
+			}
+		});
 	}
 
 }
