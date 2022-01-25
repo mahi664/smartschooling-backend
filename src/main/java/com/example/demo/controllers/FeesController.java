@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,5 +33,10 @@ public class FeesController {
 	@PostMapping(path="/Fees/Details")
 	public List<FeesDetailsBO> addFeeDetails(@RequestBody List<FeesDetailsBO> feesDetailsBOs){
 		return feesService.addFeeDetails(feesDetailsBOs);
+	}
+	
+	@GetMapping(path="/Fees/Details/{feeId}")
+	public List<FeesDetailsBO> getFeeDetails(@PathVariable String feeId){
+		return feesService.getFeeDetails(feeId);
 	}
 }
