@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.bo.AcademicDetailsBO;
+import com.example.demo.utils.DateUtils;
 
 @Service
 public class AcademicService {
@@ -33,6 +34,8 @@ public class AcademicService {
 						AcademicDetailsBO academicDetailsBO = new AcademicDetailsBO();
 						academicDetailsBO.setAcademicId(rs.getString("ACADEMIC_ID"));
 						academicDetailsBO.setAcademicYear(rs.getString("ACADEMIC_YEAR"));
+						academicDetailsBO.setAcademicStartDate(DateUtils.getDate(rs.getDate("ACADEMIC_START_DATE")));
+						academicDetailsBO.setAcademicEndDate(DateUtils.getDate(rs.getDate("ACADEMIC_END_DATE")));
 						academicList.add(academicDetailsBO);
 					}
 					return academicList;
