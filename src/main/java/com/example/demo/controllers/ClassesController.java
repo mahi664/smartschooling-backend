@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.bo.ClassDetaislBO;
+import com.example.demo.bo.SubjectDetailsBO;
 import com.example.demo.services.ClassesService;
 
 @RestController
@@ -38,5 +39,10 @@ public class ClassesController {
 	@PostMapping(path="/Classes/{classId}/Subjects")
 	public List<String> addClassSubjects(@PathVariable String classId, @RequestBody List<String> subjectIds) {
 		return classesService.addClassSubject(classId, subjectIds);
+	}
+	
+	@GetMapping(path="/Classes/{classId}/Subjects")
+	public List<SubjectDetailsBO> getClassSubjects(@PathVariable String classId) {
+		return classesService.getClassesSubjects(classId);
 	}
 }

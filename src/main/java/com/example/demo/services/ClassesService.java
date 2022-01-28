@@ -5,7 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -157,4 +159,31 @@ public class ClassesService {
 //		return null;
 	}
 
+	public List<SubjectDetailsBO> getClassesSubjects(String classId){
+		String query = "SELECT A.SUB_ID, B.SUB_NAME FROM CLASS_SUBJECT_DETAILS A, SUBJECTS B "+
+						"WHERE A.SUB_ID = B.SUB_ID AND A.CLASS_ID=?";
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				// TODO Auto-generated method stub
+				ps.setString(1, classId);
+			}
+		}, new ResultSetExtractor<List<SubjectDetailsBO>>() {
+
+			@Override
+			public List<SubjectDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				List<SubjectDetailsBO> classesSubjects = new ArrayList<>();
+				while(rs.next()) {
+					SubjectDetailsBO subjectDetailsBO = new SubjectDetailsBO();
+					subjectDetailsBO.setSubjectId(rs.getString("SUB_ID"));
+					subjectDetailsBO.setSubjectName(rs.getString("SUB_NAME"));
+					
+					classesSubjects.add(subjectDetailsBO);
+				}
+				
+				return classesSubjects;
+			}
+		});
+	}
 }
