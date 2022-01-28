@@ -37,6 +37,7 @@ public class AcademicService {
 						AcademicDetailsBO academicDetailsBO = new AcademicDetailsBO();
 						academicDetailsBO.setAcademicId(rs.getString("ACADEMIC_ID"));
 						academicDetailsBO.setAcademicYear(rs.getString("ACADEMIC_YEAR"));
+						academicDetailsBO.setDisplayName(rs.getString("DISPLAY_NAME"));
 						academicDetailsBO.setAcademicStartDate(DateUtils.getDate(rs.getDate("ACADEMIC_START_DATE")));
 						academicDetailsBO.setAcademicEndDate(DateUtils.getDate(rs.getDate("ACADEMIC_END_DATE")));
 						academicList.add(academicDetailsBO);
