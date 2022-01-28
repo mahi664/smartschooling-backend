@@ -41,8 +41,8 @@ public class ClassesController {
 		return classesService.addClassSubject(classId, subjectIds);
 	}
 	
-	@GetMapping(path="/Classes/{classId}/Subjects")
-	public List<SubjectDetailsBO> getClassSubjects(@PathVariable String classId) {
-		return classesService.getClassesSubjects(classId);
-	}
+	// @GetMapping(path="/Classes/{classId}/Subjects")
+	// public List<SubjectDetailsBO> getClassSubjects(@PathVariable String classId) {
+	// 	return classesService.getClassesSubjects(classId);
+	// }
 }
