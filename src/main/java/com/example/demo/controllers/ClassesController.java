@@ -37,8 +37,8 @@ public class ClassesController {
 	}
 	
 	@PostMapping(path="/Classes/{classId}/Subjects")
-	public List<String> addClassSubjects(@PathVariable String classId, @RequestBody List<String> subjectIds) {
-		return classesService.addClassSubject(classId, subjectIds);
+	public List<SubjectDetailsBO> addClassSubjects(@PathVariable String classId, @RequestBody List<SubjectDetailsBO> subjectIds) {
+		return classesService.addClassSubject(classId, subjectIds,true);
 	}
 	
 	@GetMapping(path="/Classes/{classId}/Subjects")
