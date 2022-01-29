@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.bo.ClassDetaislBO;
 import com.example.demo.bo.SubjectDetailsBO;
+import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
 
 @Service
@@ -122,8 +123,24 @@ public class ClassesService {
 		return null;
 	}
 
+	@Transactional
+	public List<SubjectDetailsBO> addClassSubject(String classId, List<SubjectDetailsBO> subjectIds, boolean isUpdateOp){
+		try {
+			if(isUpdateOp) {
+				deleteClassSubjects(classId, subjectIds);	
+			}
+			
+			return addClassSubject(classId, subjectIds);
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Error in adding class subject details");
+			e.printStackTrace();
+			throw e;
+		}
+	}
+	
 	@Transactional(rollbackFor=Exception.class)
-	public List<String> addClassSubject(String classId, List<String> subjectIds) {
+	public List<SubjectDetailsBO> addClassSubject(String classId, List<SubjectDetailsBO> subjectIds) {
 		try {
 			String query = "INSERT INTO CLASS_SUBJECT_DETAILS VALUES(?,?,?,?,?,?)";
 			int res[] = jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
@@ -132,9 +149,9 @@ public class ClassesService {
 				public void setValues(PreparedStatement ps, int i) throws SQLException {
 					// TODO Auto-generated method stub
 					ps.setString(1, classId);
-					ps.setString(2, subjectIds.get(i));
+					ps.setString(2, subjectIds.get(i).getSubjectId());
 					ps.setDate(3, DateUtils.getSqlDate(new Date()));
-					ps.setDate(4, DateUtils.getSqlDate(new Date(2099, 12, 31)));
+					ps.setDate(4, DateUtils.getSqlDate(Constants.MAX_DATE));
 					ps.setDate(5, DateUtils.getSqlDate(new Date()));
 					ps.setString(6, "BASE");
 				}
@@ -185,5 +202,20 @@ public class ClassesService {
 				return classesSubjects;
 			}
 		});
+	}
+	
+	public List<SubjectDetailsBO> deleteClassSubjects(String classId, List<SubjectDetailsBO> subjectIds){
+		String query = "DELETE FROM CLASS_SUBJECT_DETAILS WHERE CLASS_ID=?";
+		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, classId);
+			}
+		});
+		if(res<=0) {
+			return null;
+		}
+		return subjectIds;
 	}
 }
