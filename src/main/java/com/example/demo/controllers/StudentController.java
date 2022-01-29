@@ -32,7 +32,7 @@ public class StudentController {
 		return studentService.getStudentDetails();
 	}
 	
-	@PostMapping(path="/Students-update")
+	@PostMapping(path="/Students/update")
 	public StudentDetailsBO updateStudentDetails(@RequestBody StudentDetailsBO studentDetailsBO) {
 		return studentService.updateStudentDetails(studentDetailsBO);
 	}
