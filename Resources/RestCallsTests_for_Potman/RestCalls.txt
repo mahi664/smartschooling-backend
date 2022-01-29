@@ -1,0 +1,74 @@
+1. StudentController : GET
+
+http://localhost:8080/Students
+
+2. Student Controller : PUT
+
+http://localhost:8080/Students
+
+{
+        "studentId": "SCHNAME-0006",
+        "firstName": "Shruti",
+        "middleName": "",
+        "lastName": "Jaybhaye",
+        "birthDate": "2010-05-14T18:30:00.000+00:00",
+        "gender": "Female",
+        "adharNumber": "458596587854",
+        "mobileNumber": "5698785478",
+        "email": null,
+        "alternateMobile": null,
+        "address": "Shevgaon",
+        "religion": "Hindu",
+        "caste": "NT-D",
+        "nationality": "Indian",
+        "transportOpted": true,
+        "routeDetailsBO": {
+            "routeId": "Ghotan-Shevgaon",
+            "source": "Ghotan",
+            "destination": "Shevgaon",
+            "distance": 10.0
+        },
+        "studentFeeDetails": {
+            "AY-2021-22": [
+                {
+                    "feeId": "1",
+                    "feeName": "Tution Fees",
+                    "feeDiscription": null,
+                    "classId": "UKG",
+                    "routeId": "",
+                    "amount": 500.0,
+                    "effDate": null,
+                    "endDate": null
+                },
+                {
+                    "feeId": "2",
+                    "feeName": "Transport Fees",
+                    "feeDiscription": null,
+                    "classId": "",
+                    "routeId": "Ghotan-Shevgaon",
+                    "amount": 5000.0,
+                    "effDate": null,
+                    "endDate": null
+                },
+                {
+                    "feeId": "3",
+                    "feeName": "Addmission Fees",
+                    "feeDiscription": null,
+                    "classId": " ",
+                    "routeId": " ",
+                    "amount": 4000.0,
+                    "effDate": null,
+                    "endDate": null
+                }
+            ]
+        },
+        "studentClassDetails": {
+            "AY-2021-22": [
+                {
+                    "classId": "UKG",
+                    "className": "Upper KG",
+                    "subjects": null
+                }
+            ]
+        }
+    }
