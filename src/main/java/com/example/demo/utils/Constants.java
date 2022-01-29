@@ -12,4 +12,5 @@ public class Constants {
 	public static final 	String 		YES					= 	"Y";
 	public static final 	String 		NO					= 	"N";
 	public static final 	String 		BLANK_STRING		= 	" ";
+	public static final     int        APPEND_CHARACTERS   =    8;
 }

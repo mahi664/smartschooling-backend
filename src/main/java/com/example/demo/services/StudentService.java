@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.example.demo.bo.ClassDetaislBO;
 import com.example.demo.bo.FeesDetailsBO;
@@ -26,6 +27,8 @@ import com.example.demo.bo.StudentDetailsBO;
 import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
 import com.sun.xml.bind.v2.runtime.reflect.Lister;
+
+import jdk.internal.joptsimple.internal.Strings;
 
 @Service
 public class StudentService {
@@ -369,6 +372,165 @@ public class StudentService {
 				return studentDetails;
 			}
 		});
+	}
+
+	@Transactional
+	public StudentDetailsBO updateStudentDetails(StudentDetailsBO studentDetailsBO)
+	{
+		String studentid = studentDetailsBO.getStudentId();
+		int studentID = reformatStudentID(studentid);
+		System.out.println("Passed student id : " + studentid);
+		System.out.println("filtered student id "+studentID);
+		
+		
+		///
+		try 
+		{
+			String sID = ""+studentID;
+			boolean result = false;
+			
+			//To delete entries from 4 tables 
+			
+			result = deleteEntry_student_class_details(sID);
+			if(result)
+				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Class_Details table.");
+			else
+				System.out.println("Entry does not exitst in the table for sID "+sID);
+			
+			result=deleteEntry_student_fees_details(sID);
+			if(result)
+				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Fees_Details table.");
+			else
+				System.out.println("Entry does not exitst in the table for sID "+sID);
+			
+			result=deleteEntry_student_transport_details(sID);
+			if(result)
+				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Transport_Details table.");
+			else
+				System.out.println("Entry does not exitst in the table for sID "+sID);
+			
+			result=deleteEntry_student_details(sID);
+			if(result)
+				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Details table.");
+			else
+				System.out.println("Entry does not exitst in the table for sID "+sID);
+			
+			
+			//The student has been deleted from all the tables
+			//Now add it again in all tables using the same ID
+	        		
+			studentDetailsBO.setStudentId(sID);
+			System.out.println("Set student IS as "+sID+" before adding.");
+			result = addStudentBasicDeails(studentDetailsBO);
+			if(result && studentDetailsBO.getRouteDetailsBO()!=null && studentDetailsBO.isTransportOpted())
+				result = addSudentsTransportDetails(studentDetailsBO.getStudentId(), studentDetailsBO.getRouteDetailsBO());
+			if(result && studentDetailsBO.getStudentClassDetails()!=null)
+				result = addStudentClassesDetails(studentDetailsBO.getStudentId(),studentDetailsBO.getStudentClassDetails());
+			if(result && studentDetailsBO.getStudentFeeDetails()!=null)
+			{
+				System.out.println("Fees details for : "+studentDetailsBO.getStudentId());
+				System.out.println("Details are : " + studentDetailsBO.getStudentFeeDetails());
+				result = addStudentFeesDetails(studentDetailsBO.getStudentId(), studentDetailsBO.getStudentFeeDetails());
+			}
+				
+			if(!result) {
+				System.out.println("Problem in adding student Details");
+				return null;
+			}
+			
+			
+			
+			studentDetailsBO.setStudentId(studentid);
+			return studentDetailsBO;
+		} 
+		catch (Exception e) 
+		{
+			System.out.println("Error while Updating Student");
+			e.getStackTrace();
+			throw e;
+		}
+	}
+	
+	private int reformatStudentID(String studentid)
+	{
+		int sid=-1;
+		
+		try 
+		{
+			if(!StringUtils.isEmpty(studentid))
+			{
+				String actualID = studentid.substring(Constants.APPEND_CHARACTERS);
+				sid = Integer.parseInt(actualID);
+				return sid;
+			}
+			
+		} 
+		catch (Exception e) 
+		{
+			// TODO: handle exception
+			System.out.println("Error while reformating student id.");
+			throw e;
+		}
+		
+		return sid;
+	}
+	
+	private boolean deleteEntry_student_class_details(String stud_id)
+	{
+		String query = "DELETE FROM STUDENT_CLASS_DETAILS WHERE STUD_ID=?";
+		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
+				
+				@Override
+				public void setValues(PreparedStatement ps) throws SQLException 
+				{
+					ps.setString(1, stud_id);
+				}
+		});
+		
+		return res<=0 ? false : true;
+	}
+	
+	private boolean deleteEntry_student_fees_details(String stud_id)
+	{
+		String query = "DELETE FROM STUDENT_FEES_DETAILS WHERE STUD_ID=?";
+		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
+				
+				@Override
+				public void setValues(PreparedStatement ps) throws SQLException 
+				{
+					ps.setString(1, stud_id);
+				}
+		});
+		
+		return res<=0 ? false : true;
+	}
+	private boolean deleteEntry_student_transport_details(String stud_id)
+	{
+		String query = "DELETE FROM STUDENT_TRANSPORT_DETAILS WHERE STUD_ID=?";
+		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
+				
+				@Override
+				public void setValues(PreparedStatement ps) throws SQLException 
+				{
+					ps.setString(1, stud_id);
+				}
+		});
+		
+		return res<=0 ? false : true;
+	}
+	private boolean deleteEntry_student_details(String stud_id)
+	{
+		String query = "DELETE FROM STUDENT_DETAILS WHERE STUD_ID=?";
+		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
+				
+				@Override
+				public void setValues(PreparedStatement ps) throws SQLException 
+				{
+					ps.setString(1, stud_id);
+				}
+		});
+		
+		return res<=0 ? false : true;
 	}
 
 }
