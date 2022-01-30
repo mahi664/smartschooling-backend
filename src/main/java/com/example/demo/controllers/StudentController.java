@@ -37,4 +37,9 @@ public class StudentController {
 		return studentService.updateStudentDetails(studentDetailsBO);
 	}
 	
+	@PostMapping(path="/Students/delete")
+	public boolean deleteStudentDetails(@RequestBody StudentDetailsBO studentDetailsBO) {
+		return studentService.deleteStudentCompleteDetails(studentDetailsBO.getStudentId());
+	}
+	
 }
