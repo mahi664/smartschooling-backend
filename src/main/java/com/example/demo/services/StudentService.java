@@ -40,8 +40,20 @@ public class StudentService {
 		try {
 			
 //			String nextStudentId = getNextStudentId();
-			int nextStudentId = getMaxStudentId() + 1;
+			int nextStudentId=0;
+			if(StringUtils.isEmpty(studentDetailsBO.getStudentId()))
+			{
+				nextStudentId = getMaxStudentId() + 1;
+			}
+			else
+			{
+				if(studentDetailsBO.getStudentId().startsWith(Constants.STUDENT_ID_PREFIX))
+				{
+					nextStudentId = reformatStudentID(studentDetailsBO.getStudentId());	
+				}
+			}
 			studentDetailsBO.setStudentId(Integer.toString(nextStudentId));
+			
 			boolean res = addStudentBasicDeails(studentDetailsBO);
 			if(res && studentDetailsBO.getRouteDetailsBO()!=null && studentDetailsBO.isTransportOpted())
 				res = addSudentsTransportDetails(studentDetailsBO.getStudentId(), studentDetailsBO.getRouteDetailsBO());
@@ -373,12 +385,77 @@ public class StudentService {
 	}
 
 	@Transactional
+	public boolean deleteStudentCompleteDetails(String studentID)
+	{
+		/*
+		  Following if condition applied as this deleteStudentCompleteDetails can be called through controller as api or internally
+		  by the updateStudentDetails action.
+		  So filter condition needs to be checked.
+		  
+		*/
+		
+		int studID;
+		if(studentID.startsWith(Constants.STUDENT_ID_PREFIX))
+		{
+			studID = reformatStudentID(studentID);	
+		}
+		else
+		{
+			studID = Integer.parseInt(studentID);
+		}
+
+		System.out.println("deleteStudentCompleteDetails has been invoked for ID : "+studentID+" and filtered : "+studID);
+		
+		String sID = ""+studID;
+		boolean result = false;
+		
+		try 
+		{
+			
+			result = deleteEntryStudentClassDetails(sID);
+			if(result)
+				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Class_Details table.");
+			else
+				System.out.println("Entry does not exitst in the table for sID "+sID);
+			
+			result=deleteEntryStudentFeesDetails(sID);
+			if(result)
+				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Fees_Details table.");
+			else
+				System.out.println("Entry does not exitst in the table for sID "+sID);
+			
+			result=deleteEntryStudentTransportDetails(sID);
+			if(result)
+				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Transport_Details table.");
+			else
+				System.out.println("Entry does not exitst in the table for sID "+sID);
+			
+			result=deleteEntryStudentDetails(sID);
+			if(result)
+				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Details table.");
+			else
+				System.out.println("Entry does not exitst in the table for sID "+sID);
+			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Error while Deleting Student in deleteStudentCompleteDetails.");
+			e.getStackTrace();
+			throw e;
+			
+		}
+		
+		return result;
+	}
+	
+	
+	@Transactional
 	public StudentDetailsBO updateStudentDetails(StudentDetailsBO studentDetailsBO)
 	{
 		String studentid = studentDetailsBO.getStudentId();
 		int studentID = reformatStudentID(studentid);
-		System.out.println("Passed student id : " + studentid);
-		System.out.println("filtered student id "+studentID);
+		
+		System.out.println("updateStudentDetails has been invoked for ID : "+studentid+" and filtered : "+studentID);
 		
 		
 		///
@@ -388,57 +465,31 @@ public class StudentService {
 			boolean result = false;
 			
 			//To delete entries from 4 tables 
-			
-			result = deleteEntry_student_class_details(sID);
+		    System.out.println("Calling deleteStudentCompleteDetails for student id :"+sID);
+			result = deleteStudentCompleteDetails(sID);
 			if(result)
-				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Class_Details table.");
-			else
-				System.out.println("Entry does not exitst in the table for sID "+sID);
-			
-			result=deleteEntry_student_fees_details(sID);
-			if(result)
-				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Fees_Details table.");
-			else
-				System.out.println("Entry does not exitst in the table for sID "+sID);
-			
-			result=deleteEntry_student_transport_details(sID);
-			if(result)
-				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Transport_Details table.");
-			else
-				System.out.println("Entry does not exitst in the table for sID "+sID);
-			
-			result=deleteEntry_student_details(sID);
-			if(result)
-				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Details table.");
-			else
-				System.out.println("Entry does not exitst in the table for sID "+sID);
-			
+			{
+				System.out.println("Deleted all the entries for student ID :"+sID);
+			}
 			
 			//The student has been deleted from all the tables
 			//Now add it again in all tables using the same ID
-	        		
-			studentDetailsBO.setStudentId(sID);
-			System.out.println("Set student IS as "+sID+" before adding.");
-			result = addStudentBasicDeails(studentDetailsBO);
-			if(result && studentDetailsBO.getRouteDetailsBO()!=null && studentDetailsBO.isTransportOpted())
-				result = addSudentsTransportDetails(studentDetailsBO.getStudentId(), studentDetailsBO.getRouteDetailsBO());
-			if(result && studentDetailsBO.getStudentClassDetails()!=null)
-				result = addStudentClassesDetails(studentDetailsBO.getStudentId(),studentDetailsBO.getStudentClassDetails());
-			if(result && studentDetailsBO.getStudentFeeDetails()!=null)
+	        
+			//if entry deleted from tables, then only add
+			// else it will be normal add only.
+			
+			if(result)
 			{
-				System.out.println("Fees details for : "+studentDetailsBO.getStudentId());
-				System.out.println("Details are : " + studentDetailsBO.getStudentFeeDetails());
-				result = addStudentFeesDetails(studentDetailsBO.getStudentId(), studentDetailsBO.getStudentFeeDetails());
+				System.out.println("Calling addNewStudent for student id :"+sID);
+				studentDetailsBO=addNewStudent(studentDetailsBO);
+				System.out.println("addNewStudent action added student with student id :"+sID);
+				System.out.println("Updatation successful.");
 			}
-				
-			if(!result) {
-				System.out.println("Problem in adding student Details");
-				return null;
+			else {
+				System.out.println("Updation not successful.");
 			}
 			
 			
-			
-			studentDetailsBO.setStudentId(studentid);
 			return studentDetailsBO;
 		} 
 		catch (Exception e) 
@@ -457,8 +508,12 @@ public class StudentService {
 		{
 			if(!StringUtils.isEmpty(studentid))
 			{
-				String actualID = studentid.substring(Constants.APPEND_CHARACTERS);
+				System.out.println("Reformating student ID : "+studentid);
+				//String actualID = studentid.substring(Constants.APPEND_CHARACTERS);
+				String actualID = studentid.replaceFirst(Constants.STUDENT_ID_PREFIX, "0");
+				System.out.println("After Removing STUDENT_ID_PREFIX : "+actualID);
 				sid = Integer.parseInt(actualID);
+				System.out.println("Integer student id : "+sid);
 				return sid;
 			}
 			
@@ -473,7 +528,7 @@ public class StudentService {
 		return sid;
 	}
 	
-	private boolean deleteEntry_student_class_details(String stud_id)
+	private boolean deleteEntryStudentClassDetails(String stud_id)
 	{
 		String query = "DELETE FROM STUDENT_CLASS_DETAILS WHERE STUD_ID=?";
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
@@ -488,7 +543,7 @@ public class StudentService {
 		return res<=0 ? false : true;
 	}
 	
-	private boolean deleteEntry_student_fees_details(String stud_id)
+	private boolean deleteEntryStudentFeesDetails(String stud_id)
 	{
 		String query = "DELETE FROM STUDENT_FEES_DETAILS WHERE STUD_ID=?";
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
@@ -502,7 +557,7 @@ public class StudentService {
 		
 		return res<=0 ? false : true;
 	}
-	private boolean deleteEntry_student_transport_details(String stud_id)
+	private boolean deleteEntryStudentTransportDetails(String stud_id)
 	{
 		String query = "DELETE FROM STUDENT_TRANSPORT_DETAILS WHERE STUD_ID=?";
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
@@ -516,7 +571,7 @@ public class StudentService {
 		
 		return res<=0 ? false : true;
 	}
-	private boolean deleteEntry_student_details(String stud_id)
+	private boolean deleteEntryStudentDetails(String stud_id)
 	{
 		String query = "DELETE FROM STUDENT_DETAILS WHERE STUD_ID=?";
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
