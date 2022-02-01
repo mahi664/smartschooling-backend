@@ -222,3 +222,4 @@ CREATE TABLE smartschoolingdev.transaction_details (
 	CONSTRAINT transaction_details_fk FOREIGN KEY (account_id) REFERENCES smartschoolingdev.accounts(account_id),
 	CONSTRAINT transaction_details_fk_1 FOREIGN KEY (ref_table_type) REFERENCES smartschoolingdev.ref_table_types(ref_table_type)
 );
+ALTER TABLE smartschoolingdev.transaction_details ADD CONSTRAINT transaction_details_fk_2 FOREIGN KEY (transaction_id) REFERENCES smartschoolingdev.transactions(transaction_id);
