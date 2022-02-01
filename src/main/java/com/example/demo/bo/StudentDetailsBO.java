@@ -23,6 +23,7 @@ public class StudentDetailsBO {
 	private RouteDetailsBO routeDetailsBO;
 	private Map<String, List<FeesDetailsBO>> studentFeeDetails; // key- Academic id
 	private Map<String, List<ClassDetaislBO>> studentClassDetails; // key- AcademicId
+	private FeeReceivables feeReceivables;
 	public String getStudentId() {
 		return studentId;
 	}
@@ -131,6 +132,12 @@ public class StudentDetailsBO {
 	public void setStudentClassDetails(Map<String, List<ClassDetaislBO>> studentClassDetails) {
 		this.studentClassDetails = studentClassDetails;
 	}
+	public FeeReceivables getFeeReceivables() {
+		return feeReceivables;
+	}
+	public void setFeeReceivables(FeeReceivables feeReceivables) {
+		this.feeReceivables = feeReceivables;
+	}
 	@Override
 	public String toString() {
 		return "StudentDetailsBO [studentId=" + studentId + ", firstName=" + firstName + ", middleName=" + middleName
@@ -139,7 +146,7 @@ public class StudentDetailsBO {
 				+ alternateMobile + ", address=" + address + ", religion=" + religion + ", caste=" + caste
 				+ ", nationality=" + nationality + ", transportOpted=" + transportOpted + ", routeDetailsBO="
 				+ routeDetailsBO + ", studentFeeDetails=" + studentFeeDetails + ", studentClassDetails="
-				+ studentClassDetails + "]";
+				+ studentClassDetails + ", feeReceivables=" + feeReceivables + "]";
 	}
 	
 }
