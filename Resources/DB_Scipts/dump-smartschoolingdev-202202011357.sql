@@ -540,8 +540,10 @@ CREATE TABLE `transaction_details` (
   PRIMARY KEY (`transaction_det_id`),
   KEY `transaction_details_fk` (`account_id`),
   KEY `transaction_details_fk_1` (`ref_table_type`),
+  KEY `transaction_details_fk_2` (`transaction_id`),
   CONSTRAINT `transaction_details_fk` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`),
-  CONSTRAINT `transaction_details_fk_1` FOREIGN KEY (`ref_table_type`) REFERENCES `ref_table_types` (`ref_table_type`)
+  CONSTRAINT `transaction_details_fk_1` FOREIGN KEY (`ref_table_type`) REFERENCES `ref_table_types` (`ref_table_type`),
+  CONSTRAINT `transaction_details_fk_2` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`transaction_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -617,4 +619,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-01 13:25:48
+-- Dump completed on 2022-02-01 13:57:32
