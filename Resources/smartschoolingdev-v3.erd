@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<diagram version="1" name="smartschoolingERD_V2">
+<diagram version="1" name="smartschoolingdev-v3">
 	<entities>
 		<data-source id="mysql8-17d45e1db3f-4d2d44c087cffc76">
 			<entity id="1" name="academic_details" fq-name="smartschoolingdev.academic_details">
@@ -47,22 +47,43 @@
 			<entity id="15" name="users" fq-name="smartschoolingdev.users">
 				<path name="smartschoolingdev"/>
 			</entity>
+			<entity id="16" name="students_fees_collections_details" fq-name="smartschoolingdev.students_fees_collections_details">
+				<path name="smartschoolingdev"/>
+			</entity>
+			<entity id="17" name="accounts" fq-name="smartschoolingdev.accounts">
+				<path name="smartschoolingdev"/>
+			</entity>
+			<entity id="18" name="transactions" fq-name="smartschoolingdev.transactions">
+				<path name="smartschoolingdev"/>
+			</entity>
+			<entity id="19" name="transaction_details" fq-name="smartschoolingdev.transaction_details">
+				<path name="smartschoolingdev"/>
+			</entity>
+			<entity id="20" name="ref_table_types" fq-name="smartschoolingdev.ref_table_types">
+				<path name="smartschoolingdev"/>
+			</entity>
 		</data-source>
 	</entities>
 	<relations>
 		<relation name="student_class_details_fk_2" fq-name="smartschoolingdev.student_class_details.student_class_details_fk_2" type="fk" pk-ref="1" fk-ref="10"/>
 		<relation name="student_fees_details_fk_2" fq-name="smartschoolingdev.student_fees_details.student_fees_details_fk_2" type="fk" pk-ref="1" fk-ref="12"/>
+		<relation name="students_fees_collections_details_fk_1" fq-name="smartschoolingdev.students_fees_collections_details.students_fees_collections_details_fk_1" type="fk" pk-ref="1" fk-ref="16"/>
 		<relation name="branch_classes_details_fk_1" fq-name="smartschoolingdev.branch_classes_details.branch_classes_details_fk_1" type="fk" pk-ref="4" fk-ref="2"/>
 		<relation name="class_subject_details_fk" fq-name="smartschoolingdev.class_subject_details.class_subject_details_fk" type="fk" pk-ref="4" fk-ref="3"/>
 		<relation name="student_class_details_fk" fq-name="smartschoolingdev.student_class_details.student_class_details_fk" type="fk" pk-ref="4" fk-ref="10"/>
 		<relation name="fee_details_fk_2" fq-name="smartschoolingdev.fee_details.fee_details_fk_2" type="fk" pk-ref="6" fk-ref="5"/>
 		<relation name="student_fees_details_fk_1" fq-name="smartschoolingdev.student_fees_details.student_fees_details_fk_1" type="fk" pk-ref="6" fk-ref="12"/>
+		<relation name="students_fees_collections_details_fk_2" fq-name="smartschoolingdev.students_fees_collections_details.students_fees_collections_details_fk_2" type="fk" pk-ref="6" fk-ref="16"/>
 		<relation name="branch_classes_details_fk" fq-name="smartschoolingdev.branch_classes_details.branch_classes_details_fk" type="fk" pk-ref="7" fk-ref="2"/>
 		<relation name="institute_branch_det_fk" fq-name="smartschoolingdev.institute_branch_det.institute_branch_det_fk" type="fk" pk-ref="8" fk-ref="7"/>
 		<relation name="student_transport_detaisl_fk_1" fq-name="smartschoolingdev.student_transport_details.student_transport_detaisl_fk_1" type="fk" pk-ref="9" fk-ref="13"/>
 		<relation name="student_class_details_fk_1" fq-name="smartschoolingdev.student_class_details.student_class_details_fk_1" type="fk" pk-ref="11" fk-ref="10"/>
 		<relation name="student_fees_details_fk" fq-name="smartschoolingdev.student_fees_details.student_fees_details_fk" type="fk" pk-ref="11" fk-ref="12"/>
 		<relation name="student_transport_detaisl_fk" fq-name="smartschoolingdev.student_transport_details.student_transport_detaisl_fk" type="fk" pk-ref="11" fk-ref="13"/>
+		<relation name="students_fees_collections_details_fk" fq-name="smartschoolingdev.students_fees_collections_details.students_fees_collections_details_fk" type="fk" pk-ref="11" fk-ref="16"/>
 		<relation name="class_subject_details_fk_1" fq-name="smartschoolingdev.class_subject_details.class_subject_details_fk_1" type="fk" pk-ref="14" fk-ref="3"/>
+		<relation name="students_fees_collections_details_fk_3" fq-name="smartschoolingdev.students_fees_collections_details.students_fees_collections_details_fk_3" type="fk" pk-ref="17" fk-ref="16"/>
+		<relation name="transaction_details_fk" fq-name="smartschoolingdev.transaction_details.transaction_details_fk" type="fk" pk-ref="17" fk-ref="19"/>
+		<relation name="transaction_details_fk_1" fq-name="smartschoolingdev.transaction_details.transaction_details_fk_1" type="fk" pk-ref="20" fk-ref="19"/>
 	</relations>
 </diagram>
