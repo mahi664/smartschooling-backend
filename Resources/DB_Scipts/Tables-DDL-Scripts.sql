@@ -169,3 +169,56 @@ ALTER TABLE smartschoolingdev.student_class_details ADD CONSTRAINT student_class
 ALTER TABLE smartschoolingdev.student_class_details ADD CONSTRAINT student_class_details_fk_1 FOREIGN KEY (stud_id) REFERENCES smartschoolingdev.student_details(stud_id);
 ALTER TABLE smartschoolingdev.student_class_details ADD CONSTRAINT student_class_details_fk_2 FOREIGN KEY (academic_id) REFERENCES smartschoolingdev.academic_details(academic_id);
 
+CREATE TABLE smartschoolingdev.accounts (
+	account_id varchar(100) NOT NULL,
+	account_name varchar(100) NOT NULL,
+	bank_name varchar(100) DEFAULT null NULL,
+	bank_account_number varchar(100) DEFAULT null NULL,
+	CONSTRAINT accounts_pk PRIMARY KEY (account_id)
+);
+
+CREATE TABLE smartschoolingdev.students_fees_collections_details (
+	collection_id varchar(100) NOT NULL,
+	stud_id varchar(100) NOT NULL,
+	academic_id varchar(100) NOT NULL,
+	fee_id varchar(100) NOT NULL,
+	amount DOUBLE NOT NULL,
+	collection_date DATETIME NOT NULL,
+	account_id VARCHAR(100) NOT NULL,
+	last_update_time DATETIME NOT NULL,
+	last_user varchar(100) NOT NULL,
+	CONSTRAINT students_fees_collections_details_pk PRIMARY KEY (collection_id),
+	CONSTRAINT students_fees_collections_details_fk FOREIGN KEY (stud_id) REFERENCES smartschoolingdev.student_details(stud_id),
+	CONSTRAINT students_fees_collections_details_fk_1 FOREIGN KEY (academic_id) REFERENCES smartschoolingdev.academic_details(academic_id),
+	CONSTRAINT students_fees_collections_details_fk_2 FOREIGN KEY (fee_id) REFERENCES smartschoolingdev.fee_types(fee_id),
+	CONSTRAINT students_fees_collections_details_fk_3 FOREIGN KEY (account_id) REFERENCES smartschoolingdev.accounts(account_id)
+);
+
+CREATE TABLE smartschoolingdev.transactions (
+	transaction_id varchar(100) NOT NULL,
+	amount DOUBLE NOT NULL,
+	transaction_date DATETIME NOT NULL,
+	last_update_time DATETIME NOT NULL,
+	last_user varchar(100) NOT NULL,
+	CONSTRAINT transactions_pk PRIMARY KEY (transaction_id)
+);
+
+CREATE TABLE smartschoolingdev.ref_table_types (
+	ref_table_type varchar(10) NOT NULL,
+	ref_table_name varchar(100) NOT NULL,
+	CONSTRAINT ref_table_types_pk PRIMARY KEY (ref_table_type)
+);
+
+CREATE TABLE smartschoolingdev.transaction_details (
+	transaction_det_id varchar(100) NOT NULL,
+	transaction_id varchar(100) NOT NULL,
+	account_id varchar(100) NOT NULL,
+	transaction_type CHAR NOT NULL,
+	ref_id varchar(100) DEFAULT null NULL,
+	ref_table_type VARCHAR(10) DEFAULT null NULL,
+	last_update_time DATETIME NOT NULL,
+	last_user varchar(100) NOT NULL,
+	CONSTRAINT transaction_details_pk PRIMARY KEY (transaction_det_id),
+	CONSTRAINT transaction_details_fk FOREIGN KEY (account_id) REFERENCES smartschoolingdev.accounts(account_id),
+	CONSTRAINT transaction_details_fk_1 FOREIGN KEY (ref_table_type) REFERENCES smartschoolingdev.ref_table_types(ref_table_type)
+);
