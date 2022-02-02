@@ -12,6 +12,7 @@ public class FeesDetailsBO {
 	private double amount;
 	private Date effDate;
 	private Date endDate;
+	private String lastUser;
 	public String getFeeId() {
 		return feeId;
 	}
@@ -60,11 +61,17 @@ public class FeesDetailsBO {
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
+	public String getLastUser() {
+		return lastUser;
+	}
+	public void setLastUser(String lastUser) {
+		this.lastUser = lastUser;
+	}
 	@Override
 	public String toString() {
 		return "FeesDetailsBO [feeId=" + feeId + ", feeName=" + feeName + ", feeDiscription=" + feeDiscription
 				+ ", classId=" + classId + ", routeId=" + routeId + ", amount=" + amount + ", effDate=" + effDate
-				+ ", endDate=" + endDate + "]";
+				+ ", endDate=" + endDate + ", lastUser=" + lastUser + "]";
 	}
 	
 }
