@@ -67,6 +67,7 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
+INSERT INTO `accounts` VALUES ('1','Dummy','dummy','dummy');
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -352,7 +353,7 @@ CREATE TABLE `student_class_details` (
 
 LOCK TABLES `student_class_details` WRITE;
 /*!40000 ALTER TABLE `student_class_details` DISABLE KEYS */;
-INSERT INTO `student_class_details` VALUES ('1','AY-2021-22','1st','2022-01-19 00:00:00','BASE'),('10','AY-2021-22','1st','2022-01-24 00:00:00','BASE'),('11','AY-2021-22','2nd','2022-01-29 00:00:00','BASE'),('12','AY-2021-22','3rd','2022-01-24 00:00:00','BASE'),('13','AY-2021-22','4th','2022-01-29 00:00:00','BASE'),('2','AY-2021-22','2nd','2022-01-19 00:00:00','BASE'),('3','AY-2021-22','4th','2022-01-19 00:00:00','BASE'),('4','AY-2021-22','3rd','2022-01-19 00:00:00','BASE'),('5','AY-2021-22','LKG','2022-01-20 00:00:00','BASE'),('6','AY-2021-22','UKG','2022-01-29 00:00:00','BASE'),('7','AY-2021-22','LKG','2022-01-29 00:00:00','BASE'),('8','AY-2021-22','UKG','2022-01-21 00:00:00','BASE'),('9','AY-2021-22','1st','2022-01-21 00:00:00','BASE');
+INSERT INTO `student_class_details` VALUES ('1','AY-2021-22','1st','2022-01-19 00:00:00','BASE'),('10','AY-2021-22','1st','2022-01-24 00:00:00','BASE'),('11','AY-2021-22','2nd','2022-01-29 00:00:00','BASE'),('12','AY-2021-22','3rd','2022-01-24 00:00:00','BASE'),('13','AY-2021-22','4th','2022-01-29 00:00:00','BASE'),('14','AY-2021-22','5th','2022-02-02 00:00:00','BASE'),('2','AY-2021-22','2nd','2022-01-19 00:00:00','BASE'),('3','AY-2021-22','4th','2022-01-19 00:00:00','BASE'),('4','AY-2021-22','3rd','2022-01-19 00:00:00','BASE'),('5','AY-2021-22','LKG','2022-01-20 00:00:00','BASE'),('6','AY-2021-22','UKG','2022-01-29 00:00:00','BASE'),('7','AY-2021-22','LKG','2022-01-29 00:00:00','BASE'),('8','AY-2021-22','UKG','2022-01-21 00:00:00','BASE'),('9','AY-2021-22','1st','2022-01-21 00:00:00','BASE');
 /*!40000 ALTER TABLE `student_class_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -390,7 +391,7 @@ CREATE TABLE `student_details` (
 
 LOCK TABLES `student_details` WRITE;
 /*!40000 ALTER TABLE `student_details` DISABLE KEYS */;
-INSERT INTO `student_details` VALUES ('1','Mahesh','Keshavrao','Ghuge','0098-05-22 00:00:00','Male','121212121212',NULL,'8600429732',NULL,'Ghotan','Hindu','NT-D','Y','Indian'),('10','Shubham','','Joshi','0099-06-08 00:00:00','Male','8965874585',NULL,'9856985478',NULL,'Jalana','Hindu','Open','N','Indian'),('11','Test','','Student 1','0098-11-04 00:00:00','Female','145144447787',NULL,'8574145236',NULL,'Ghotan','Hindu','NT-A','Y','Indian'),('12','Test','','Student 2','0098-08-07 00:00:00','Female','859685857485',NULL,'8596857415',NULL,'Ghotan','Hindu','NT-B','N','Indian'),('13','Test','','Student3','2002-01-12 00:00:00','Male','785588878787','','8596857415',NULL,'Khanapur','Hindu','OBC','Y','Indian'),('2','Abhijeet','','Jaybhaye','2001-11-18 00:00:00','Male','454545454545',NULL,'8959656585',NULL,'Shevgaon','Hindu','NT-D','Y','Indian'),('3','Nikhil','','Jaybhaye','2004-12-08 00:00:00','Male','896585696523',NULL,'6985632541',NULL,'Shevgaon','Hindu','NT-D','Y','Indian'),('4','Aditya','','Dikshit','0097-02-08 00:00:00','Male','565895474585',NULL,'7852547852',NULL,'Nashik','Hindu','Open','N','Indian'),('5','Harshavardhan','Dadasaheb','Garje','2010-02-10 00:00:00','Male','458596585236',NULL,'8596858745',NULL,'Ghotan','Hindu','NT-D','Y','Indian'),('6','Shruti','Kishor','Jaybhaye','2010-05-15 00:00:00','Female','111111111111',NULL,'5698785478',NULL,'Shevgaon','Hindu','NT-D','Y','Indian'),('7','Sai','Vishal','Sanap','2012-08-31 00:00:00','Male','8958658969',NULL,'5896985658',NULL,'Shevgaon','Hindu','NT-D','Y','Indian'),('8','Ayush','','Garje','2015-04-24 00:00:00','Male','589654125632',NULL,'4785585214',NULL,'Ghotan','Hindu','NT-D','Y','Indian'),('9','Akshay','','Garje','0097-06-08 00:00:00','Male','458574856963',NULL,'6985474412',NULL,'Padali','Hindu','OBC','Y','Indian');
+INSERT INTO `student_details` VALUES ('1','Mahesh','Keshavrao','Ghuge','0098-05-22 00:00:00','Male','121212121212',NULL,'8600429732',NULL,'Ghotan','Hindu','NT-D','Y','Indian'),('10','Shubham','','Joshi','0099-06-08 00:00:00','Male','8965874585',NULL,'9856985478',NULL,'Jalana','Hindu','Open','N','Indian'),('11','Test','','Student 1','0098-11-04 00:00:00','Female','145144447787',NULL,'8574145236',NULL,'Ghotan','Hindu','NT-A','Y','Indian'),('12','Test','','Student 2','0098-08-07 00:00:00','Female','859685857485',NULL,'8596857415',NULL,'Ghotan','Hindu','NT-B','N','Indian'),('13','Test','','Student3','2002-01-12 00:00:00','Male','785588878787','','8596857415',NULL,'Khanapur','Hindu','OBC','Y','Indian'),('14','Test','','Student4','0098-05-15 00:00:00','Male','','','7845896858',NULL,'Khanapur','Hindu','NT-A','Y','Indian'),('2','Abhijeet','','Jaybhaye','2001-11-18 00:00:00','Male','454545454545',NULL,'8959656585',NULL,'Shevgaon','Hindu','NT-D','Y','Indian'),('3','Nikhil','','Jaybhaye','2004-12-08 00:00:00','Male','896585696523',NULL,'6985632541',NULL,'Shevgaon','Hindu','NT-D','Y','Indian'),('4','Aditya','','Dikshit','0097-02-08 00:00:00','Male','565895474585',NULL,'7852547852',NULL,'Nashik','Hindu','Open','N','Indian'),('5','Harshavardhan','Dadasaheb','Garje','2010-02-10 00:00:00','Male','458596585236',NULL,'8596858745',NULL,'Ghotan','Hindu','NT-D','Y','Indian'),('6','Shruti','Kishor','Jaybhaye','2010-05-15 00:00:00','Female','111111111111',NULL,'5698785478',NULL,'Shevgaon','Hindu','NT-D','Y','Indian'),('7','Sai','Vishal','Sanap','2012-08-31 00:00:00','Male','8958658969',NULL,'5896985658',NULL,'Shevgaon','Hindu','NT-D','Y','Indian'),('8','Ayush','','Garje','2015-04-24 00:00:00','Male','589654125632',NULL,'4785585214',NULL,'Ghotan','Hindu','NT-D','Y','Indian'),('9','Akshay','','Garje','0097-06-08 00:00:00','Male','458574856963',NULL,'6985474412',NULL,'Padali','Hindu','OBC','Y','Indian');
 /*!40000 ALTER TABLE `student_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -422,7 +423,7 @@ CREATE TABLE `student_fees_details` (
 
 LOCK TABLES `student_fees_details` WRITE;
 /*!40000 ALTER TABLE `student_fees_details` DISABLE KEYS */;
-INSERT INTO `student_fees_details` VALUES ('1','AY-2021-22','1','2022-01-19 00:00:00','BASE'),('1','AY-2021-22','2','2022-01-19 00:00:00','BASE'),('1','AY-2021-22','3','2022-01-19 00:00:00','BASE'),('10','AY-2021-22','1','2022-01-24 00:00:00','BASE'),('10','AY-2021-22','3','2022-01-24 00:00:00','BASE'),('11','AY-2021-22','1','2022-01-29 00:00:00','BASE'),('11','AY-2021-22','2','2022-01-29 00:00:00','BASE'),('11','AY-2021-22','3','2022-01-29 00:00:00','BASE'),('12','AY-2021-22','1','2022-01-24 00:00:00','BASE'),('12','AY-2021-22','3','2022-01-24 00:00:00','BASE'),('13','AY-2021-22','1','2022-01-29 00:00:00','BASE'),('13','AY-2021-22','2','2022-01-29 00:00:00','BASE'),('13','AY-2021-22','3','2022-01-29 00:00:00','BASE'),('13','AY-2021-22','4','2022-01-29 00:00:00','BASE'),('2','AY-2021-22','1','2022-01-19 00:00:00','BASE'),('2','AY-2021-22','2','2022-01-19 00:00:00','BASE'),('2','AY-2021-22','3','2022-01-19 00:00:00','BASE'),('3','AY-2021-22','1','2022-01-19 00:00:00','BASE'),('3','AY-2021-22','2','2022-01-19 00:00:00','BASE'),('3','AY-2021-22','3','2022-01-19 00:00:00','BASE'),('4','AY-2021-22','1','2022-01-19 00:00:00','BASE'),('4','AY-2021-22','3','2022-01-19 00:00:00','BASE'),('5','AY-2021-22','1','2022-01-20 00:00:00','BASE'),('5','AY-2021-22','2','2022-01-20 00:00:00','BASE'),('5','AY-2021-22','3','2022-01-20 00:00:00','BASE'),('6','AY-2021-22','1','2022-01-29 00:00:00','BASE'),('6','AY-2021-22','2','2022-01-29 00:00:00','BASE'),('6','AY-2021-22','3','2022-01-29 00:00:00','BASE'),('7','AY-2021-22','1','2022-01-29 00:00:00','BASE'),('7','AY-2021-22','2','2022-01-29 00:00:00','BASE'),('7','AY-2021-22','3','2022-01-29 00:00:00','BASE'),('8','AY-2021-22','1','2022-01-21 00:00:00','BASE'),('8','AY-2021-22','2','2022-01-21 00:00:00','BASE'),('8','AY-2021-22','3','2022-01-21 00:00:00','BASE'),('9','AY-2021-22','1','2022-01-21 00:00:00','BASE'),('9','AY-2021-22','2','2022-01-21 00:00:00','BASE'),('9','AY-2021-22','3','2022-01-21 00:00:00','BASE');
+INSERT INTO `student_fees_details` VALUES ('1','AY-2021-22','1','2022-01-19 00:00:00','BASE'),('1','AY-2021-22','2','2022-01-19 00:00:00','BASE'),('1','AY-2021-22','3','2022-01-19 00:00:00','BASE'),('10','AY-2021-22','1','2022-01-24 00:00:00','BASE'),('10','AY-2021-22','3','2022-01-24 00:00:00','BASE'),('11','AY-2021-22','1','2022-01-29 00:00:00','BASE'),('11','AY-2021-22','2','2022-01-29 00:00:00','BASE'),('11','AY-2021-22','3','2022-01-29 00:00:00','BASE'),('12','AY-2021-22','1','2022-01-24 00:00:00','BASE'),('12','AY-2021-22','3','2022-01-24 00:00:00','BASE'),('13','AY-2021-22','1','2022-01-29 00:00:00','BASE'),('13','AY-2021-22','2','2022-01-29 00:00:00','BASE'),('13','AY-2021-22','3','2022-01-29 00:00:00','BASE'),('13','AY-2021-22','4','2022-01-29 00:00:00','BASE'),('14','AY-2020-21','1','2022-02-02 00:00:00','BASE'),('14','AY-2020-21','2','2022-02-02 00:00:00','BASE'),('14','AY-2020-21','3','2022-02-02 00:00:00','BASE'),('14','AY-2020-21','4','2022-02-02 00:00:00','BASE'),('2','AY-2021-22','1','2022-01-19 00:00:00','BASE'),('2','AY-2021-22','2','2022-01-19 00:00:00','BASE'),('2','AY-2021-22','3','2022-01-19 00:00:00','BASE'),('3','AY-2021-22','1','2022-01-19 00:00:00','BASE'),('3','AY-2021-22','2','2022-01-19 00:00:00','BASE'),('3','AY-2021-22','3','2022-01-19 00:00:00','BASE'),('4','AY-2021-22','1','2022-01-19 00:00:00','BASE'),('4','AY-2021-22','3','2022-01-19 00:00:00','BASE'),('5','AY-2021-22','1','2022-01-20 00:00:00','BASE'),('5','AY-2021-22','2','2022-01-20 00:00:00','BASE'),('5','AY-2021-22','3','2022-01-20 00:00:00','BASE'),('6','AY-2021-22','1','2022-01-29 00:00:00','BASE'),('6','AY-2021-22','2','2022-01-29 00:00:00','BASE'),('6','AY-2021-22','3','2022-01-29 00:00:00','BASE'),('7','AY-2021-22','1','2022-01-29 00:00:00','BASE'),('7','AY-2021-22','2','2022-01-29 00:00:00','BASE'),('7','AY-2021-22','3','2022-01-29 00:00:00','BASE'),('8','AY-2021-22','1','2022-01-21 00:00:00','BASE'),('8','AY-2021-22','2','2022-01-21 00:00:00','BASE'),('8','AY-2021-22','3','2022-01-21 00:00:00','BASE'),('9','AY-2021-22','1','2022-01-21 00:00:00','BASE'),('9','AY-2021-22','2','2022-01-21 00:00:00','BASE'),('9','AY-2021-22','3','2022-01-21 00:00:00','BASE');
 /*!40000 ALTER TABLE `student_fees_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -453,46 +454,75 @@ CREATE TABLE `student_transport_details` (
 
 LOCK TABLES `student_transport_details` WRITE;
 /*!40000 ALTER TABLE `student_transport_details` DISABLE KEYS */;
-INSERT INTO `student_transport_details` VALUES ('1','Ghotan-Khanapur','2022-01-19 00:00:00','2099-12-31 00:00:00','2022-01-19 00:00:00','BASE'),('11','Ghotan-Khanapur','2022-01-29 00:00:00','2099-12-31 00:00:00','2022-01-29 00:00:00','BASE'),('13','Ghotan-Khanapur','2022-01-29 00:00:00','2099-12-31 00:00:00','2022-01-29 00:00:00','BASE'),('2','Ghotan-Shevgaon','2022-01-19 00:00:00','2099-12-31 00:00:00','2022-01-19 00:00:00','BASE'),('3','Ghotan-Shevgaon','2022-01-19 00:00:00','2099-12-31 00:00:00','2022-01-19 00:00:00','BASE'),('5','Ghotan-Khanapur','2022-01-20 00:00:00','2099-12-31 00:00:00','2022-01-20 00:00:00','BASE'),('6','Ghotan-Shevgaon','2022-01-29 00:00:00','2099-12-31 00:00:00','2022-01-29 00:00:00','BASE'),('7','Ghotan-Shevgaon','2022-01-29 00:00:00','2099-12-31 00:00:00','2022-01-29 00:00:00','BASE'),('8','Ghotan-Khanapur','2022-01-21 00:00:00','2099-12-31 00:00:00','2022-01-21 00:00:00','BASE'),('9','Ghotan-Shevgaon','2022-01-21 00:00:00','2099-12-31 00:00:00','2022-01-21 00:00:00','BASE');
+INSERT INTO `student_transport_details` VALUES ('1','Ghotan-Khanapur','2022-01-19 00:00:00','2099-12-31 00:00:00','2022-01-19 00:00:00','BASE'),('11','Ghotan-Khanapur','2022-01-29 00:00:00','2099-12-31 00:00:00','2022-01-29 00:00:00','BASE'),('13','Ghotan-Khanapur','2022-01-29 00:00:00','2099-12-31 00:00:00','2022-01-29 00:00:00','BASE'),('14','Ghotan-Khanapur','2022-02-02 00:00:00','2099-12-31 00:00:00','2022-02-02 00:00:00','BASE'),('2','Ghotan-Shevgaon','2022-01-19 00:00:00','2099-12-31 00:00:00','2022-01-19 00:00:00','BASE'),('3','Ghotan-Shevgaon','2022-01-19 00:00:00','2099-12-31 00:00:00','2022-01-19 00:00:00','BASE'),('5','Ghotan-Khanapur','2022-01-20 00:00:00','2099-12-31 00:00:00','2022-01-20 00:00:00','BASE'),('6','Ghotan-Shevgaon','2022-01-29 00:00:00','2099-12-31 00:00:00','2022-01-29 00:00:00','BASE'),('7','Ghotan-Shevgaon','2022-01-29 00:00:00','2099-12-31 00:00:00','2022-01-29 00:00:00','BASE'),('8','Ghotan-Khanapur','2022-01-21 00:00:00','2099-12-31 00:00:00','2022-01-21 00:00:00','BASE'),('9','Ghotan-Shevgaon','2022-01-21 00:00:00','2099-12-31 00:00:00','2022-01-21 00:00:00','BASE');
 /*!40000 ALTER TABLE `student_transport_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `students_fees_collections_details`
+-- Table structure for table `students_fees_collection_transaction`
 --
 
-DROP TABLE IF EXISTS `students_fees_collections_details`;
+DROP TABLE IF EXISTS `students_fees_collection_transaction`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `students_fees_collections_details` (
+CREATE TABLE `students_fees_collection_transaction` (
   `collection_id` varchar(100) NOT NULL,
   `stud_id` varchar(100) NOT NULL,
-  `academic_id` varchar(100) NOT NULL,
-  `fee_id` varchar(100) NOT NULL,
-  `amount` double NOT NULL,
-  `collection_date` datetime NOT NULL,
+  `transaction_date` datetime NOT NULL,
   `account_id` varchar(100) NOT NULL,
   `last_update_time` datetime NOT NULL,
   `last_user` varchar(100) NOT NULL,
   PRIMARY KEY (`collection_id`),
-  KEY `students_fees_collections_details_fk` (`stud_id`),
-  KEY `students_fees_collections_details_fk_1` (`academic_id`),
-  KEY `students_fees_collections_details_fk_2` (`fee_id`),
-  KEY `students_fees_collections_details_fk_3` (`account_id`),
-  CONSTRAINT `students_fees_collections_details_fk` FOREIGN KEY (`stud_id`) REFERENCES `student_details` (`stud_id`),
-  CONSTRAINT `students_fees_collections_details_fk_1` FOREIGN KEY (`academic_id`) REFERENCES `academic_details` (`academic_id`),
-  CONSTRAINT `students_fees_collections_details_fk_2` FOREIGN KEY (`fee_id`) REFERENCES `fee_types` (`fee_id`),
-  CONSTRAINT `students_fees_collections_details_fk_3` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`)
+  KEY `students_fees_collection_transaction_fk` (`account_id`),
+  KEY `students_fees_collection_transaction_fk_1` (`stud_id`),
+  CONSTRAINT `students_fees_collection_transaction_fk` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`),
+  CONSTRAINT `students_fees_collection_transaction_fk_1` FOREIGN KEY (`stud_id`) REFERENCES `student_details` (`stud_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `students_fees_collections_details`
+-- Dumping data for table `students_fees_collection_transaction`
 --
 
-LOCK TABLES `students_fees_collections_details` WRITE;
-/*!40000 ALTER TABLE `students_fees_collections_details` DISABLE KEYS */;
-/*!40000 ALTER TABLE `students_fees_collections_details` ENABLE KEYS */;
+LOCK TABLES `students_fees_collection_transaction` WRITE;
+/*!40000 ALTER TABLE `students_fees_collection_transaction` DISABLE KEYS */;
+INSERT INTO `students_fees_collection_transaction` VALUES ('1','1','2022-05-12 00:00:00','1','2022-05-12 00:00:00','BASE');
+/*!40000 ALTER TABLE `students_fees_collection_transaction` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `students_fees_collection_transaction_details`
+--
+
+DROP TABLE IF EXISTS `students_fees_collection_transaction_details`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `students_fees_collection_transaction_details` (
+  `trans_det_id` varchar(100) NOT NULL,
+  `collection_id` varchar(100) NOT NULL,
+  `fee_id` varchar(100) NOT NULL,
+  `academic_id` varchar(100) NOT NULL,
+  `amount` double NOT NULL,
+  `last_update_time` datetime NOT NULL,
+  `last_user` varchar(100) NOT NULL,
+  PRIMARY KEY (`trans_det_id`),
+  KEY `students_fees_collection_transaction_details_fk` (`collection_id`),
+  KEY `students_fees_collection_transaction_details_fk_1` (`fee_id`),
+  KEY `students_fees_collection_transaction_details_fk_2` (`academic_id`),
+  CONSTRAINT `students_fees_collection_transaction_details_fk` FOREIGN KEY (`collection_id`) REFERENCES `students_fees_collection_transaction` (`collection_id`),
+  CONSTRAINT `students_fees_collection_transaction_details_fk_1` FOREIGN KEY (`fee_id`) REFERENCES `fee_types` (`fee_id`),
+  CONSTRAINT `students_fees_collection_transaction_details_fk_2` FOREIGN KEY (`academic_id`) REFERENCES `academic_details` (`academic_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `students_fees_collection_transaction_details`
+--
+
+LOCK TABLES `students_fees_collection_transaction_details` WRITE;
+/*!40000 ALTER TABLE `students_fees_collection_transaction_details` DISABLE KEYS */;
+INSERT INTO `students_fees_collection_transaction_details` VALUES ('1','1','1','AY-2021-22',2000,'2022-05-12 00:00:00','BASE'),('2','1','2','AY-2021-22',3000,'2022-05-12 00:00:00','BASE');
+/*!40000 ALTER TABLE `students_fees_collection_transaction_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -619,4 +649,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-01 13:57:32
+-- Dump completed on 2022-02-03  0:14:08

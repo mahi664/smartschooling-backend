@@ -20,11 +20,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.example.demo.bo.AcademicDetailsBO;
+import com.example.demo.bo.AccountsDetailsBO;
 import com.example.demo.bo.ClassDetaislBO;
 import com.example.demo.bo.FeeReceivables;
 import com.example.demo.bo.FeesDetailsBO;
 import com.example.demo.bo.RouteDetailsBO;
 import com.example.demo.bo.StudentDetailsBO;
+import com.example.demo.bo.StudentsFeesTransactionDetailsBO;
 import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
 
@@ -588,7 +591,9 @@ public class StudentService {
 	}
 
 	private Map<String, StudentDetailsBO> getStudentsFeesPaidAmount(Map<String, StudentDetailsBO> studentsReceivableMap) {
-		String query = "select stud_id, sum(amount) as fees_paid from students_fees_collections_details group by stud_id";
+		String query = "select A.stud_id, sum(B.amount) as fees_paid "
+				+ "from students_fees_collection_transaction A, students_fees_collection_transaction_details B "
+				+ "where A.collection_id = B.collection_id group by A.stud_id";
 		return jdbcTemplate.query(query, new ResultSetExtractor<Map<String, StudentDetailsBO>>() {
 
 			@Override
@@ -655,5 +660,115 @@ public class StudentService {
 				return studentsTotalFeeAmountMap;
 			}
 		});
+	}
+
+	public Map<String, List<FeesDetailsBO>> getStudentFeesAssignedDetails(String studentId) {
+		try {
+			String reformattedStudId = Integer.toString(reformatStudentID(studentId));
+			String query = "select B.academic_id, B.fee_id, C.fee_name, A.amount, B.last_update_time, B.last_user "
+					+ "from fee_details A, student_fees_details B, fee_types C "
+					+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id "
+					+ "and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id) or "
+					+ "A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id= ? and A.route_id= ?)) "
+					+ "and B.stud_id = ?";
+			return jdbcTemplate.query(query, new PreparedStatementSetter() {
+				
+				@Override
+				public void setValues(PreparedStatement ps) throws SQLException {
+					ps.setString(1, Constants.BLANK_STRING);
+					ps.setString(2, Constants.BLANK_STRING);
+					ps.setString(3, reformattedStudId);
+				}
+			}, new ResultSetExtractor<Map<String, List<FeesDetailsBO>>>() {
+
+				@Override
+				public Map<String, List<FeesDetailsBO>> extractData(ResultSet rs)throws SQLException, DataAccessException {
+					Map<String, List<FeesDetailsBO>> academicId2FeesDetailsMap = new HashMap<>();
+					while(rs.next()) {
+						String academicId = rs.getString("ACADEMIC_ID");
+						if(!academicId2FeesDetailsMap.containsKey(academicId)) {
+							academicId2FeesDetailsMap.put(academicId, new ArrayList<FeesDetailsBO>());
+						}
+						List<FeesDetailsBO> feesDetailsBOs = academicId2FeesDetailsMap.get(academicId);
+						FeesDetailsBO feesDetailsBO = new FeesDetailsBO();
+						feesDetailsBO.setFeeId(rs.getString("FEE_ID"));
+						feesDetailsBO.setFeeName(rs.getString("FEE_NAME"));
+						feesDetailsBO.setAmount(rs.getDouble("AMOUNT"));
+						feesDetailsBO.setEffDate(DateUtils.getDate(rs.getDate("LAST_UPDATE_TIME")));
+						feesDetailsBO.setLastUser(rs.getString("LAST_USER"));
+						
+						feesDetailsBOs.add(feesDetailsBO);
+					}
+					return academicId2FeesDetailsMap;
+				}
+			});
+		} catch (Exception e) {
+			System.out.println("Error While getting students fees assigned details");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public List<StudentsFeesTransactionDetailsBO> getStudentsFeesCollectionsTransactions(String studentId) {
+		try {
+			String reformattedStudId = Integer.toString(reformatStudentID(studentId));
+			String query = "select A.collection_id,A.account_id,C.account_name,A.last_update_time,A.last_user, B.academic_id, B.amount, B.fee_id, D.fee_name "
+					+ "from students_fees_collection_transaction A, students_fees_collection_transaction_details B, accounts C, fee_types D "
+					+ "where A.collection_id = B.collection_id and A.account_id=C.account_id and B.fee_id = D.fee_id and A.stud_id=?";
+			return jdbcTemplate.query(query, new PreparedStatementSetter() {
+				
+				@Override
+				public void setValues(PreparedStatement ps) throws SQLException {
+					ps.setString(1, reformattedStudId);
+				}
+			}, new ResultSetExtractor<List<StudentsFeesTransactionDetailsBO>>() {
+
+				@Override
+				public List<StudentsFeesTransactionDetailsBO> extractData(ResultSet rs)throws SQLException, DataAccessException {
+					Map<String, StudentsFeesTransactionDetailsBO> txnId2DetailsMap = new HashMap<>();
+					while(rs.next()) {
+						String txnId = rs.getString("COLLECTION_ID");
+						if(!txnId2DetailsMap.containsKey(txnId)) {
+							StudentsFeesTransactionDetailsBO txnDetailsBO = new StudentsFeesTransactionDetailsBO();
+							txnDetailsBO.setCollectionId(txnId);
+							txnDetailsBO.setCollectionDate(DateUtils.getDate(rs.getDate("LAST_UPDATE_TIME")));
+							txnDetailsBO.setLastUser(rs.getString("LAST_USER"));
+							txnDetailsBO.setAcademicId2FeesDetailsMap(new HashMap<>());
+							txnDetailsBO.setAmount(0);
+							
+							AccountsDetailsBO accountDetailsBO = new AccountsDetailsBO();
+							accountDetailsBO.setAccountId(rs.getString("ACCOUNT_ID"));
+							accountDetailsBO.setAccountName(rs.getString("ACCOUNT_NAME"));
+							txnDetailsBO.setAccountsDetailsBO(accountDetailsBO);
+							
+							txnId2DetailsMap.put(txnId, txnDetailsBO);
+						}
+						
+						StudentsFeesTransactionDetailsBO txnDetailsBO = txnId2DetailsMap.get(txnId);
+						double amount = rs.getDouble("AMOUNT");
+						String academicId = rs.getString("ACADEMIC_ID");
+						Map<String, List<FeesDetailsBO>> academicId2FeesDetails = txnDetailsBO.getAcademicId2FeesDetailsMap();
+						if(!academicId2FeesDetails.containsKey(academicId)) {
+							academicId2FeesDetails.put(academicId, new ArrayList<>());
+						}
+						List<FeesDetailsBO> feesDetailsBOs = academicId2FeesDetails.get(academicId);
+						FeesDetailsBO feesDetailsBO = new FeesDetailsBO();
+						feesDetailsBO.setFeeId(rs.getString("FEE_ID"));
+						feesDetailsBO.setFeeName(rs.getString("FEE_NAME"));
+						feesDetailsBO.setAmount(amount);
+						feesDetailsBO.setEffDate(DateUtils.getDate(rs.getDate("LAST_UPDATE_TIME")));
+						feesDetailsBO.setLastUser(rs.getString("LAST_USER"));
+						feesDetailsBOs.add(feesDetailsBO);
+						
+						txnDetailsBO.setAmount(txnDetailsBO.getAmount() + amount);
+					}
+					return new ArrayList<>(txnId2DetailsMap.values());
+				}
+			});
+		} catch (Exception e) {
+			System.out.println("Error while fetching students fees collection transactions");
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

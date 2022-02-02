@@ -1,24 +1,34 @@
 package com.example.demo.bo;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class StudentsFeesTransactionDetailsBO {
 	private String collectionId;
-	private String feeId;
 	private double amount;
 	private Date collectionDate;
 	private AccountsDetailsBO accountsDetailsBO;
+	private Map<String, List<FeesDetailsBO>> academicId2FeesDetailsMap;	
+	private String lastUser;
+	
+	public String getLastUser() {
+		return lastUser;
+	}
+	public void setLastUser(String lastUser) {
+		this.lastUser = lastUser;
+	}
+	public Map<String, List<FeesDetailsBO>> getAcademicId2FeesDetailsMap() {
+		return academicId2FeesDetailsMap;
+	}
+	public void setAcademicId2FeesDetailsMap(Map<String, List<FeesDetailsBO>> academicId2FeesDetailsMap) {
+		this.academicId2FeesDetailsMap = academicId2FeesDetailsMap;
+	}
 	public String getCollectionId() {
 		return collectionId;
 	}
 	public void setCollectionId(String collectionId) {
 		this.collectionId = collectionId;
-	}
-	public String getFeeId() {
-		return feeId;
-	}
-	public void setFeeId(String feeId) {
-		this.feeId = feeId;
 	}
 	public double getAmount() {
 		return amount;
@@ -40,7 +50,8 @@ public class StudentsFeesTransactionDetailsBO {
 	}
 	@Override
 	public String toString() {
-		return "StudentsFeesTransactionDetailsBO [collectionId=" + collectionId + ", feeId=" + feeId + ", amount="
-				+ amount + ", collectionDate=" + collectionDate + ", accountsDetailsBO=" + accountsDetailsBO + "]";
+		return "StudentsFeesTransactionDetailsBO [collectionId=" + collectionId + ", amount=" + amount
+				+ ", collectionDate=" + collectionDate + ", accountsDetailsBO=" + accountsDetailsBO
+				+ ", academicId2FeesDetailsMap=" + academicId2FeesDetailsMap + ", lastUser=" + lastUser + "]";
 	}
 }
