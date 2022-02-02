@@ -177,22 +177,32 @@ CREATE TABLE smartschoolingdev.accounts (
 	CONSTRAINT accounts_pk PRIMARY KEY (account_id)
 );
 
-CREATE TABLE smartschoolingdev.students_fees_collections_details (
+CREATE TABLE smartschoolingdev.students_fees_collection_transaction (
 	collection_id varchar(100) NOT NULL,
 	stud_id varchar(100) NOT NULL,
-	academic_id varchar(100) NOT NULL,
-	fee_id varchar(100) NOT NULL,
-	amount DOUBLE NOT NULL,
-	collection_date DATETIME NOT NULL,
-	account_id VARCHAR(100) NOT NULL,
+	transaction_date DATETIME NOT NULL,
+	account_id varchar(100) NOT NULL,
 	last_update_time DATETIME NOT NULL,
 	last_user varchar(100) NOT NULL,
-	CONSTRAINT students_fees_collections_details_pk PRIMARY KEY (collection_id),
-	CONSTRAINT students_fees_collections_details_fk FOREIGN KEY (stud_id) REFERENCES smartschoolingdev.student_details(stud_id),
-	CONSTRAINT students_fees_collections_details_fk_1 FOREIGN KEY (academic_id) REFERENCES smartschoolingdev.academic_details(academic_id),
-	CONSTRAINT students_fees_collections_details_fk_2 FOREIGN KEY (fee_id) REFERENCES smartschoolingdev.fee_types(fee_id),
-	CONSTRAINT students_fees_collections_details_fk_3 FOREIGN KEY (account_id) REFERENCES smartschoolingdev.accounts(account_id)
+	CONSTRAINT students_fees_collection_transaction_pk PRIMARY KEY (collection_id),
+	CONSTRAINT students_fees_collection_transaction_fk FOREIGN KEY (account_id) REFERENCES smartschoolingdev.accounts(account_id),
+	CONSTRAINT students_fees_collection_transaction_fk_1 FOREIGN KEY (stud_id) REFERENCES smartschoolingdev.student_details(stud_id)
 );
+
+CREATE TABLE smartschoolingdev.students_fees_collection_transaction_details (
+	trans_det_id varchar(100) NOT NULL,
+	collection_id varchar(100) NOT NULL,
+	fee_id varchar(100) NOT NULL,
+	academic_id varchar(100) NOT NULL,
+	amount DOUBLE NOT NULL,
+	last_update_time DATETIME NOT NULL,
+	last_user varchar(100) NOT NULL,
+	CONSTRAINT students_fees_collection_transaction_details_pk PRIMARY KEY (trans_det_id),
+	CONSTRAINT students_fees_collection_transaction_details_fk FOREIGN KEY (collection_id) REFERENCES smartschoolingdev.students_fees_collection_transaction(collection_id),
+	CONSTRAINT students_fees_collection_transaction_details_fk_1 FOREIGN KEY (fee_id) REFERENCES smartschoolingdev.fee_types(fee_id),
+	CONSTRAINT students_fees_collection_transaction_details_fk_2 FOREIGN KEY (academic_id) REFERENCES smartschoolingdev.academic_details(academic_id)
+);
+
 
 CREATE TABLE smartschoolingdev.transactions (
 	transaction_id varchar(100) NOT NULL,
