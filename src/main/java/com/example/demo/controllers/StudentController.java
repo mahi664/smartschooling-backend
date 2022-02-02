@@ -42,4 +42,8 @@ public class StudentController {
 		return studentService.deleteStudentCompleteDetails(studentDetailsBO.getStudentId());
 	}
 	
+	@GetMapping(path = "/Students/Receivables")
+	public List<StudentDetailsBO> getStudentsReceivables(){
+		return studentService.getStudentsReceivables();
+	}
 }
