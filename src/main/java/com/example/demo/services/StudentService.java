@@ -21,47 +21,44 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.example.demo.bo.ClassDetaislBO;
+import com.example.demo.bo.FeeReceivables;
 import com.example.demo.bo.FeesDetailsBO;
 import com.example.demo.bo.RouteDetailsBO;
 import com.example.demo.bo.StudentDetailsBO;
 import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
 
-
 @Service
 public class StudentService {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	
+
 	@Transactional
 	public StudentDetailsBO addNewStudent(StudentDetailsBO studentDetailsBO) {
 		// TODO Auto-generated method stub
 		try {
-			
+
 //			String nextStudentId = getNextStudentId();
-			int nextStudentId=0;
-			if(StringUtils.isEmpty(studentDetailsBO.getStudentId()))
-			{
+			int nextStudentId = 0;
+			if (StringUtils.isEmpty(studentDetailsBO.getStudentId())) {
 				nextStudentId = getMaxStudentId() + 1;
-			}
-			else
-			{
-				if(studentDetailsBO.getStudentId().startsWith(Constants.STUDENT_ID_PREFIX))
-				{
-					nextStudentId = reformatStudentID(studentDetailsBO.getStudentId());	
+			} else {
+				if (studentDetailsBO.getStudentId().startsWith(Constants.STUDENT_ID_PREFIX)) {
+					nextStudentId = reformatStudentID(studentDetailsBO.getStudentId());
 				}
 			}
 			studentDetailsBO.setStudentId(Integer.toString(nextStudentId));
-			
+
 			boolean res = addStudentBasicDeails(studentDetailsBO);
-			if(res && studentDetailsBO.getRouteDetailsBO()!=null && studentDetailsBO.isTransportOpted())
+			if (res && studentDetailsBO.getRouteDetailsBO() != null && studentDetailsBO.isTransportOpted())
 				res = addSudentsTransportDetails(studentDetailsBO.getStudentId(), studentDetailsBO.getRouteDetailsBO());
-			if(res && studentDetailsBO.getStudentClassDetails()!=null)
-				res = addStudentClassesDetails(studentDetailsBO.getStudentId(),studentDetailsBO.getStudentClassDetails());
-			if(res && studentDetailsBO.getStudentFeeDetails()!=null)
+			if (res && studentDetailsBO.getStudentClassDetails() != null)
+				res = addStudentClassesDetails(studentDetailsBO.getStudentId(),
+						studentDetailsBO.getStudentClassDetails());
+			if (res && studentDetailsBO.getStudentFeeDetails() != null)
 				res = addStudentFeesDetails(studentDetailsBO.getStudentId(), studentDetailsBO.getStudentFeeDetails());
-			if(!res) {
+			if (!res) {
 				System.out.println("Problem in adding student Details");
 				return null;
 			}
@@ -77,7 +74,7 @@ public class StudentService {
 	private boolean addStudentFeesDetails(String studentId, Map<String, List<FeesDetailsBO>> studentFeeDetails) {
 		// TODO Auto-generated method stub
 		boolean res = true;
-		for(String academicId : studentFeeDetails.keySet()) {
+		for (String academicId : studentFeeDetails.keySet()) {
 			res = res && addStudentFeesDetails(studentId, academicId, studentFeeDetails.get(academicId));
 		}
 		return res;
@@ -87,7 +84,7 @@ public class StudentService {
 		// TODO Auto-generated method stub
 		String query = "INSERT INTO STUDENT_FEES_DETAILS VALUES(?,?,?,?,?)";
 		int res[] = jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
-			
+
 			@Override
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
 				// TODO Auto-generated method stub
@@ -97,30 +94,31 @@ public class StudentService {
 				ps.setDate(4, DateUtils.getSqlDate(new Date()));
 				ps.setString(5, "BASE");
 			}
-			
+
 			@Override
 			public int getBatchSize() {
 				// TODO Auto-generated method stub
 				return feesDetailsBOs.size();
 			}
 		});
-		return res.length<=0 ? false : true;
+		return res.length <= 0 ? false : true;
 	}
 
 	private boolean addStudentClassesDetails(String studentId, Map<String, List<ClassDetaislBO>> studentClassDetails) {
 		// TODO Auto-generated method stub
 		boolean res = true;
-		for(String academicId : studentClassDetails.keySet()) {
-			res = res && addStudentClassesDetails(studentId,academicId,studentClassDetails.get(academicId));
+		for (String academicId : studentClassDetails.keySet()) {
+			res = res && addStudentClassesDetails(studentId, academicId, studentClassDetails.get(academicId));
 		}
 		return res;
 	}
 
-	private boolean addStudentClassesDetails(String studentId, String academicId, List<ClassDetaislBO> classDetaislBOs) {
+	private boolean addStudentClassesDetails(String studentId, String academicId,
+			List<ClassDetaislBO> classDetaislBOs) {
 		// TODO Auto-generated method stub
 		String query = "INSERT INTO STUDENT_CLASS_DETAILS VALUES(?,?,?,?,?)";
 		int res[] = jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
-			
+
 			@Override
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
 				// TODO Auto-generated method stub
@@ -130,21 +128,21 @@ public class StudentService {
 				ps.setDate(4, DateUtils.getSqlDate(new Date()));
 				ps.setString(5, "BASE");
 			}
-			
+
 			@Override
 			public int getBatchSize() {
 				// TODO Auto-generated method stub
 				return classDetaislBOs.size();
 			}
 		});
-		return res.length<=0 ? false : true;
+		return res.length <= 0 ? false : true;
 	}
 
 	private boolean addSudentsTransportDetails(String studentId, RouteDetailsBO routeDetailsBO) {
 		// TODO Auto-generated method stub
 		String query = "INSERT INTO STUDENT_TRANSPORT_DETAILS VALUES(?,?,?,?,?,?)";
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
-			
+
 			@Override
 			public void setValues(PreparedStatement ps) throws SQLException {
 				// TODO Auto-generated method stub
@@ -156,14 +154,14 @@ public class StudentService {
 				ps.setString(6, "BASE");
 			}
 		});
-		return res<=0 ? false : true;
+		return res <= 0 ? false : true;
 	}
 
 	private boolean addStudentBasicDeails(StudentDetailsBO studentDetailsBO) {
 		// TODO Auto-generated method stub
 		String query = "INSERT INTO STUDENT_DETAILS VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
-			
+
 			@Override
 			public void setValues(PreparedStatement ps) throws SQLException {
 				// TODO Auto-generated method stub
@@ -184,7 +182,7 @@ public class StudentService {
 				ps.setString(15, studentDetailsBO.getNationality());
 			}
 		});
-		return res<=0 ? false : true;
+		return res <= 0 ? false : true;
 	}
 
 	private String getNextStudentId() {
@@ -195,12 +193,12 @@ public class StudentService {
 
 	private String getFormattedStudentId(int studentId) {
 		String nextStudentIdString = Constants.STUDENT_ID_PREFIX;
-		if(studentId<10)
-			nextStudentIdString += "000"+studentId;
-		else if(studentId>=10 && studentId<100)
-			nextStudentIdString += "00"+studentId;
-		else if(studentId>=100 && studentId<1000)
-			nextStudentIdString += "0"+studentId;
+		if (studentId < 10)
+			nextStudentIdString += "000" + studentId;
+		else if (studentId >= 10 && studentId < 100)
+			nextStudentIdString += "00" + studentId;
+		else if (studentId >= 100 && studentId < 1000)
+			nextStudentIdString += "0" + studentId;
 		else
 			nextStudentIdString += studentId;
 		return nextStudentIdString;
@@ -213,7 +211,7 @@ public class StudentService {
 			@Override
 			public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
 				int maxStudId = 0;
-				while(rs.next())
+				while (rs.next())
 					maxStudId = rs.getInt("MAX_STUDENT_ID");
 				return maxStudId;
 			}
@@ -224,7 +222,7 @@ public class StudentService {
 	public List<StudentDetailsBO> getStudentDetails() {
 		// TODO Auto-generated method stub
 		Map<String, StudentDetailsBO> studentDetails = getStudentBasicDetails();
-		if(studentDetails!=null && studentDetails.size()>0) {
+		if (studentDetails != null && studentDetails.size() > 0) {
 			populateStudentAcademicDetails(studentDetails);
 			populateStudentFeesDetails(studentDetails);
 			populateStudentTransportDetails(studentDetails);
@@ -234,18 +232,17 @@ public class StudentService {
 
 	private void populateStudentTransportDetails(Map<String, StudentDetailsBO> studentDetails) {
 		// TODO Auto-generated method stub
-		String query = "select A.*, B.source,B.destination,B.distance " + 
-				"from student_transport_details A, routes B " + 
-				"where A.route_id = B.route_id";
+		String query = "select A.*, B.source,B.destination,B.distance " + "from student_transport_details A, routes B "
+				+ "where A.route_id = B.route_id";
 		jdbcTemplate.query(query, new ResultSetExtractor<Void>() {
 
 			@Override
 			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
 				// TODO Auto-generated method stub
-				while(rs.next()) {
+				while (rs.next()) {
 					String studentId = getFormattedStudentId(Integer.parseInt(rs.getString("STUD_ID")));
 					StudentDetailsBO studentDetailsBO = studentDetails.get(studentId);
-					if(studentDetailsBO.getRouteDetailsBO()==null)
+					if (studentDetailsBO.getRouteDetailsBO() == null)
 						studentDetailsBO.setRouteDetailsBO(new RouteDetailsBO());
 					RouteDetailsBO routeDetailsBO = studentDetailsBO.getRouteDetailsBO();
 					routeDetailsBO.setRouteId(rs.getString("ROUTE_ID"));
@@ -259,12 +256,12 @@ public class StudentService {
 	}
 
 	private void populateStudentFeesDetails(Map<String, StudentDetailsBO> studentDetails) {
-		
-		String query = "select B.stud_id, B.academic_id, B.fee_id, C.fee_name, A.amount, A.class_id, A.route_id from fee_details A, student_fees_details B, fee_types C " + 
-				"where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id) " + 
-				"or A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id= ? and A.route_id=?))";
+
+		String query = "select B.stud_id, B.academic_id, B.fee_id, C.fee_name, A.amount, A.class_id, A.route_id from fee_details A, student_fees_details B, fee_types C "
+				+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id) "
+				+ "or A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id= ? and A.route_id=?))";
 		jdbcTemplate.query(query, new PreparedStatementSetter() {
-			
+
 			@Override
 			public void setValues(PreparedStatement ps) throws SQLException {
 				// TODO Auto-generated method stub
@@ -275,15 +272,15 @@ public class StudentService {
 
 			@Override
 			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
-				while(rs.next()) {
+				while (rs.next()) {
 					String studentId = getFormattedStudentId(Integer.parseInt(rs.getString("STUD_ID")));
 					String academicId = rs.getString("ACADEMIC_ID");
 					StudentDetailsBO studentDetailsBO = studentDetails.get(studentId);
-					if(studentDetails!=null) {
+					if (studentDetails != null) {
 						Map<String, List<FeesDetailsBO>> feesDetails = studentDetailsBO.getStudentFeeDetails();
-						if(feesDetails==null)
+						if (feesDetails == null)
 							feesDetails = new HashMap<String, List<FeesDetailsBO>>();
-						if(!feesDetails.containsKey(academicId))
+						if (!feesDetails.containsKey(academicId))
 							feesDetails.put(academicId, new ArrayList<FeesDetailsBO>());
 						List<FeesDetailsBO> feesDetailsBOs = feesDetails.get(academicId);
 						FeesDetailsBO feesDetailsBO = new FeesDetailsBO();
@@ -296,29 +293,29 @@ public class StudentService {
 						studentDetailsBO.setStudentFeeDetails(feesDetails);
 					}
 				}
-				
+
 				return null;
 			}
 		});
 	}
 
 	private void populateStudentAcademicDetails(Map<String, StudentDetailsBO> studentDetails) {
-		String query = "select A.*, B.class_name from student_class_details A, classes B " + 
-				"where A.class_id = B.class_id";
+		String query = "select A.*, B.class_name from student_class_details A, classes B "
+				+ "where A.class_id = B.class_id";
 		jdbcTemplate.query(query, new ResultSetExtractor<Void>() {
 
 			@Override
 			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
 				// TODO Auto-generated method stub
-				while(rs.next()) {
+				while (rs.next()) {
 					String studentId = getFormattedStudentId(Integer.parseInt(rs.getString("STUD_ID")));
 					StudentDetailsBO studentDetailsBO = studentDetails.get(studentId);
-					if(studentDetailsBO!=null) {
+					if (studentDetailsBO != null) {
 						Map<String, List<ClassDetaislBO>> classDetails = studentDetailsBO.getStudentClassDetails();
-						if(classDetails==null)
+						if (classDetails == null)
 							classDetails = new HashMap<String, List<ClassDetaislBO>>();
 						String academicId = rs.getString("ACADEMIC_ID");
-						if(!classDetails.containsKey(academicId))
+						if (!classDetails.containsKey(academicId))
 							classDetails.put(academicId, new ArrayList<ClassDetaislBO>());
 						List<ClassDetaislBO> classes = classDetails.get(academicId);
 						ClassDetaislBO classDetaislBO = new ClassDetaislBO();
@@ -328,7 +325,7 @@ public class StudentService {
 						studentDetailsBO.setStudentClassDetails(classDetails);
 					}
 				}
-				
+
 				return null;
 			}
 		});
@@ -339,7 +336,7 @@ public class StudentService {
 //		String query = "select A.* , B.route_id, C.source, C.destination, C.distance " + 
 //				"from student_details A, student_transport_details B, routes C " + 
 //				"where A.stud_id = B.stud_id and B.route_id = C.route_id";
-		
+
 		String query = "SELECT * FROM STUDENT_DETAILS";
 		return jdbcTemplate.query(query, new ResultSetExtractor<Map<String, StudentDetailsBO>>() {
 
@@ -347,14 +344,14 @@ public class StudentService {
 			public Map<String, StudentDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
 				// TODO Auto-generated method stub
 				Map<String, StudentDetailsBO> studentDetails = new HashMap<String, StudentDetailsBO>();
-				while(rs.next()) {
+				while (rs.next()) {
 					String studentId = getFormattedStudentId(rs.getInt("STUD_ID"));
-					if(!studentDetails.containsKey(studentId))
+					if (!studentDetails.containsKey(studentId))
 						studentDetails.put(studentId, new StudentDetailsBO());
 					StudentDetailsBO studentDetailsBO = studentDetails.get(studentId);
 					studentDetailsBO.setStudentId(studentId);
 					studentDetailsBO.setFirstName(rs.getString("FIRST_NAME"));
-					if(rs.getString("MIDDLE_NAME")!=null)
+					if (rs.getString("MIDDLE_NAME") != null)
 						studentDetailsBO.setMiddleName(rs.getString("MIDDLE_NAME"));
 					else
 						studentDetailsBO.setMiddleName(Constants.BLANK_STRING);
@@ -368,9 +365,9 @@ public class StudentService {
 					studentDetailsBO.setAddress(rs.getString("ADDRESS"));
 					studentDetailsBO.setReligion(rs.getString("RELIGION"));
 					studentDetailsBO.setCaste(rs.getString("CASTE"));
-					studentDetailsBO.setTransportOpted(Constants.YES.equals(rs.getString("TRANSPORT"))?true:false);
+					studentDetailsBO.setTransportOpted(Constants.YES.equals(rs.getString("TRANSPORT")) ? true : false);
 					studentDetailsBO.setNationality(rs.getString("NATIONALITY"));
-					
+
 //					if(studentDetailsBO.getRouteDetailsBO()==null)
 //						studentDetailsBO.setRouteDetailsBO(new RouteDetailsBO());
 //					RouteDetailsBO routeDetailsBO = studentDetailsBO.getRouteDetailsBO();
@@ -385,205 +382,278 @@ public class StudentService {
 	}
 
 	@Transactional
-	public boolean deleteStudentCompleteDetails(String studentID)
-	{
+	public boolean deleteStudentCompleteDetails(String studentID) {
 		/*
-		  Following if condition applied as this deleteStudentCompleteDetails can be called through controller as api or internally
-		  by the updateStudentDetails action.
-		  So filter condition needs to be checked.
-		  
-		*/
-		
+		 * Following if condition applied as this deleteStudentCompleteDetails can be
+		 * called through controller as api or internally by the updateStudentDetails
+		 * action. So filter condition needs to be checked.
+		 * 
+		 */
+
 		int studID;
-		if(studentID.startsWith(Constants.STUDENT_ID_PREFIX))
-		{
-			studID = reformatStudentID(studentID);	
-		}
-		else
-		{
+		if (studentID.startsWith(Constants.STUDENT_ID_PREFIX)) {
+			studID = reformatStudentID(studentID);
+		} else {
 			studID = Integer.parseInt(studentID);
 		}
 
-		System.out.println("deleteStudentCompleteDetails has been invoked for ID : "+studentID+" and filtered : "+studID);
-		
-		String sID = ""+studID;
+		System.out.println(
+				"deleteStudentCompleteDetails has been invoked for ID : " + studentID + " and filtered : " + studID);
+
+		String sID = "" + studID;
 		boolean result = false;
-		
-		try 
-		{
-			
+
+		try {
+
 			result = deleteEntryStudentClassDetails(sID);
-			if(result)
-				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Class_Details table.");
+			if (result)
+				System.out.println(
+						"Entry for student id " + sID + " has been deleted from the Student_Class_Details table.");
 			else
-				System.out.println("Entry does not exitst in the table for sID "+sID);
-			
-			result=deleteEntryStudentFeesDetails(sID);
-			if(result)
-				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Fees_Details table.");
+				System.out.println("Entry does not exitst in the table for sID " + sID);
+
+			result = deleteEntryStudentFeesDetails(sID);
+			if (result)
+				System.out.println(
+						"Entry for student id " + sID + " has been deleted from the Student_Fees_Details table.");
 			else
-				System.out.println("Entry does not exitst in the table for sID "+sID);
-			
-			result=deleteEntryStudentTransportDetails(sID);
-			if(result)
-				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Transport_Details table.");
+				System.out.println("Entry does not exitst in the table for sID " + sID);
+
+			result = deleteEntryStudentTransportDetails(sID);
+			if (result)
+				System.out.println(
+						"Entry for student id " + sID + " has been deleted from the Student_Transport_Details table.");
 			else
-				System.out.println("Entry does not exitst in the table for sID "+sID);
-			
-			result=deleteEntryStudentDetails(sID);
-			if(result)
-				System.out.println("Entry for student id "+sID+" has been deleted from the Student_Details table.");
+				System.out.println("Entry does not exitst in the table for sID " + sID);
+
+			result = deleteEntryStudentDetails(sID);
+			if (result)
+				System.out.println("Entry for student id " + sID + " has been deleted from the Student_Details table.");
 			else
-				System.out.println("Entry does not exitst in the table for sID "+sID);
-			
-			
+				System.out.println("Entry does not exitst in the table for sID " + sID);
+
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println("Error while Deleting Student in deleteStudentCompleteDetails.");
 			e.getStackTrace();
 			throw e;
-			
+
 		}
-		
+
 		return result;
 	}
-	
-	
+
 	@Transactional
-	public StudentDetailsBO updateStudentDetails(StudentDetailsBO studentDetailsBO)
-	{
+	public StudentDetailsBO updateStudentDetails(StudentDetailsBO studentDetailsBO) {
 		String studentid = studentDetailsBO.getStudentId();
 		int studentID = reformatStudentID(studentid);
-		
-		System.out.println("updateStudentDetails has been invoked for ID : "+studentid+" and filtered : "+studentID);
-		
-		
+
+		System.out.println(
+				"updateStudentDetails has been invoked for ID : " + studentid + " and filtered : " + studentID);
+
 		///
-		try 
-		{
-			String sID = ""+studentID;
+		try {
+			String sID = "" + studentID;
 			boolean result = false;
-			
-			//To delete entries from 4 tables 
-		    System.out.println("Calling deleteStudentCompleteDetails for student id :"+sID);
+
+			// To delete entries from 4 tables
+			System.out.println("Calling deleteStudentCompleteDetails for student id :" + sID);
 			result = deleteStudentCompleteDetails(sID);
-			if(result)
-			{
-				System.out.println("Deleted all the entries for student ID :"+sID);
+			if (result) {
+				System.out.println("Deleted all the entries for student ID :" + sID);
 			}
-			
-			//The student has been deleted from all the tables
-			//Now add it again in all tables using the same ID
-	        
-			//if entry deleted from tables, then only add
+
+			// The student has been deleted from all the tables
+			// Now add it again in all tables using the same ID
+
+			// if entry deleted from tables, then only add
 			// else it will be normal add only.
-			
-			if(result)
-			{
-				System.out.println("Calling addNewStudent for student id :"+sID);
-				studentDetailsBO=addNewStudent(studentDetailsBO);
-				System.out.println("addNewStudent action added student with student id :"+sID);
+
+			if (result) {
+				System.out.println("Calling addNewStudent for student id :" + sID);
+				studentDetailsBO = addNewStudent(studentDetailsBO);
+				System.out.println("addNewStudent action added student with student id :" + sID);
 				System.out.println("Updatation successful.");
-			}
-			else {
+			} else {
 				System.out.println("Updation not successful.");
 			}
-			
-			
+
 			return studentDetailsBO;
-		} 
-		catch (Exception e) 
-		{
+		} catch (Exception e) {
 			System.out.println("Error while Updating Student");
 			e.getStackTrace();
 			throw e;
 		}
 	}
-	
-	private int reformatStudentID(String studentid)
-	{
-		int sid=-1;
-		
-		try 
-		{
-			if(!StringUtils.isEmpty(studentid))
-			{
-				System.out.println("Reformating student ID : "+studentid);
-				//String actualID = studentid.substring(Constants.APPEND_CHARACTERS);
+
+	private int reformatStudentID(String studentid) {
+		int sid = -1;
+
+		try {
+			if (!StringUtils.isEmpty(studentid)) {
+				System.out.println("Reformating student ID : " + studentid);
+				// String actualID = studentid.substring(Constants.APPEND_CHARACTERS);
 				String actualID = studentid.replaceFirst(Constants.STUDENT_ID_PREFIX, "0");
-				System.out.println("After Removing STUDENT_ID_PREFIX : "+actualID);
+				System.out.println("After Removing STUDENT_ID_PREFIX : " + actualID);
 				sid = Integer.parseInt(actualID);
-				System.out.println("Integer student id : "+sid);
+				System.out.println("Integer student id : " + sid);
 				return sid;
 			}
-			
-		} 
-		catch (Exception e) 
-		{
+
+		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println("Error while reformating student id.");
 			throw e;
 		}
-		
+
 		return sid;
 	}
-	
-	private boolean deleteEntryStudentClassDetails(String stud_id)
-	{
+
+	private boolean deleteEntryStudentClassDetails(String stud_id) {
 		String query = "DELETE FROM STUDENT_CLASS_DETAILS WHERE STUD_ID=?";
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
-				
-				@Override
-				public void setValues(PreparedStatement ps) throws SQLException 
-				{
-					ps.setString(1, stud_id);
-				}
+
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, stud_id);
+			}
 		});
-		
-		return res<=0 ? false : true;
-	}
-	
-	private boolean deleteEntryStudentFeesDetails(String stud_id)
-	{
-		String query = "DELETE FROM STUDENT_FEES_DETAILS WHERE STUD_ID=?";
-		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
-				
-				@Override
-				public void setValues(PreparedStatement ps) throws SQLException 
-				{
-					ps.setString(1, stud_id);
-				}
-		});
-		
-		return res<=0 ? false : true;
-	}
-	private boolean deleteEntryStudentTransportDetails(String stud_id)
-	{
-		String query = "DELETE FROM STUDENT_TRANSPORT_DETAILS WHERE STUD_ID=?";
-		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
-				
-				@Override
-				public void setValues(PreparedStatement ps) throws SQLException 
-				{
-					ps.setString(1, stud_id);
-				}
-		});
-		
-		return res<=0 ? false : true;
-	}
-	private boolean deleteEntryStudentDetails(String stud_id)
-	{
-		String query = "DELETE FROM STUDENT_DETAILS WHERE STUD_ID=?";
-		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
-				
-				@Override
-				public void setValues(PreparedStatement ps) throws SQLException 
-				{
-					ps.setString(1, stud_id);
-				}
-		});
-		
-		return res<=0 ? false : true;
+
+		return res <= 0 ? false : true;
 	}
 
+	private boolean deleteEntryStudentFeesDetails(String stud_id) {
+		String query = "DELETE FROM STUDENT_FEES_DETAILS WHERE STUD_ID=?";
+		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
+
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, stud_id);
+			}
+		});
+
+		return res <= 0 ? false : true;
+	}
+
+	private boolean deleteEntryStudentTransportDetails(String stud_id) {
+		String query = "DELETE FROM STUDENT_TRANSPORT_DETAILS WHERE STUD_ID=?";
+		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
+
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, stud_id);
+			}
+		});
+
+		return res <= 0 ? false : true;
+	}
+
+	private boolean deleteEntryStudentDetails(String stud_id) {
+		String query = "DELETE FROM STUDENT_DETAILS WHERE STUD_ID=?";
+		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
+
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, stud_id);
+			}
+		});
+
+		return res <= 0 ? false : true;
+	}
+
+	public List<StudentDetailsBO> getStudentsReceivables() {
+		try {
+			Map<String, StudentDetailsBO> studentsReceivableMap = null;
+			studentsReceivableMap = getStudentsTotalFeeAmount();
+			studentsReceivableMap = getStudentsFeesPaidAmount(studentsReceivableMap);
+			studentsReceivableMap = getStudentFeesDueAmount(studentsReceivableMap);
+			populateStudentAcademicDetails(studentsReceivableMap);
+			return new ArrayList<>(studentsReceivableMap.values());
+		}catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Error in fetching students Receivables");
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	private Map<String, StudentDetailsBO> getStudentFeesDueAmount(Map<String, StudentDetailsBO> studentsReceivableMap) {
+		for(String studentId : studentsReceivableMap.keySet()) {
+			StudentDetailsBO studentDetailsBO = studentsReceivableMap.get(studentId);
+			FeeReceivables feeReceivables = studentDetailsBO.getFeeReceivables();
+			feeReceivables.setDueAmount(feeReceivables.getTotalFee() - feeReceivables.getPaidAmount());
+			studentDetailsBO.setFeeReceivables(feeReceivables);
+		}
+		return studentsReceivableMap;
+	}
+
+	private Map<String, StudentDetailsBO> getStudentsFeesPaidAmount(Map<String, StudentDetailsBO> studentsReceivableMap) {
+		String query = "select stud_id, sum(amount) as fees_paid from students_fees_collections_details group by stud_id";
+		return jdbcTemplate.query(query, new ResultSetExtractor<Map<String, StudentDetailsBO>>() {
+
+			@Override
+			public Map<String, StudentDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()) {
+					String studentId = getFormattedStudentId(Integer.parseInt(rs.getString("STUD_ID")));
+					if(!studentsReceivableMap.containsKey(studentId)) {
+						studentsReceivableMap.put(studentId, new StudentDetailsBO());
+					}
+					StudentDetailsBO studentDetailsBO = studentsReceivableMap.get(studentId);
+					if(studentDetailsBO.getStudentId()==null || Constants.BLANK_STRING.equals(studentDetailsBO.getStudentId())) {
+						studentDetailsBO.setStudentId(studentId);
+					}
+					if(studentDetailsBO.getFeeReceivables()==null) {
+						studentDetailsBO.setFeeReceivables(new FeeReceivables());
+					}
+					FeeReceivables feeReceivables = new FeeReceivables();
+					feeReceivables.setPaidAmount(rs.getDouble("FEES_PAID"));
+					studentDetailsBO.setFeeReceivables(feeReceivables);
+				}
+				return studentsReceivableMap;
+			}
+		});
+	}
+
+	public Map<String, StudentDetailsBO> getStudentsTotalFeeAmount() {
+		Map<String, StudentDetailsBO> studentsTotalFeeAmountMap = new HashMap<>();
+		String query = "select D.stud_id, D.first_name, D.middle_name, D.last_name, D.mobile, D.address, sum(A.amount) as total_fee "
+				+ "from fee_details A, student_fees_details B, fee_types C, student_details D\r\n"
+				+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id and B.stud_id = D.stud_id\r\n"
+				+ "and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id) or \r\n"
+				+ "A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id=? and A.route_id=?))\r\n"
+				+ "group by D.stud_id";
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, Constants.BLANK_STRING);
+				ps.setString(2, Constants.BLANK_STRING);
+			}
+		}, new ResultSetExtractor<Map<String, StudentDetailsBO>>() {
+
+			@Override
+			public Map<String, StudentDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while (rs.next()) {
+					String studentId = getFormattedStudentId(Integer.parseInt(rs.getString("STUD_ID")));
+					if (!studentsTotalFeeAmountMap.containsKey(studentId)) {
+						studentsTotalFeeAmountMap.put(studentId, new StudentDetailsBO());
+					}
+					StudentDetailsBO studentDetailsBO = studentsTotalFeeAmountMap.get(studentId);
+					studentDetailsBO.setStudentId(studentId);
+					studentDetailsBO.setFirstName(rs.getString("FIRST_NAME"));
+					studentDetailsBO.setMiddleName(rs.getString("MIDDLE_NAME"));
+					studentDetailsBO.setLastName(rs.getString("LAST_NAME"));
+					studentDetailsBO.setMobileNumber(rs.getString("MOBILE"));
+					studentDetailsBO.setAddress(rs.getString("ADDRESS"));
+					if (studentDetailsBO.getFeeReceivables() == null) {
+						studentDetailsBO.setFeeReceivables(new FeeReceivables());
+					}
+					FeeReceivables feeReceivables = studentDetailsBO.getFeeReceivables();
+					feeReceivables.setTotalFee(rs.getDouble("TOTAL_FEE"));
+					studentDetailsBO.setFeeReceivables(feeReceivables);
+				}
+				return studentsTotalFeeAmountMap;
+			}
+		});
+	}
 }
