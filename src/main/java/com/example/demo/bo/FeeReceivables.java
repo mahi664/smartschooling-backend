@@ -1,9 +1,9 @@
 package com.example.demo.bo;
 
 public class FeeReceivables {
-	private double totalFee;
-	private double dueAmount;
-	private double paidAmount;
+	private double totalFee = 0;
+	private double dueAmount = 0;
+	private double paidAmount = 0;
 	
 	public double getTotalFee() {
 		return totalFee;
