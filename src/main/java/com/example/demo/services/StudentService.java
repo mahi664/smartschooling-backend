@@ -610,7 +610,7 @@ public class StudentService {
 					if(studentDetailsBO.getFeeReceivables()==null) {
 						studentDetailsBO.setFeeReceivables(new FeeReceivables());
 					}
-					FeeReceivables feeReceivables = new FeeReceivables();
+					FeeReceivables feeReceivables = studentDetailsBO.getFeeReceivables();
 					feeReceivables.setPaidAmount(rs.getDouble("FEES_PAID"));
 					studentDetailsBO.setFeeReceivables(feeReceivables);
 				}
@@ -622,11 +622,11 @@ public class StudentService {
 	public Map<String, StudentDetailsBO> getStudentsTotalFeeAmount() {
 		Map<String, StudentDetailsBO> studentsTotalFeeAmountMap = new HashMap<>();
 		String query = "select D.stud_id, D.first_name, D.middle_name, D.last_name, D.mobile, D.address, sum(A.amount) as total_fee "
-				+ "from fee_details A, student_fees_details B, fee_types C, student_details D\r\n"
-				+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id and B.stud_id = D.stud_id\r\n"
-				+ "and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id) or \r\n"
-				+ "A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id=? and A.route_id=?))\r\n"
-				+ "group by D.stud_id";
+				+ "from fee_details A, student_fees_details B, fee_types C, student_details D, academic_details E "
+				+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id and B.stud_id = D.stud_id "
+				+ "and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id and academic_id=E.academic_id) or "
+				+ "A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id=? and A.route_id=?)) "
+				+ "and B.academic_id = E.academic_id group by D.stud_id";
 		return jdbcTemplate.query(query, new PreparedStatementSetter() {
 
 			@Override
@@ -666,11 +666,11 @@ public class StudentService {
 		try {
 			String reformattedStudId = Integer.toString(reformatStudentID(studentId));
 			String query = "select B.academic_id, B.fee_id, C.fee_name, A.amount, B.last_update_time, B.last_user "
-					+ "from fee_details A, student_fees_details B, fee_types C "
+					+ "from fee_details A, student_fees_details B, fee_types C, academic_details D "
 					+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id "
-					+ "and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id) or "
+					+ "and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id and academic_id = D.academic_id) or "
 					+ "A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id= ? and A.route_id= ?)) "
-					+ "and B.stud_id = ?";
+					+ "and B.academic_id=d.academic_id and B.stud_id = ?";
 			return jdbcTemplate.query(query, new PreparedStatementSetter() {
 				
 				@Override
