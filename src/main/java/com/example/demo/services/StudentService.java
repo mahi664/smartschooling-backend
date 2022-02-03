@@ -771,4 +771,32 @@ public class StudentService {
 		}
 		return null;
 	}
+
+	public Map<String, List<FeesDetailsBO>> getStudentFeesDueDetails(String studentId) {
+		try {
+			Map<String, List<FeesDetailsBO>> academicID2FeesMap = getStudentFeesAssignedDetails(studentId);
+			List<StudentsFeesTransactionDetailsBO> studentsFeesTransactionDetailsBOs = getStudentsFeesCollectionsTransactions(studentId);
+			for(StudentsFeesTransactionDetailsBO studTxnDetBO : studentsFeesTransactionDetailsBOs) {
+				Map<String, List<FeesDetailsBO>> academicId2FeesPaidMap = studTxnDetBO.getAcademicId2FeesDetailsMap();
+				for(String academicId : academicId2FeesPaidMap.keySet()) {
+					reduceFeesAssigned(academicID2FeesMap, academicId, academicId2FeesPaidMap.get(academicId));
+				}
+			}
+			return academicID2FeesMap;
+		} catch (Exception e) {
+			System.out.println("Error while fetching students fees due details");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private void reduceFeesAssigned(Map<String, List<FeesDetailsBO>> academicID2FeesMap, String academicId, List<FeesDetailsBO> feesPaidDetailsBOs) {
+		for(FeesDetailsBO feesPaidDetailsBO : feesPaidDetailsBOs) {
+			for(FeesDetailsBO feesDetailsBO : academicID2FeesMap.get(academicId)) {
+				if(feesDetailsBO.getFeeId().equals(feesPaidDetailsBO.getFeeId())) {
+					feesDetailsBO.setAmount(feesDetailsBO.getAmount() - feesPaidDetailsBO.getAmount());
+				}
+			}
+		}
+	}
 }
