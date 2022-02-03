@@ -60,4 +60,9 @@ public class StudentController {
 	public List<StudentsFeesTransactionDetailsBO> getStudentFeesCollectionsTransactions(@PathVariable String studentId){
 		return studentService.getStudentsFeesCollectionsTransactions(studentId);
 	}
+	
+	@GetMapping(path = "/Students/{studentId}/Fees/Dues")
+	public Map<String, List<FeesDetailsBO>> getStudentFeesDueDetails(@PathVariable String studentId){
+		return studentService.getStudentFeesDueDetails(studentId);
+	}
 }
