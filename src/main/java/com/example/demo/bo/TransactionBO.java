@@ -1,12 +1,13 @@
 package com.example.demo.bo;
 
 import java.util.Date;
+import java.util.List;
 
 public class TransactionBO {
 	private String transactionId;
 	private double amount;
 	private Date transactonDate;
-	private TransactionDetailsBO transactionDetailsBO;
+	private List<TransactionDetailsBO> transactionDetailsBO;
 	public String getTransactionId() {
 		return transactionId;
 	}
@@ -25,10 +26,10 @@ public class TransactionBO {
 	public void setTransactonDate(Date transactonDate) {
 		this.transactonDate = transactonDate;
 	}
-	public TransactionDetailsBO getTransactionDetailsBO() {
+	public List<TransactionDetailsBO> getTransactionDetailsBO() {
 		return transactionDetailsBO;
 	}
-	public void setTransactionDetailsBO(TransactionDetailsBO transactionDetailsBO) {
+	public void setTransactionDetailsBO(List<TransactionDetailsBO> transactionDetailsBO) {
 		this.transactionDetailsBO = transactionDetailsBO;
 	}
 	@Override

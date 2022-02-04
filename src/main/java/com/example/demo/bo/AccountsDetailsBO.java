@@ -5,6 +5,14 @@ public class AccountsDetailsBO {
 	private String accountName;
 	private String bankName;
 	private String bankAccountNumber;
+	
+	public AccountsDetailsBO() {
+		super();
+	}
+	public AccountsDetailsBO(String accountId) {
+		super();
+		this.accountId = accountId;
+	}
 	public String getAccountId() {
 		return accountId;
 	}
