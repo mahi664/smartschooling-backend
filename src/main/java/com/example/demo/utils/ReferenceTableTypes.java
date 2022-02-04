@@ -1,7 +1,7 @@
 package com.example.demo.utils;
 
 public enum ReferenceTableTypes {
-	STUD_FEES_COLLECTON_DET("students_fees_collections_details");
+	STUDENTS_FEES_COLLECTION_TRANSACTION("STUDENTS_FEES_COLLECTION_TRANSACTION");
 	
 	private String value;
 

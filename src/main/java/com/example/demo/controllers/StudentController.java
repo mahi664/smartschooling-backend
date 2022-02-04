@@ -65,4 +65,9 @@ public class StudentController {
 	public Map<String, List<FeesDetailsBO>> getStudentFeesDueDetails(@PathVariable String studentId){
 		return studentService.getStudentFeesDueDetails(studentId);
 	}
+	
+	@PostMapping(path = "/Students/{studentId}/Fees/Collections")
+	public StudentsFeesTransactionDetailsBO addStudentFeesCollectionsTransactions(@PathVariable String studentId, @RequestBody StudentsFeesTransactionDetailsBO studentsFeesTransactionDetailsBO){
+		return studentService.addNewStudentFeeCollectionDetails(studentId, studentsFeesTransactionDetailsBO);
+	}
 }

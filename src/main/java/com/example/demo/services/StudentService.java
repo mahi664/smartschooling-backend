@@ -28,14 +28,25 @@ import com.example.demo.bo.FeesDetailsBO;
 import com.example.demo.bo.RouteDetailsBO;
 import com.example.demo.bo.StudentDetailsBO;
 import com.example.demo.bo.StudentsFeesTransactionDetailsBO;
+import com.example.demo.bo.TransactionBO;
+import com.example.demo.bo.TransactionDetailsBO;
+import com.example.demo.utils.CommonUtils;
 import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
+import com.example.demo.utils.DefaultAccountsTypes;
+import com.example.demo.utils.ReferenceTableTypes;
+import com.example.demo.utils.TransactionTypes;
 
 @Service
 public class StudentService {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	private UtilService utilService;
+	
+	private Map<String, String> refTableTypesM;
 
 	@Transactional
 	public StudentDetailsBO addNewStudent(StudentDetailsBO studentDetailsBO) {
@@ -798,5 +809,206 @@ public class StudentService {
 				}
 			}
 		}
+	}
+	
+	@Transactional
+	public StudentsFeesTransactionDetailsBO addNewStudentFeeCollectionDetails(String studentId, StudentsFeesTransactionDetailsBO studentsFeesTransactionDetailsBO) {
+		try {
+			
+			refTableTypesM = utilService.getRefTableTypes();
+			
+			int res = addNewStrudentFeesTxn(studentId, studentsFeesTransactionDetailsBO);
+			if(res<=0) {
+				System.out.println("Problem in adding student fees collection Txn");
+				return null;
+			}
+			boolean res1 = addNewStduentFeesTxnDet(studentsFeesTransactionDetailsBO);
+			if(!res1) {
+				System.out.println("Problem in adding student fees collection Txn");
+				return null;
+			}
+			
+			TransactionBO transactionBO = populateTransactionBO(studentsFeesTransactionDetailsBO);
+			res = addNewTransaction(transactionBO);
+			if(res<=0) {
+				System.out.println("Problem in adding student fees collection Txn");
+				return null;
+			}
+			res1 = addNewTransactionDetails(transactionBO.getTransactionId(), transactionBO.getTransactionDetailsBO());
+			if(!res1) {
+				System.out.println("Problem in adding student fees collection Txn");
+				return null;
+			}
+			return studentsFeesTransactionDetailsBO;
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Error while adding new student Fees Collection");
+			e.printStackTrace();
+			throw e;
+		}
+	}
+
+	private boolean addNewTransactionDetails(String transactionId, List<TransactionDetailsBO> transactionDetailsBO) {
+		String nextTxnDetId = getNextTransactionDetId();
+		String query = "INSERT INTO TRANSACTION_DETAILS VALUES(?,?,?,?,?,?,?,?)";
+		int res[] = jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
+			int nextDetId = Integer.parseInt(nextTxnDetId);
+			
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				ps.setString(1, Integer.toString(nextDetId++));
+				ps.setString(2, transactionId);
+				ps.setString(3, transactionDetailsBO.get(i).getAccountsDetailsBO().getAccountId());
+				ps.setString(4, Character.toString(transactionDetailsBO.get(i).getTransactionType()));
+				ps.setString(5, transactionDetailsBO.get(i).getRefId());
+				ps.setString(6, transactionDetailsBO.get(i).getRefTableType());
+				ps.setDate(7, DateUtils.getSqlDate(new Date()));
+				ps.setString(8, "BASE");
+			}
+			
+			@Override
+			public int getBatchSize() {
+				// TODO Auto-generated method stub
+				return transactionDetailsBO.size();
+			}
+		});
+		return res.length<=0 ? false : true;
+	}
+
+	protected String getNextTransactionDetId() {
+		return Integer.toString(getTransactionDetId() + 1);
+	}
+
+	private int getTransactionDetId() {
+		String query = "SELECT COUNT(TRANSACTION_DET_ID) AS MAX_ID FROM TRANSACTION_DETAILS";
+		return jdbcTemplate.query(query, new ResultSetExtractor<Integer>() {
+
+			@Override
+			public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+				int maxTxnId = 0;
+				while(rs.next())
+					maxTxnId = rs.getInt("MAX_ID");
+				return maxTxnId;
+			}
+			
+		});
+	}
+
+	private TransactionBO populateTransactionBO(StudentsFeesTransactionDetailsBO studentsFeesTransactionDetailsBO) {
+		TransactionBO txnBO = new  TransactionBO();
+		txnBO.setTransactionId(getTxnId());
+		txnBO.setTransactonDate(studentsFeesTransactionDetailsBO.getCollectionDate());
+		txnBO.setAmount(studentsFeesTransactionDetailsBO.getAmount());
+		
+		List<TransactionDetailsBO> txnDetailsBOs = new ArrayList<>();
+		
+		TransactionDetailsBO txnDetBO = new TransactionDetailsBO();
+		txnDetBO.setAccountsDetailsBO(new AccountsDetailsBO(DefaultAccountsTypes.STUDENT_FEES_ACCOUNT.getValue()));
+		txnDetBO.setRefId(studentsFeesTransactionDetailsBO.getCollectionId());
+		txnDetBO.setRefTableType(refTableTypesM.get(ReferenceTableTypes.STUDENTS_FEES_COLLECTION_TRANSACTION.getValue()));
+		txnDetBO.setTransactionType(TransactionTypes.DEBIT.toString().charAt(0));
+		txnDetailsBOs.add(txnDetBO);
+		
+		txnDetBO = new TransactionDetailsBO();
+		txnDetBO.setAccountsDetailsBO(studentsFeesTransactionDetailsBO.getAccountsDetailsBO());
+		txnDetBO.setTransactionType(TransactionTypes.CREDIT.toString().charAt(0));
+		txnDetailsBOs.add(txnDetBO);
+		
+		txnBO.setTransactionDetailsBO(txnDetailsBOs);
+		return txnBO;
+	}
+
+	private int addNewTransaction(TransactionBO transactionBO) {
+		String query = "INSERT INTO TRANSACTIONS VALUES(?,?,?,?,?)";
+		return jdbcTemplate.update(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, transactionBO.getTransactionId());
+				ps.setDouble(2, transactionBO.getAmount());
+				ps.setDate(3, DateUtils.getSqlDate(transactionBO.getTransactonDate()));
+				ps.setDate(4, DateUtils.getSqlDate(transactionBO.getTransactonDate()));
+				ps.setString(5, "BASE");
+			}
+		});
+	}
+
+	private String getTxnId() {
+		return CommonUtils.getUniqueId();
+	}
+
+	private boolean addNewStduentFeesTxnDet(StudentsFeesTransactionDetailsBO studentsFeesTransactionDetailsBO) {
+		boolean result = true;
+		for(String academicId : studentsFeesTransactionDetailsBO.getAcademicId2FeesDetailsMap().keySet()) {
+			result = result & resaddNewStudentFeesTxnDet(academicId, studentsFeesTransactionDetailsBO.getCollectionId(),
+					studentsFeesTransactionDetailsBO.getAcademicId2FeesDetailsMap().get(academicId), studentsFeesTransactionDetailsBO);
+		}
+		return result;
+	}
+
+	private boolean resaddNewStudentFeesTxnDet(String academicId, String collectionId, List<FeesDetailsBO> feesDetailsBOs, StudentsFeesTransactionDetailsBO studentsFeesTransactionDetailsBO) {
+		String txnDetId = getNextTxnDetId();
+		String query = "INSERT INTO STUDENTS_FEES_COLLECTION_TRANSACTION_DETAILS VALUES(?,?,?,?,?,?,?)";
+		int res[] = jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
+			int nextTxnId = Integer.parseInt(txnDetId);
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				ps.setString(1, Integer.toString(nextTxnId++));
+				ps.setString(2, collectionId);
+				ps.setString(3, feesDetailsBOs.get(i).getFeeId());
+				ps.setString(4, academicId);
+				ps.setDouble(5, feesDetailsBOs.get(i).getAmount());
+				ps.setDate(6, DateUtils.getSqlDate(new Date()));
+				ps.setString(7, "BASE");
+			}
+			
+			@Override
+			public int getBatchSize() {
+				// TODO Auto-generated method stub
+				return feesDetailsBOs.size();
+			}
+		});
+		return res.length<=0 ? false : true;
+	}
+
+	private String getNextTxnDetId() {
+		return Integer.toString(getMaxTxnDetId() + 1);
+	}
+
+	private int getMaxTxnDetId() {
+		String query = "SELECT COUNT(TRANS_DET_ID) AS MAX_ID FROM STUDENTS_FEES_COLLECTION_TRANSACTION_DETAILS";
+		return jdbcTemplate.query(query, new ResultSetExtractor<Integer>() {
+
+			@Override
+			public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+				int maxTxnId = 0;
+				while(rs.next())
+					maxTxnId = rs.getInt("MAX_ID");
+				return maxTxnId;
+			}
+			
+		});
+	}
+
+	private int addNewStrudentFeesTxn(String studentId,StudentsFeesTransactionDetailsBO studentsFeesTransactionDetailsBO) {
+		String collectionId = getCollectionId(); 
+		studentsFeesTransactionDetailsBO.setCollectionId(collectionId);
+		String query = "INSERT INTO STUDENTS_FEES_COLLECTION_TRANSACTION VALUES(?,?,?,?,?,?)";
+		return jdbcTemplate.update(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, studentsFeesTransactionDetailsBO.getCollectionId());
+				ps.setString(2, Integer.toString(reformatStudentID(studentId)));
+				ps.setDate(3, DateUtils.getSqlDate(studentsFeesTransactionDetailsBO.getCollectionDate()));
+				ps.setString(4, studentsFeesTransactionDetailsBO.getAccountsDetailsBO().getAccountId());
+				ps.setDate(5, DateUtils.getSqlDate(new Date()));
+				ps.setString(6, "BASE");
+			}
+		});
+	}
+
+	private String getCollectionId() {
+		return CommonUtils.getUniqueId();
 	}
 }
