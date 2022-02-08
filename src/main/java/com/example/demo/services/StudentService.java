@@ -54,17 +54,23 @@ public class StudentService {
 		try {
 
 //			String nextStudentId = getNextStudentId();
+			boolean updateOperation = false;
 			int nextStudentId = 0;
 			if (StringUtils.isEmpty(studentDetailsBO.getStudentId())) {
 				nextStudentId = getMaxStudentId() + 1;
 			} else {
+				updateOperation = true;
 				if (studentDetailsBO.getStudentId().startsWith(Constants.STUDENT_ID_PREFIX)) {
 					nextStudentId = reformatStudentID(studentDetailsBO.getStudentId());
 				}
 			}
 			studentDetailsBO.setStudentId(Integer.toString(nextStudentId));
 
-			boolean res = addStudentBasicDeails(studentDetailsBO);
+			boolean res = true;
+			if(!updateOperation)
+				res = addStudentBasicDeails(studentDetailsBO);
+			else
+				res = updateStudentBasicDetails(studentDetailsBO);
 			if (res && studentDetailsBO.getRouteDetailsBO() != null && studentDetailsBO.isTransportOpted())
 				res = addSudentsTransportDetails(studentDetailsBO.getStudentId(), studentDetailsBO.getRouteDetailsBO());
 			if (res && studentDetailsBO.getStudentClassDetails() != null)
@@ -83,6 +89,36 @@ public class StudentService {
 			System.out.println("Error while adding new Student");
 			throw e;
 		}
+	}
+
+	private boolean updateStudentBasicDetails(StudentDetailsBO studentDetailsBO) {
+		String query = "UPDATE STUDENT_DETAILS SET FIRST_NAME = ?, MIDDLE_NAME = ?, LAST_NAME = ?, "
+				+ "BIRTH_DATE = ?, GENDER = ?, ADHAR = ?, EMAIL = ?, MOBILE = ?, ALTERNATE_MOBILE = ?,"
+				+ "ADDRESS = ?, RELIGION = ?, CASTE = ?, TRANSPORT = ?, NATIONALITY = ? "
+				+ "WHERE STUD_ID = ?";
+		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+			
+				ps.setString(1, studentDetailsBO.getFirstName());
+				ps.setString(2, studentDetailsBO.getMiddleName());
+				ps.setString(3, studentDetailsBO.getLastName());
+				ps.setDate(4, DateUtils.getSqlDate(studentDetailsBO.getBirthDate()));
+				ps.setString(5, studentDetailsBO.getGender());
+				ps.setString(6, studentDetailsBO.getAdharNumber());
+				ps.setString(7, studentDetailsBO.getEmail());
+				ps.setString(8, studentDetailsBO.getMobileNumber());
+				ps.setString(9, studentDetailsBO.getAlternateMobile());
+				ps.setString(10, studentDetailsBO.getAddress());
+				ps.setString(11, studentDetailsBO.getReligion());
+				ps.setString(12, studentDetailsBO.getCaste());
+				ps.setString(13, studentDetailsBO.isTransportOpted() ? Constants.YES : Constants.NO);
+				ps.setString(14, studentDetailsBO.getNationality());
+				ps.setString(15, studentDetailsBO.getStudentId());
+			}
+		});
+		return res>0 ? true : false;
 	}
 
 	private boolean addStudentFeesDetails(String studentId, Map<String, List<FeesDetailsBO>> studentFeeDetails) {
@@ -272,7 +308,7 @@ public class StudentService {
 	private void populateStudentFeesDetails(Map<String, StudentDetailsBO> studentDetails) {
 
 		String query = "select B.stud_id, B.academic_id, B.fee_id, C.fee_name, A.amount, A.class_id, A.route_id from fee_details A, student_fees_details B, fee_types C "
-				+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id) "
+				+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id and academic_id = B.academic_id) "
 				+ "or A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id= ? and A.route_id=?))";
 		jdbcTemplate.query(query, new PreparedStatementSetter() {
 
@@ -440,11 +476,11 @@ public class StudentService {
 			else
 				System.out.println("Entry does not exitst in the table for sID " + sID);
 
-			result = deleteEntryStudentDetails(sID);
-			if (result)
-				System.out.println("Entry for student id " + sID + " has been deleted from the Student_Details table.");
-			else
-				System.out.println("Entry does not exitst in the table for sID " + sID);
+//			result = deleteEntryStudentDetails(sID);
+//			if (result)
+//				System.out.println("Entry for student id " + sID + " has been deleted from the Student_Details table.");
+//			else
+//				System.out.println("Entry does not exitst in the table for sID " + sID);
 
 		} catch (Exception e) {
 			// TODO: handle exception
