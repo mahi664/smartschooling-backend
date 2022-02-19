@@ -2,9 +2,17 @@ package com.example.demo.bo;
 
 import java.util.Date;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public class AcademicDetailsBO {
+	@Schema(description = "Academic Id to uniquely identify academic yeay",
+			example = "AY-2019-20")
 	private String academicId;
+	@Schema(description = "Name of the academic year",
+			example = "Academic Year 2019-20")
 	private String academicYear;
+	@Schema(description = "Display Name of the academic year",
+			example = "Academic Year 2019-20")
 	private String displayName;
 	private Date academicStartDate;
 	private Date academicEndDate;
