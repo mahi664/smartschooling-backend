@@ -404,6 +404,7 @@ CREATE TABLE smartschoolingdev.user_manager_mapping (
 
 CREATE TABLE smartschoolingdev.user_attendance (
 	user_id varchar(100) NOT NULL,
+	academic_id varchar(100) NOT NULL,
 	attendance_date DATETIME NOT NULL,
 	availability CHAR NOT NULL,
 	check_in DATETIME NOT NULL,
@@ -411,5 +412,6 @@ CREATE TABLE smartschoolingdev.user_attendance (
 	last_update_time DATETIME NOT NULL,
 	last_user varchar(100) NOT NULL,
 	CONSTRAINT user_attendance_pk PRIMARY KEY (user_id,attendance_date),
-	CONSTRAINT user_attendance_fk FOREIGN KEY (user_id) REFERENCES smartschoolingdev.user_basic_details(user_id)
+	CONSTRAINT user_attendance_fk FOREIGN KEY (user_id) REFERENCES smartschoolingdev.user_basic_details(user_id),
+	CONSTRAINT user_attendance_fk_1 FOREIGN KEY (academic_id) REFERENCES smartschoolingdev.academic_details(academic_id)
 );
