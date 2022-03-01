@@ -19,7 +19,7 @@ public class UserBasicDetailsBO {
 	private String religion;
 	private String caste;
 	private String nationality;
-	private LoginDetailsBO loginDetailsBO;
+	private LoginRequest loginDetailsBO;
 	private List<RoleDetailsBO> userRolesDetailsBOs;
 	private Map<String, UserAcademicDetailsBO> academicDetailsM; // Academic Id to academic details Map
 	private List<UserApplicableLeavesBO> userApplicableLeavesBOs;
@@ -107,10 +107,10 @@ public class UserBasicDetailsBO {
 	public void setNationality(String nationality) {
 		this.nationality = nationality;
 	}
-	public LoginDetailsBO getLoginDetailsBO() {
+	public LoginRequest getLoginDetailsBO() {
 		return loginDetailsBO;
 	}
-	public void setLoginDetailsBO(LoginDetailsBO loginDetailsBO) {
+	public void setLoginDetailsBO(LoginRequest loginDetailsBO) {
 		this.loginDetailsBO = loginDetailsBO;
 	}
 	public List<RoleDetailsBO> getUserRolesDetailsBOs() {

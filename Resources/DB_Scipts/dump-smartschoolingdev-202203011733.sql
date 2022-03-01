@@ -401,6 +401,36 @@ INSERT INTO `ref_table_types` VALUES ('SFCT','STUDENTS_FEES_COLLECTION_TRANSACTI
 UNLOCK TABLES;
 
 --
+-- Table structure for table `role_applicable_leaves`
+--
+
+DROP TABLE IF EXISTS `role_applicable_leaves`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `role_applicable_leaves` (
+  `role_id` varchar(100) NOT NULL,
+  `leave_id` varchar(100) NOT NULL,
+  `eff_date` datetime NOT NULL,
+  `end_date` datetime NOT NULL,
+  `last_update_time` datetime NOT NULL,
+  `last_user` varchar(100) NOT NULL,
+  PRIMARY KEY (`role_id`,`leave_id`,`eff_date`,`end_date`),
+  KEY `user_applicable_leaves_fk_1` (`leave_id`),
+  CONSTRAINT `user_applicable_leaves_fk` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`),
+  CONSTRAINT `user_applicable_leaves_fk_1` FOREIGN KEY (`leave_id`) REFERENCES `leave_types` (`leave_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `role_applicable_leaves`
+--
+
+LOCK TABLES `role_applicable_leaves` WRITE;
+/*!40000 ALTER TABLE `role_applicable_leaves` DISABLE KEYS */;
+/*!40000 ALTER TABLE `role_applicable_leaves` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `roles`
 --
 
@@ -423,6 +453,7 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
+INSERT INTO `roles` VALUES ('1','Admin','Admin','2022-02-28 00:00:00','BASE');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -779,38 +810,6 @@ LOCK TABLES `user_academic_details` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_applicable_leaves`
---
-
-DROP TABLE IF EXISTS `user_applicable_leaves`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `user_applicable_leaves` (
-  `user_leave_rec_id` varchar(100) NOT NULL,
-  `user_id` varchar(100) NOT NULL,
-  `leave_id` varchar(100) NOT NULL,
-  `eff_date` datetime NOT NULL,
-  `end_date` datetime NOT NULL,
-  `last_update_time` datetime NOT NULL,
-  `last_user` varchar(100) NOT NULL,
-  PRIMARY KEY (`user_leave_rec_id`),
-  UNIQUE KEY `user_applicable_leaves_un` (`user_id`,`leave_id`,`eff_date`,`end_date`),
-  KEY `user_applicable_leaves_fk_1` (`leave_id`),
-  CONSTRAINT `user_applicable_leaves_fk` FOREIGN KEY (`user_id`) REFERENCES `user_basic_details` (`user_id`),
-  CONSTRAINT `user_applicable_leaves_fk_1` FOREIGN KEY (`leave_id`) REFERENCES `leave_types` (`leave_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user_applicable_leaves`
---
-
-LOCK TABLES `user_applicable_leaves` WRITE;
-/*!40000 ALTER TABLE `user_applicable_leaves` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_applicable_leaves` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `user_attendance`
 --
 
@@ -819,6 +818,7 @@ DROP TABLE IF EXISTS `user_attendance`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user_attendance` (
   `user_id` varchar(100) NOT NULL,
+  `academic_id` varchar(100) NOT NULL,
   `attendance_date` datetime NOT NULL,
   `availability` char(1) NOT NULL,
   `check_in` datetime NOT NULL,
@@ -826,7 +826,9 @@ CREATE TABLE `user_attendance` (
   `last_update_time` datetime NOT NULL,
   `last_user` varchar(100) NOT NULL,
   PRIMARY KEY (`user_id`,`attendance_date`),
-  CONSTRAINT `user_attendance_fk` FOREIGN KEY (`user_id`) REFERENCES `user_basic_details` (`user_id`)
+  KEY `user_attendance_fk_1` (`academic_id`),
+  CONSTRAINT `user_attendance_fk` FOREIGN KEY (`user_id`) REFERENCES `user_basic_details` (`user_id`),
+  CONSTRAINT `user_attendance_fk_1` FOREIGN KEY (`academic_id`) REFERENCES `academic_details` (`academic_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -870,6 +872,7 @@ CREATE TABLE `user_basic_details` (
 
 LOCK TABLES `user_basic_details` WRITE;
 /*!40000 ALTER TABLE `user_basic_details` DISABLE KEYS */;
+INSERT INTO `user_basic_details` VALUES ('1','Admin',NULL,'Admin','8965896589',NULL,'Admin','2022-03-01 00:00:00','M',NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `user_basic_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -882,16 +885,16 @@ DROP TABLE IF EXISTS `user_leave_accrual_details`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user_leave_accrual_details` (
   `id` varchar(100) NOT NULL,
-  `user_leave_rec_id` varchar(100) NOT NULL,
+  `leave_id` varchar(100) NOT NULL,
   `academic_id` varchar(100) NOT NULL,
   `accrual_date` datetime NOT NULL,
   `last_update_time` datetime NOT NULL,
   `last_user` varchar(100) NOT NULL,
   `amount` double NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `user_leave_accrual_details_fk` (`user_leave_rec_id`),
+  KEY `user_leave_accrual_details_fk` (`leave_id`),
   KEY `user_leave_accrual_details_fk_1` (`academic_id`),
-  CONSTRAINT `user_leave_accrual_details_fk` FOREIGN KEY (`user_leave_rec_id`) REFERENCES `user_applicable_leaves` (`user_leave_rec_id`),
+  CONSTRAINT `user_leave_accrual_details_fk` FOREIGN KEY (`leave_id`) REFERENCES `leave_types` (`leave_id`),
   CONSTRAINT `user_leave_accrual_details_fk_1` FOREIGN KEY (`academic_id`) REFERENCES `academic_details` (`academic_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -913,15 +916,15 @@ DROP TABLE IF EXISTS `user_leaves_deduction_details`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user_leaves_deduction_details` (
-  `user_leave_rec_id` varchar(100) NOT NULL,
+  `leave_id` varchar(100) NOT NULL,
   `eff_date` datetime NOT NULL,
   `end_date` datetime NOT NULL,
   `half_day` char(1) NOT NULL,
   `amount` double NOT NULL,
   `last_update_time` datetime NOT NULL,
   `last_user` varchar(100) NOT NULL,
-  PRIMARY KEY (`user_leave_rec_id`,`eff_date`,`end_date`),
-  CONSTRAINT `user_leaves_deduction_details_fk` FOREIGN KEY (`user_leave_rec_id`) REFERENCES `user_applicable_leaves` (`user_leave_rec_id`)
+  PRIMARY KEY (`leave_id`,`eff_date`,`end_date`),
+  CONSTRAINT `user_leaves_deduction_details_fk` FOREIGN KEY (`leave_id`) REFERENCES `leave_types` (`leave_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -958,6 +961,7 @@ CREATE TABLE `user_login_details` (
 
 LOCK TABLES `user_login_details` WRITE;
 /*!40000 ALTER TABLE `user_login_details` DISABLE KEYS */;
+INSERT INTO `user_login_details` VALUES ('1','admin','$2a$10$uV03cIQdFuMmu88m.XE0ReN.YxS8SUrbTfsxdhg3w90XngV7lkygW','2022-02-28 00:00:00','BASE');
 /*!40000 ALTER TABLE `user_login_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1054,6 +1058,7 @@ CREATE TABLE `user_role_mapping` (
 
 LOCK TABLES `user_role_mapping` WRITE;
 /*!40000 ALTER TABLE `user_role_mapping` DISABLE KEYS */;
+INSERT INTO `user_role_mapping` VALUES ('1','1','2022-02-28 00:00:00','2099-12-31 00:00:00','2022-02-28 00:00:00','BASE');
 /*!40000 ALTER TABLE `user_role_mapping` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1098,4 +1103,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-22 21:08:15
+-- Dump completed on 2022-03-01 17:33:50
