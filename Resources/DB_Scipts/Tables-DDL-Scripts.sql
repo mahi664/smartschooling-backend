@@ -317,43 +317,41 @@ CREATE TABLE smartschoolingdev.user_academic_details (
 	CONSTRAINT user_academic_details_fk_3 FOREIGN KEY (sub_id) REFERENCES smartschoolingdev.subjects(sub_id)
 );
 
-CREATE TABLE smartschoolingdev.user_applicable_leaves (
-	user_leave_rec_id varchar(100) NOT NULL,
-	user_id varchar(100) NOT NULL,
+CREATE TABLE smartschoolingdev.role_applicable_leaves (
+	role_id varchar(100) NOT NULL,
 	leave_id varchar(100) NOT NULL,
 	eff_date DATETIME NOT NULL,
 	end_date DATETIME NOT NULL,
 	last_update_time DATETIME NOT NULL,
 	last_user varchar(100) NOT NULL,
-	CONSTRAINT user_applicable_leaves_pk PRIMARY KEY (user_leave_rec_id),
-	CONSTRAINT user_applicable_leaves_un UNIQUE KEY (user_id,leave_id,eff_date,end_date),
-	CONSTRAINT user_applicable_leaves_fk FOREIGN KEY (user_id) REFERENCES smartschoolingdev.user_basic_details(user_id),
+	CONSTRAINT user_applicable_leaves_pk PRIMARY KEY (role_id, leave_id, eff_date, end_date),
+	CONSTRAINT user_applicable_leaves_fk FOREIGN KEY (role_id) REFERENCES smartschoolingdev.roles(role_id),
 	CONSTRAINT user_applicable_leaves_fk_1 FOREIGN KEY (leave_id) REFERENCES smartschoolingdev.leave_types(leave_id)
 );
 
 CREATE TABLE smartschoolingdev.user_leave_accrual_details (
 	id varchar(100) NOT NULL,
-	user_leave_rec_id varchar(100) NOT NULL,
+	leave_id varchar(100) NOT NULL,
 	academic_id varchar(100) NOT NULL,
 	accrual_date DATETIME NOT NULL,
 	last_update_time DATETIME NOT NULL,
 	last_user varchar(100) NOT NULL,
 	amount DOUBLE NOT NULL,
 	CONSTRAINT user_leave_accrual_details_pk PRIMARY KEY (id),
-	CONSTRAINT user_leave_accrual_details_fk FOREIGN KEY (user_leave_rec_id) REFERENCES smartschoolingdev.user_applicable_leaves(user_leave_rec_id),
+	CONSTRAINT user_leave_accrual_details_fk FOREIGN KEY (leave_id) REFERENCES smartschoolingdev.leave_types(leave_id),
 	CONSTRAINT user_leave_accrual_details_fk_1 FOREIGN KEY (academic_id) REFERENCES smartschoolingdev.academic_details(academic_id)
 );
 
 CREATE TABLE smartschoolingdev.user_leaves_deduction_details (
-	user_leave_rec_id varchar(100) NOT NULL,
+	leave_id varchar(100) NOT NULL,
 	eff_date DATETIME NOT NULL,
 	end_date DATETIME NOT NULL,
 	half_day CHAR NOT NULL,
 	amount DOUBLE NOT NULL,
 	last_update_time DATETIME NOT NULL,
 	last_user varchar(100) NOT NULL,
-	CONSTRAINT user_leaves_deduction_details_pk PRIMARY KEY (user_leave_rec_id,eff_date,end_date),
-	CONSTRAINT user_leaves_deduction_details_fk FOREIGN KEY (user_leave_rec_id) REFERENCES smartschoolingdev.user_applicable_leaves(user_leave_rec_id)
+	CONSTRAINT user_leaves_deduction_details_pk PRIMARY KEY (leave_id,eff_date,end_date),
+	CONSTRAINT user_leaves_deduction_details_fk FOREIGN KEY (leave_id) REFERENCES smartschoolingdev.leave_types(leave_id)
 );
 
 CREATE TABLE smartschoolingdev.user_salary_details (
