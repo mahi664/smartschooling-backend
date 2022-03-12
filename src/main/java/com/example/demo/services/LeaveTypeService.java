@@ -108,4 +108,19 @@ public class LeaveTypeService {
 			}
 		});
 	}
+
+	public List<String> getAccrualFrequencies() {
+		String query = "SELECT * FROM ACCRUAL_FREQUENCY";
+		return jdbcTemplate.query(query, new ResultSetExtractor<List<String>>() {
+
+			@Override
+			public List<String> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				List<String> accrualFrequencies = new ArrayList<>();
+				while(rs.next()) {
+					accrualFrequencies.add(rs.getString("accrual_frequency"));
+				}
+				return accrualFrequencies;
+			}
+		});
+	}
 }

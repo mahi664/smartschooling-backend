@@ -413,3 +413,5 @@ CREATE TABLE smartschoolingdev.user_attendance (
 	CONSTRAINT user_attendance_fk FOREIGN KEY (user_id) REFERENCES smartschoolingdev.user_basic_details(user_id),
 	CONSTRAINT user_attendance_fk_1 FOREIGN KEY (academic_id) REFERENCES smartschoolingdev.academic_details(academic_id)
 );
+
+INSERT INTO accrual_frequency (accrual_frequency) values ('Daily'),('Weekly'),('Monthly'),('Quarterly'),('Yearly');
