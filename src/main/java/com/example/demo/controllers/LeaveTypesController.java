@@ -3,6 +3,7 @@ package com.example.demo.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import com.example.demo.services.LeaveTypeService;
 
 @RestController
 @RequestMapping(value = "/Leave-Types")
+@CrossOrigin(origins="*")
 public class LeaveTypesController {
 
 	@Autowired
@@ -27,5 +29,10 @@ public class LeaveTypesController {
 	@GetMapping
 	public List<LeaveDetailsBO> getLeaveTypes(){
 		return leaveTypeService.getLeaveTypes();
+	}
+	
+	@GetMapping(value = "/accrual-frequency")
+	public List<String> getAccrualFrequencies(){
+		return leaveTypeService.getAccrualFrequencies();
 	}
 }
