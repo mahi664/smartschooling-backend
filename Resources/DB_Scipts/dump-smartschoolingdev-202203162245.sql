@@ -430,7 +430,7 @@ CREATE TABLE `role_applicable_leaves` (
 
 LOCK TABLES `role_applicable_leaves` WRITE;
 /*!40000 ALTER TABLE `role_applicable_leaves` DISABLE KEYS */;
-INSERT INTO `role_applicable_leaves` VALUES ('1','1','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE'),('1','2','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE'),('1','3','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE'),('2','1','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE'),('2','2','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE'),('2','3','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE');
+INSERT INTO `role_applicable_leaves` VALUES ('1','1','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE'),('1','2','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE'),('1','3','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE'),('2','1','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE'),('2','2','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE'),('2','3','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE'),('3','1','2022-03-12 00:00:00','2099-12-31 00:00:00','2022-03-12 00:00:00','BASE');
 /*!40000 ALTER TABLE `role_applicable_leaves` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -457,7 +457,7 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES ('1','Admin','Admin','2022-02-28 00:00:00','BASE'),('2','Accountant','This is Accountant','2022-03-12 00:00:00','BASE');
+INSERT INTO `roles` VALUES ('1','Admin','Admin','2022-02-28 00:00:00','BASE'),('2','Accountant','This is Accountant','2022-03-12 00:00:00','BASE'),('3','Test Role','Test Role','2022-03-12 00:00:00','BASE');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -876,7 +876,7 @@ CREATE TABLE `user_basic_details` (
 
 LOCK TABLES `user_basic_details` WRITE;
 /*!40000 ALTER TABLE `user_basic_details` DISABLE KEYS */;
-INSERT INTO `user_basic_details` VALUES ('1','Admin',NULL,'Admin','8965896589',NULL,'Admin','2022-03-01 00:00:00','M',NULL,NULL,NULL,NULL);
+INSERT INTO `user_basic_details` VALUES ('1','Admin',NULL,'Admin','8965896589',NULL,'Admin','2022-03-01 00:00:00','M',NULL,NULL,NULL,NULL),('2','Mahesh','Keshavrao','Ghuge','8600429732','mahighuge664@gmail.com','Ghotan','1998-05-12 00:00:00','UM','848140842557','Hindu','NT-D','Indian');
 /*!40000 ALTER TABLE `user_basic_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -954,6 +954,7 @@ CREATE TABLE `user_login_details` (
   `password` varchar(1000) NOT NULL,
   `last_update_time` datetime NOT NULL,
   `last_user` varchar(100) NOT NULL,
+  `password_update_time` datetime DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   CONSTRAINT `user_login_details_fk` FOREIGN KEY (`user_id`) REFERENCES `user_basic_details` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -965,7 +966,7 @@ CREATE TABLE `user_login_details` (
 
 LOCK TABLES `user_login_details` WRITE;
 /*!40000 ALTER TABLE `user_login_details` DISABLE KEYS */;
-INSERT INTO `user_login_details` VALUES ('1','admin','$2a$10$uV03cIQdFuMmu88m.XE0ReN.YxS8SUrbTfsxdhg3w90XngV7lkygW','2022-02-28 00:00:00','BASE');
+INSERT INTO `user_login_details` VALUES ('1','admin','$2a$10$uV03cIQdFuMmu88m.XE0ReN.YxS8SUrbTfsxdhg3w90XngV7lkygW','2022-02-28 00:00:00','BASE',NULL),('2','GMahesh2','$2a$10$pr61N4Rk3tvovv4hY3REH.Mi4vTNIz6oN1l32eZ8DH/ePL767tB9u','2022-03-16 00:00:00','BASE',NULL);
 /*!40000 ALTER TABLE `user_login_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1062,7 +1063,7 @@ CREATE TABLE `user_role_mapping` (
 
 LOCK TABLES `user_role_mapping` WRITE;
 /*!40000 ALTER TABLE `user_role_mapping` DISABLE KEYS */;
-INSERT INTO `user_role_mapping` VALUES ('1','1','2022-02-28 00:00:00','2099-12-31 00:00:00','2022-02-28 00:00:00','BASE');
+INSERT INTO `user_role_mapping` VALUES ('1','1','2022-02-28 00:00:00','2099-12-31 00:00:00','2022-02-28 00:00:00','BASE'),('2','1','2022-02-28 00:00:00','2099-12-31 00:00:00','2022-02-28 00:00:00','BASE');
 /*!40000 ALTER TABLE `user_role_mapping` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1107,4 +1108,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-03-12 22:32:43
+-- Dump completed on 2022-03-16 22:45:48
