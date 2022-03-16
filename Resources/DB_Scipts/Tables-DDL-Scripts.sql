@@ -415,3 +415,6 @@ CREATE TABLE smartschoolingdev.user_attendance (
 );
 
 INSERT INTO accrual_frequency (accrual_frequency) values ('Daily'),('Weekly'),('Monthly'),('Quarterly'),('Yearly');
+
+ALTER TABLE smartschoolingdev.user_login_details ADD password_update_time DATETIME NULL;
+
