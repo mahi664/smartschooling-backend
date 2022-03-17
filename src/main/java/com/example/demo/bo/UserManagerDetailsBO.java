@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class UserManagerDetailsBO {
 
-	private String userId;
+	private String userId; //User id of the reporting manager
 	private Date effDate;
 	private Date endDate;
 	public String getUserId() {

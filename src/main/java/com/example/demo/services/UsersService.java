@@ -3,7 +3,9 @@ package com.example.demo.services;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -95,6 +97,35 @@ public class UsersService {
 					maxUserId = rs.getInt("max_user_id");
 				}
 				return maxUserId;
+			}
+		});
+	}
+
+	public List<UserBasicDetailsBO> getUsers() {
+		String query = "SELECT * FROM USER_BASIC_DETAILS";
+		return jdbcTemplate.query(query, new ResultSetExtractor<List<UserBasicDetailsBO>>() {
+
+			@Override
+			public List<UserBasicDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				List<UserBasicDetailsBO> userBasicDetailsBOs = new ArrayList<>();
+				while(rs.next()) {
+					UserBasicDetailsBO userBasicDetailsBO = new UserBasicDetailsBO();
+					userBasicDetailsBO.setUserId(rs.getString("USER_ID"));
+					userBasicDetailsBO.setFirstName(rs.getString("FIRST_NAME"));
+					userBasicDetailsBO.setMiddleName(rs.getString("MIDDLE_NAME"));
+					userBasicDetailsBO.setLastName(rs.getString("LAST_NAME"));
+					userBasicDetailsBO.setMobile(rs.getString("MOBILE"));
+					userBasicDetailsBO.setEmail(rs.getString("EMAIL"));
+					userBasicDetailsBO.setAddress(rs.getString("ADDRESS"));
+					userBasicDetailsBO.setBirthDate(DateUtils.getDate(rs.getDate("BIRTH_DATE")));
+					userBasicDetailsBO.setMaritalStatus(rs.getString("MARITAL_STATUS"));
+					userBasicDetailsBO.setAdhar(rs.getString("ADHAR"));
+					userBasicDetailsBO.setReligion(rs.getString("RELIGION"));
+					userBasicDetailsBO.setCaste(rs.getString("CASTE"));
+					userBasicDetailsBO.setNationality(rs.getString("NATIONALITY"));
+					userBasicDetailsBOs.add(userBasicDetailsBO);
+				}
+				return userBasicDetailsBOs;
 			}
 		});
 	}
