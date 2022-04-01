@@ -112,7 +112,7 @@ public class UsersService {
 					UserBasicDetailsBO userBasicDetailsBO = new UserBasicDetailsBO();
 					userBasicDetailsBO.setUserId(rs.getString("USER_ID"));
 					userBasicDetailsBO.setFirstName(rs.getString("FIRST_NAME"));
-					userBasicDetailsBO.setMiddleName(rs.getString("MIDDLE_NAME"));
+					userBasicDetailsBO.setMiddleName(rs.getString("MIDDLE_NAME")==null?"":rs.getString("MIDDLE_NAME"));
 					userBasicDetailsBO.setLastName(rs.getString("LAST_NAME"));
 					userBasicDetailsBO.setMobile(rs.getString("MOBILE"));
 					userBasicDetailsBO.setEmail(rs.getString("EMAIL"));
@@ -123,6 +123,8 @@ public class UsersService {
 					userBasicDetailsBO.setReligion(rs.getString("RELIGION"));
 					userBasicDetailsBO.setCaste(rs.getString("CASTE"));
 					userBasicDetailsBO.setNationality(rs.getString("NATIONALITY"));
+					userBasicDetailsBO.setGender(rs.getString("GENDER"));
+					userBasicDetailsBO.setAlternateMobile(rs.getString("ALTERNATE_MOBILE"));
 					userBasicDetailsBOs.add(userBasicDetailsBO);
 				}
 				return userBasicDetailsBOs;
