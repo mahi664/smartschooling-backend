@@ -17,6 +17,8 @@ public class UserBasicDetailsBO {
 	private String religion;
 	private String caste;
 	private String nationality;
+	private String gender;
+	private String alternateMobile;
 
 	public String getUserId() {
 		return userId;
@@ -122,12 +124,29 @@ public class UserBasicDetailsBO {
 		this.nationality = nationality;
 	}
 
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getAlternateMobile() {
+		return alternateMobile;
+	}
+
+	public void setAlternateMobile(String alternateMobile) {
+		this.alternateMobile = alternateMobile;
+	}
+
 	@Override
 	public String toString() {
 		return "UserBasicDetailsBO [userId=" + userId + ", firstName=" + firstName + ", middleName=" + middleName
 				+ ", lastName=" + lastName + ", mobile=" + mobile + ", email=" + email + ", address=" + address
 				+ ", birthDate=" + birthDate + ", maritalStatus=" + maritalStatus + ", adhar=" + adhar + ", religion="
-				+ religion + ", caste=" + caste + ", nationality=" + nationality + "]";
+				+ religion + ", caste=" + caste + ", nationality=" + nationality + ", gender=" + gender
+				+ ", alternateMobile=" + alternateMobile + "]";
 	}
 
 }

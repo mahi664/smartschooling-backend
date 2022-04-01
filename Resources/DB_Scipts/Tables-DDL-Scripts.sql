@@ -418,3 +418,11 @@ INSERT INTO accrual_frequency (accrual_frequency) values ('Daily'),('Weekly'),('
 
 ALTER TABLE smartschoolingdev.user_login_details ADD password_update_time DATETIME NULL;
 
+ALTER TABLE smartschoolingdev.user_basic_details ADD gender varchar(100) NOT NULL;
+ALTER TABLE smartschoolingdev.user_basic_details ADD alternate_mobile varchar(100) NULL;
+
+
+
+
+
+
