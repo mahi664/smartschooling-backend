@@ -3,6 +3,7 @@ package com.example.demo.configurations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -36,7 +37,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
 		http.csrf().disable()
 			.cors().disable()
 			.authorizeRequests()
+			.antMatchers("/swagger-ui/**").permitAll()
 			.antMatchers("/auth/**").permitAll()
+			.antMatchers("/v3/api-docs/**").permitAll()
+			.antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
 			.anyRequest().authenticated()
 			.and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
