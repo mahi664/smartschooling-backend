@@ -810,6 +810,7 @@ CREATE TABLE `user_academic_details` (
 
 LOCK TABLES `user_academic_details` WRITE;
 /*!40000 ALTER TABLE `user_academic_details` DISABLE KEYS */;
+INSERT INTO `user_academic_details` VALUES ('2','AY-2021-22','1st','ENG','2022-04-04 00:00:00','Mahesh'),('2','AY-2021-22','1st','MAR','2022-04-04 00:00:00','Mahesh'),('2','AY-2021-22','1st','MATHS','2022-04-04 00:00:00','Mahesh');
 /*!40000 ALTER TABLE `user_academic_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -866,6 +867,8 @@ CREATE TABLE `user_basic_details` (
   `religion` varchar(100) DEFAULT NULL,
   `caste` varchar(100) DEFAULT NULL,
   `nationality` varchar(100) DEFAULT NULL,
+  `gender` varchar(100) NOT NULL,
+  `alternate_mobile` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -876,7 +879,7 @@ CREATE TABLE `user_basic_details` (
 
 LOCK TABLES `user_basic_details` WRITE;
 /*!40000 ALTER TABLE `user_basic_details` DISABLE KEYS */;
-INSERT INTO `user_basic_details` VALUES ('1','Admin',NULL,'Admin','8965896589',NULL,'Admin','2022-03-01 00:00:00','M',NULL,NULL,NULL,NULL),('2','Mahesh','Keshavrao','Ghuge','8600429732','mahighuge664@gmail.com','Ghotan','1998-05-12 00:00:00','UM','848140842557','Hindu','NT-D','Indian');
+INSERT INTO `user_basic_details` VALUES ('1','Admin',NULL,'Admin','8965896589',NULL,'Admin','2022-03-01 00:00:00','M',NULL,NULL,NULL,NULL,'',NULL),('2','Mahesh','Keshavrao','Ghuge','8600429732','mahighuge664@gmail.com','Ghotan','1998-05-12 00:00:00','UM','848140842557','Hindu','NT-D','Indian','',NULL);
 /*!40000 ALTER TABLE `user_basic_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -997,6 +1000,7 @@ CREATE TABLE `user_manager_mapping` (
 
 LOCK TABLES `user_manager_mapping` WRITE;
 /*!40000 ALTER TABLE `user_manager_mapping` DISABLE KEYS */;
+INSERT INTO `user_manager_mapping` VALUES ('2','1','2022-04-01 00:00:00','2099-12-31 00:00:00','2022-04-04 00:00:00','Mahesh');
 /*!40000 ALTER TABLE `user_manager_mapping` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1092,6 +1096,7 @@ CREATE TABLE `user_salary_details` (
 
 LOCK TABLES `user_salary_details` WRITE;
 /*!40000 ALTER TABLE `user_salary_details` DISABLE KEYS */;
+INSERT INTO `user_salary_details` VALUES ('2',10000,'2022-04-01 00:00:00','2099-12-31 00:00:00','2022-04-04 00:00:00','Mahesh');
 /*!40000 ALTER TABLE `user_salary_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1108,4 +1113,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-03-16 22:45:48
+-- Dump completed on 2022-04-04 21:05:38
