@@ -34,8 +34,8 @@ public class UsersService {
 		String userId = getNextUserId();
 		userBasicDetailsBO.setUserId(userId);
 		String query = "INSERT INTO user_basic_details "
-				+ "(user_id, first_name, middle_name, last_name, mobile, email, address, birth_date, marital_status, adhar, religion, caste, nationality) "
-				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+				+ "(user_id, first_name, middle_name, last_name, mobile, email, address, birth_date, marital_status, adhar, religion, caste, nationality, gender, alternate_mobile) "
+				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 			
 			@Override
@@ -53,6 +53,8 @@ public class UsersService {
 				ps.setString(11, userBasicDetailsBO.getReligion());
 				ps.setString(12, userBasicDetailsBO.getCaste());
 				ps.setString(13, userBasicDetailsBO.getNationality());
+				ps.setString(14, userBasicDetailsBO.getGender());
+				ps.setString(15, userBasicDetailsBO.getAlternateMobile());
 			}
 		});
 		if(res>0) {
