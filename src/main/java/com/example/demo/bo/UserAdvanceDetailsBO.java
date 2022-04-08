@@ -3,6 +3,9 @@ package com.example.demo.bo;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class UserAdvanceDetailsBO extends UserBasicDetailsBO {
 
 	private Map<String, UserAcademicDetailsBO> userAcademicDetails; // Map of Academic id to Academic Details
@@ -10,6 +13,7 @@ public class UserAdvanceDetailsBO extends UserBasicDetailsBO {
 	private List<UserManagerDetailsBO> userManagerDetails;
 	private Map<String, PayrollDetailsBO> userPayrollDetails; // Map of Academic Id to Payroll details
 	private List<SalaryDetailsBO> userSalaryDetails;
+	
 	public Map<String, UserAcademicDetailsBO> getUserAcademicDetails() {
 		return userAcademicDetails;
 	}

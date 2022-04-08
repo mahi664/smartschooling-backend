@@ -5,7 +5,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -16,7 +19,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.bo.ClassDetaislBO;
+import com.example.demo.bo.FeeReceivables;
+import com.example.demo.bo.MonthMasterDetailsBO;
+import com.example.demo.bo.PayrollDetailsBO;
+import com.example.demo.bo.SalaryDetailsBO;
+import com.example.demo.bo.StudentDetailsBO;
+import com.example.demo.bo.SubjectDetailsBO;
+import com.example.demo.bo.UserAcademicDetailsBO;
+import com.example.demo.bo.UserAdvanceDetailsBO;
 import com.example.demo.bo.UserBasicDetailsBO;
+import com.example.demo.bo.UserManagerDetailsBO;
 import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
 
@@ -28,6 +41,9 @@ public class UsersService {
 	
 	@Autowired
 	BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	@Autowired
+	UserAdvanceDetailsBO singleUserAdvanceDetailsBO;
 	
 	@Transactional
 	public UserBasicDetailsBO addNewUser(UserBasicDetailsBO userBasicDetailsBO) {
@@ -125,12 +141,382 @@ public class UsersService {
 					userBasicDetailsBO.setReligion(rs.getString("RELIGION"));
 					userBasicDetailsBO.setCaste(rs.getString("CASTE"));
 					userBasicDetailsBO.setNationality(rs.getString("NATIONALITY"));
+					
+					//commenting this out as there is no column as GENDER in user_basic_details
 					userBasicDetailsBO.setGender(rs.getString("GENDER"));
+					
+					//commenting this out as there is no column as ALTERNATE_MOBILE in user_basic_details
 					userBasicDetailsBO.setAlternateMobile(rs.getString("ALTERNATE_MOBILE"));
 					userBasicDetailsBOs.add(userBasicDetailsBO);
 				}
 				return userBasicDetailsBOs;
 			}
 		});
+	}
+	
+	public UserBasicDetailsBO getBasicDetailsOfOneUser(String userId)
+	{
+		String query = "SELECT * FROM USER_BASIC_DETAILS where user_id=?";
+		
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, userId);
+			}
+			
+		}, new ResultSetExtractor<UserBasicDetailsBO>() {
+			
+			@Override
+			public UserBasicDetailsBO extractData(ResultSet rs) throws SQLException, DataAccessException {
+				
+				UserBasicDetailsBO userBasicDetailsBO = new UserBasicDetailsBO(); 
+				while (rs.next()) 
+				{
+					userBasicDetailsBO.setUserId(rs.getString("USER_ID"));
+					userBasicDetailsBO.setFirstName(rs.getString("FIRST_NAME"));
+					userBasicDetailsBO.setMiddleName(rs.getString("MIDDLE_NAME")==null?"":rs.getString("MIDDLE_NAME"));
+					userBasicDetailsBO.setLastName(rs.getString("LAST_NAME"));
+					userBasicDetailsBO.setMobile(rs.getString("MOBILE"));
+					userBasicDetailsBO.setEmail(rs.getString("EMAIL"));
+					userBasicDetailsBO.setAddress(rs.getString("ADDRESS"));
+					userBasicDetailsBO.setBirthDate(DateUtils.getDate(rs.getDate("BIRTH_DATE")));
+					userBasicDetailsBO.setMaritalStatus(rs.getString("MARITAL_STATUS"));
+					userBasicDetailsBO.setAdhar(rs.getString("ADHAR"));
+					userBasicDetailsBO.setReligion(rs.getString("RELIGION"));
+					userBasicDetailsBO.setCaste(rs.getString("CASTE"));
+					userBasicDetailsBO.setNationality(rs.getString("NATIONALITY"));
+					//commenting this out as there is no column as GENDER in user_basic_details
+					userBasicDetailsBO.setGender(rs.getString("GENDER"));
+					
+					//commenting this out as there is no column as ALTERNATE_MOBILE in user_basic_details
+					userBasicDetailsBO.setAlternateMobile(rs.getString("ALTERNATE_MOBILE"));
+				}
+				return userBasicDetailsBO;
+			}
+			
+		});
+	}
+	
+	//
+	public void populateInheritedEntriesofUserAdvanceDetailsBO(UserBasicDetailsBO userBasicDetailsBO)
+	{
+		singleUserAdvanceDetailsBO.setUserId(userBasicDetailsBO.getUserId());
+		singleUserAdvanceDetailsBO.setFirstName(userBasicDetailsBO.getFirstName());
+		singleUserAdvanceDetailsBO.setMiddleName(userBasicDetailsBO.getMiddleName());
+		singleUserAdvanceDetailsBO.setLastName(userBasicDetailsBO.getLastName());
+		singleUserAdvanceDetailsBO.setMobile(userBasicDetailsBO.getMobile());
+		singleUserAdvanceDetailsBO.setEmail(userBasicDetailsBO.getEmail());
+		singleUserAdvanceDetailsBO.setAddress(userBasicDetailsBO.getAddress());
+		singleUserAdvanceDetailsBO.setBirthDate(userBasicDetailsBO.getBirthDate());
+		singleUserAdvanceDetailsBO.setMaritalStatus(userBasicDetailsBO.getMaritalStatus());
+		singleUserAdvanceDetailsBO.setAdhar(userBasicDetailsBO.getAdhar());
+		singleUserAdvanceDetailsBO.setReligion(userBasicDetailsBO.getReligion());
+		singleUserAdvanceDetailsBO.setCaste(userBasicDetailsBO.getCaste());
+		singleUserAdvanceDetailsBO.setNationality(userBasicDetailsBO.getNationality());
+		singleUserAdvanceDetailsBO.setGender(userBasicDetailsBO.getGender());
+		singleUserAdvanceDetailsBO.setAlternateMobile(userBasicDetailsBO.getAlternateMobile());
+	}
+	public String getClassNameFromClassID(String classID)
+	{
+		String query = "SELECT class_name FROM classes where class_id=?";	
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps)throws SQLException
+			{
+				ps.setString(1, classID);
+			}
+		}, new ResultSetExtractor<String>() {
+			
+			@Override
+			public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+				
+				String classes=null;
+				while (rs.next()) 
+				{
+					classes = rs.getString("class_name");
+					
+				}
+				return classes;
+			}
+			
+		});
+	}
+	public String getSubjectNameFromSubjectID(String subjectID)
+	{
+		String query = "SELECT sub_name FROM subjects where sub_id=?";	
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps)throws SQLException
+			{
+				ps.setString(1, subjectID);
+			}
+		}, new ResultSetExtractor<String>() {
+			
+			@Override
+			public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+				
+				String subjects=null;
+				while (rs.next()) 
+				{
+					subjects = rs.getString("sub_name");
+					
+				}
+				return subjects;
+			}
+			
+		});
+	}
+	public String getMonthNameFromMonthMaster(String monthId)
+	{
+		String query = "SELECT month FROM month_master where month_id=?";	
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps)throws SQLException
+			{
+				ps.setString(1, monthId);
+			}
+		}, new ResultSetExtractor<String>() {
+			
+			@Override
+			public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+				
+				String month=null;
+				while (rs.next()) 
+				{
+					month = rs.getString("month");
+					
+				}
+				return month;
+			}
+			
+		});
+	}
+	
+	//Prototype to get the user academic details in UserAdvanceDeails
+	//private Map<String, UserAcademicDetailsBO> userAcademicDetails; // Map of Academic id to Academic Details
+	public Map<String, UserAcademicDetailsBO> getAcademicDetailsOfOneUser(String userId)
+	{
+		String query = "SELECT * FROM USER_ACADEMIC_DETAILS where user_id=?";
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, userId);
+			}
+			
+		}, new ResultSetExtractor<Map<String, UserAcademicDetailsBO>>(){
+			
+			@Override
+			public Map<String, UserAcademicDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				Map<String, UserAcademicDetailsBO> userAcademicDetailsMap = new HashMap<>();
+				while(rs.next())
+				{
+					String academicID = rs.getString("ACADEMIC_ID");
+					String classID = rs.getString("CLASS_ID");
+					String className = getClassNameFromClassID(classID);
+					String subjectID = rs.getString("SUB_ID");
+					String subjectName = getSubjectNameFromSubjectID(subjectID);
+					
+					if(userAcademicDetailsMap.containsKey(academicID))
+					{
+						UserAcademicDetailsBO userAcademicDetails = userAcademicDetailsMap.get(academicID);
+						List<ClassDetaislBO> classDetails = userAcademicDetails.getUserClassSubjectsL();
+						
+						int foundClasID = 0;
+						for(ClassDetaislBO cbo : classDetails)
+						{
+							String classID_list = cbo.getClassId();
+							if(classID_list.equals(classID))
+							{
+								foundClasID=1;
+								SubjectDetailsBO subjectDetailsBO = new SubjectDetailsBO();
+								subjectDetailsBO.setSubjectId(subjectID);
+								subjectDetailsBO.setSubjectName(subjectName);
+								cbo.getSubjects().add(subjectDetailsBO);
+								break;
+							}
+						}
+						if(foundClasID==0)
+						{
+							SubjectDetailsBO subjectDetailsBO = new SubjectDetailsBO();
+							subjectDetailsBO.setSubjectId(subjectID);
+							subjectDetailsBO.setSubjectName(subjectName);
+							List<SubjectDetailsBO> subjects = new ArrayList();
+							subjects.add(subjectDetailsBO);
+							ClassDetaislBO classDet = new ClassDetaislBO();
+							classDet.setClassId(classID);
+							classDet.setClassName(className);
+							classDet.setSubjects(subjects);
+							classDetails.add(classDet);
+						}
+					}
+					else
+					{
+						SubjectDetailsBO subjectDetailsBO = new SubjectDetailsBO();
+						subjectDetailsBO.setSubjectId(subjectID);
+						subjectDetailsBO.setSubjectName(subjectName);
+						
+						List<SubjectDetailsBO> subjects = new ArrayList();
+						subjects.add(subjectDetailsBO);
+						
+						ClassDetaislBO classDetailBO = new ClassDetaislBO();
+						classDetailBO.setClassId(classID);
+						classDetailBO.setClassName(className);
+						classDetailBO.setSubjects(subjects);
+						
+						List<ClassDetaislBO> classDetailsBOList = new ArrayList();
+						classDetailsBOList.add(classDetailBO);
+						
+						UserAcademicDetailsBO userAcademicDetailsBO = new UserAcademicDetailsBO();
+						userAcademicDetailsBO.setUserClassSubjectsL(classDetailsBOList);
+						
+						userAcademicDetailsMap.put(academicID, userAcademicDetailsBO);
+					}
+					
+				}
+				return userAcademicDetailsMap;
+			}
+		});
+	}
+	
+	public List<UserManagerDetailsBO> getManagerDetailsOfOneUser(String userId)
+	{
+		String query = "SELECT * FROM USER_MANAGER_MAPPING where user_id=?";
+		
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, userId);
+			}
+			
+		}, new ResultSetExtractor<List<UserManagerDetailsBO>>() {
+			
+			@Override
+			public List<UserManagerDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				
+				List<UserManagerDetailsBO> userManagerDetailsBO = new ArrayList(); 
+				while (rs.next()) 
+				{
+					UserManagerDetailsBO umdBO = new UserManagerDetailsBO();
+					umdBO.setUserId(rs.getString("reports_to"));
+					umdBO.setEffDate(rs.getDate("eff_date"));
+					umdBO.setEndDate(rs.getDate("end_date"));
+					
+					userManagerDetailsBO.add(umdBO);
+				}
+				return userManagerDetailsBO;
+			}
+			
+		});
+	}
+	
+	public List<SalaryDetailsBO> getSalaryDetailsOfOneUser(String userId)
+	{
+		String query = "SELECT * FROM USER_SALARY_DETAILS where user_id=?";
+		
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, userId);
+			}
+			
+		}, new ResultSetExtractor<List<SalaryDetailsBO>>() {
+			
+			@Override
+			public List<SalaryDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				
+				List<SalaryDetailsBO> salaryDetailsBO = new ArrayList(); 
+				while (rs.next()) 
+				{
+					SalaryDetailsBO salaryDet = new SalaryDetailsBO();
+					salaryDet.setAmount(rs.getDouble("amount"));
+					salaryDet.setEffDate(rs.getDate("eff_date"));
+					salaryDet.setEndDate(rs.getDate("end_date"));
+					
+					salaryDetailsBO.add(salaryDet);
+				}
+				return salaryDetailsBO;
+			}
+			
+		});
+	}
+	
+	//Prototype to get Payroll details in user_payroll_details
+	//private Map<String, PayrollDetailsBO> userPayrollDetails; // Map of Academic Id to Payroll details
+	public Map<String, PayrollDetailsBO> getPayrollDetailsOfOneUser(String userId)
+	{
+		String query = "SELECT * FROM USER_PAYROLL_DETAILS where user_id=?";
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, userId);
+			}
+			
+		}, new ResultSetExtractor<Map<String, PayrollDetailsBO>>(){
+			
+			@Override
+			public Map<String, PayrollDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				Map<String, PayrollDetailsBO> userPayrollDetailsMap = new HashMap<>();
+				while(rs.next())
+				{
+					String academicID = rs.getString("ACADEMIC_ID");
+					
+					
+					if(userPayrollDetailsMap.containsKey(academicID))
+					{
+						//As of now, not considering this. But there is a problem here.
+						//When the AcademicID is existing in the map, and then if we try to add another, it will override the previous one.
+						//May be List should be there such as
+						//  Map<String, List<PayrollDetailsBO>>
+					}
+					else
+					{
+						
+						PayrollDetailsBO payrollDetails = new PayrollDetailsBO();
+						payrollDetails.setPayrollDate(rs.getDate("payroll_date"));
+						payrollDetails.setPaidDays(rs.getDouble("paid_days"));
+						payrollDetails.setUnpaidDays(rs.getDouble("unpaid_day"));
+						payrollDetails.setAmount(rs.getDouble("amount"));
+						payrollDetails.setPayrollLocked(rs.getString("payroll_locked").charAt(0));
+						
+						int month_id = rs.getInt("month_id");
+						String monthID = ""+month_id;
+						String month = getMonthNameFromMonthMaster(monthID); 
+						
+						
+						MonthMasterDetailsBO monthMasterDetailsBO = new MonthMasterDetailsBO();
+						monthMasterDetailsBO.setMonthId(month_id);
+						monthMasterDetailsBO.setMonthName(month);
+						
+						payrollDetails.setPayrollMonth(monthMasterDetailsBO);
+						
+						
+						
+						
+						userPayrollDetailsMap.put(academicID, payrollDetails);
+					}
+					
+				}
+				return userPayrollDetailsMap;
+			}
+		});
+	}
+	
+	public UserAdvanceDetailsBO getUsersAdvanceDetails(String userId)
+	{
+		
+		populateInheritedEntriesofUserAdvanceDetailsBO(getBasicDetailsOfOneUser(userId));
+		singleUserAdvanceDetailsBO.setUserAcademicDetails(getAcademicDetailsOfOneUser(userId));
+		singleUserAdvanceDetailsBO.setUserManagerDetails(getManagerDetailsOfOneUser(userId));
+		singleUserAdvanceDetailsBO.setUserSalaryDetails(getSalaryDetailsOfOneUser(userId));
+		singleUserAdvanceDetailsBO.setUserPayrollDetails(getPayrollDetailsOfOneUser(userId));
+	    return singleUserAdvanceDetailsBO;
 	}
 }
