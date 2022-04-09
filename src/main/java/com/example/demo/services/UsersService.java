@@ -43,7 +43,7 @@ public class UsersService {
 	BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@Autowired
-	UserAdvanceDetailsBO singleUserAdvanceDetailsBO;
+	UserAdvanceDetailsBO userAdvanceDetailsBO;
 	
 	@Transactional
 	public UserBasicDetailsBO addNewUser(UserBasicDetailsBO userBasicDetailsBO) {
@@ -141,11 +141,7 @@ public class UsersService {
 					userBasicDetailsBO.setReligion(rs.getString("RELIGION"));
 					userBasicDetailsBO.setCaste(rs.getString("CASTE"));
 					userBasicDetailsBO.setNationality(rs.getString("NATIONALITY"));
-					
-					//commenting this out as there is no column as GENDER in user_basic_details
 					userBasicDetailsBO.setGender(rs.getString("GENDER"));
-					
-					//commenting this out as there is no column as ALTERNATE_MOBILE in user_basic_details
 					userBasicDetailsBO.setAlternateMobile(rs.getString("ALTERNATE_MOBILE"));
 					userBasicDetailsBOs.add(userBasicDetailsBO);
 				}
@@ -154,7 +150,8 @@ public class UsersService {
 		});
 	}
 	
-	public UserBasicDetailsBO getBasicDetailsOfOneUser(String userId)
+	
+	public UserAdvanceDetailsBO getUserBasicDetails(String userId)
 	{
 		String query = "SELECT * FROM USER_BASIC_DETAILS where user_id=?";
 		
@@ -165,58 +162,38 @@ public class UsersService {
 				ps.setString(1, userId);
 			}
 			
-		}, new ResultSetExtractor<UserBasicDetailsBO>() {
+		}, new ResultSetExtractor<UserAdvanceDetailsBO>() {
 			
 			@Override
-			public UserBasicDetailsBO extractData(ResultSet rs) throws SQLException, DataAccessException {
+			public UserAdvanceDetailsBO extractData(ResultSet rs) throws SQLException, DataAccessException {
 				
-				UserBasicDetailsBO userBasicDetailsBO = new UserBasicDetailsBO(); 
 				while (rs.next()) 
 				{
-					userBasicDetailsBO.setUserId(rs.getString("USER_ID"));
-					userBasicDetailsBO.setFirstName(rs.getString("FIRST_NAME"));
-					userBasicDetailsBO.setMiddleName(rs.getString("MIDDLE_NAME")==null?"":rs.getString("MIDDLE_NAME"));
-					userBasicDetailsBO.setLastName(rs.getString("LAST_NAME"));
-					userBasicDetailsBO.setMobile(rs.getString("MOBILE"));
-					userBasicDetailsBO.setEmail(rs.getString("EMAIL"));
-					userBasicDetailsBO.setAddress(rs.getString("ADDRESS"));
-					userBasicDetailsBO.setBirthDate(DateUtils.getDate(rs.getDate("BIRTH_DATE")));
-					userBasicDetailsBO.setMaritalStatus(rs.getString("MARITAL_STATUS"));
-					userBasicDetailsBO.setAdhar(rs.getString("ADHAR"));
-					userBasicDetailsBO.setReligion(rs.getString("RELIGION"));
-					userBasicDetailsBO.setCaste(rs.getString("CASTE"));
-					userBasicDetailsBO.setNationality(rs.getString("NATIONALITY"));
-					//commenting this out as there is no column as GENDER in user_basic_details
-					userBasicDetailsBO.setGender(rs.getString("GENDER"));
-					
-					//commenting this out as there is no column as ALTERNATE_MOBILE in user_basic_details
-					userBasicDetailsBO.setAlternateMobile(rs.getString("ALTERNATE_MOBILE"));
+					userAdvanceDetailsBO.setUserId(rs.getString("USER_ID"));
+					userAdvanceDetailsBO.setFirstName(rs.getString("FIRST_NAME"));
+					userAdvanceDetailsBO.setMiddleName(rs.getString("MIDDLE_NAME")==null?"":rs.getString("MIDDLE_NAME"));
+					userAdvanceDetailsBO.setLastName(rs.getString("LAST_NAME"));
+					userAdvanceDetailsBO.setMobile(rs.getString("MOBILE"));
+					userAdvanceDetailsBO.setEmail(rs.getString("EMAIL"));
+					userAdvanceDetailsBO.setAddress(rs.getString("ADDRESS"));
+					userAdvanceDetailsBO.setBirthDate(DateUtils.getDate(rs.getDate("BIRTH_DATE")));
+					userAdvanceDetailsBO.setMaritalStatus(rs.getString("MARITAL_STATUS"));
+					userAdvanceDetailsBO.setAdhar(rs.getString("ADHAR"));
+					userAdvanceDetailsBO.setReligion(rs.getString("RELIGION"));
+					userAdvanceDetailsBO.setCaste(rs.getString("CASTE"));
+					userAdvanceDetailsBO.setNationality(rs.getString("NATIONALITY"));
+					userAdvanceDetailsBO.setGender(rs.getString("GENDER"));
+					userAdvanceDetailsBO.setAlternateMobile(rs.getString("ALTERNATE_MOBILE"));
 				}
-				return userBasicDetailsBO;
+				return userAdvanceDetailsBO;
 			}
 			
 		});
 	}
 	
-	//
-	public void populateInheritedEntriesofUserAdvanceDetailsBO(UserBasicDetailsBO userBasicDetailsBO)
-	{
-		singleUserAdvanceDetailsBO.setUserId(userBasicDetailsBO.getUserId());
-		singleUserAdvanceDetailsBO.setFirstName(userBasicDetailsBO.getFirstName());
-		singleUserAdvanceDetailsBO.setMiddleName(userBasicDetailsBO.getMiddleName());
-		singleUserAdvanceDetailsBO.setLastName(userBasicDetailsBO.getLastName());
-		singleUserAdvanceDetailsBO.setMobile(userBasicDetailsBO.getMobile());
-		singleUserAdvanceDetailsBO.setEmail(userBasicDetailsBO.getEmail());
-		singleUserAdvanceDetailsBO.setAddress(userBasicDetailsBO.getAddress());
-		singleUserAdvanceDetailsBO.setBirthDate(userBasicDetailsBO.getBirthDate());
-		singleUserAdvanceDetailsBO.setMaritalStatus(userBasicDetailsBO.getMaritalStatus());
-		singleUserAdvanceDetailsBO.setAdhar(userBasicDetailsBO.getAdhar());
-		singleUserAdvanceDetailsBO.setReligion(userBasicDetailsBO.getReligion());
-		singleUserAdvanceDetailsBO.setCaste(userBasicDetailsBO.getCaste());
-		singleUserAdvanceDetailsBO.setNationality(userBasicDetailsBO.getNationality());
-		singleUserAdvanceDetailsBO.setGender(userBasicDetailsBO.getGender());
-		singleUserAdvanceDetailsBO.setAlternateMobile(userBasicDetailsBO.getAlternateMobile());
-	}
+	
+	
+	
 	public String getClassNameFromClassID(String classID)
 	{
 		String query = "SELECT class_name FROM classes where class_id=?";	
@@ -298,7 +275,7 @@ public class UsersService {
 	
 	//Prototype to get the user academic details in UserAdvanceDeails
 	//private Map<String, UserAcademicDetailsBO> userAcademicDetails; // Map of Academic id to Academic Details
-	public Map<String, UserAcademicDetailsBO> getAcademicDetailsOfOneUser(String userId)
+	public Map<String, UserAcademicDetailsBO> getUserAcademicDetails(String userId)
 	{
 		String query = "SELECT * FROM USER_ACADEMIC_DETAILS where user_id=?";
 		return jdbcTemplate.query(query, new PreparedStatementSetter() {
@@ -383,7 +360,7 @@ public class UsersService {
 		});
 	}
 	
-	public List<UserManagerDetailsBO> getManagerDetailsOfOneUser(String userId)
+	public List<UserManagerDetailsBO> getUserManagerDetails(String userId)
 	{
 		String query = "SELECT * FROM USER_MANAGER_MAPPING where user_id=?";
 		
@@ -449,7 +426,7 @@ public class UsersService {
 	
 	//Prototype to get Payroll details in user_payroll_details
 	//private Map<String, PayrollDetailsBO> userPayrollDetails; // Map of Academic Id to Payroll details
-	public Map<String, PayrollDetailsBO> getPayrollDetailsOfOneUser(String userId)
+	public Map<String, List<PayrollDetailsBO>> getUserPayrollDetails(String userId)
 	{
 		String query = "SELECT * FROM USER_PAYROLL_DETAILS where user_id=?";
 		return jdbcTemplate.query(query, new PreparedStatementSetter() {
@@ -459,48 +436,41 @@ public class UsersService {
 				ps.setString(1, userId);
 			}
 			
-		}, new ResultSetExtractor<Map<String, PayrollDetailsBO>>(){
+		}, new ResultSetExtractor<Map<String, List<PayrollDetailsBO>>>(){
 			
 			@Override
-			public Map<String, PayrollDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
-				Map<String, PayrollDetailsBO> userPayrollDetailsMap = new HashMap<>();
+			public Map<String, List<PayrollDetailsBO>> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				Map<String, List<PayrollDetailsBO>> userPayrollDetailsMap = new HashMap<>();
 				while(rs.next())
 				{
 					String academicID = rs.getString("ACADEMIC_ID");
 					
+					PayrollDetailsBO payrollDetails = new PayrollDetailsBO();
+					payrollDetails.setPayrollDate(rs.getDate("payroll_date"));
+					payrollDetails.setPaidDays(rs.getDouble("paid_days"));
+					payrollDetails.setUnpaidDays(rs.getDouble("unpaid_day"));
+					payrollDetails.setAmount(rs.getDouble("amount"));
+					payrollDetails.setPayrollLocked(rs.getString("payroll_locked").charAt(0));
+					int month_id = rs.getInt("month_id");
+					String monthID = ""+month_id;
+					String month = getMonthNameFromMonthMaster(monthID); 
+					MonthMasterDetailsBO monthMasterDetailsBO = new MonthMasterDetailsBO();
+					monthMasterDetailsBO.setMonthId(month_id);
+					monthMasterDetailsBO.setMonthName(month);
+					payrollDetails.setPayrollMonth(monthMasterDetailsBO);
 					
 					if(userPayrollDetailsMap.containsKey(academicID))
 					{
-						//As of now, not considering this. But there is a problem here.
-						//When the AcademicID is existing in the map, and then if we try to add another, it will override the previous one.
-						//May be List should be there such as
-						//  Map<String, List<PayrollDetailsBO>>
+						List<PayrollDetailsBO> listPayrollDetailsBO = userPayrollDetailsMap.get(academicID);
+						listPayrollDetailsBO.add(payrollDetails);
+						userPayrollDetailsMap.put(academicID, listPayrollDetailsBO);
+						
 					}
 					else
 					{
-						
-						PayrollDetailsBO payrollDetails = new PayrollDetailsBO();
-						payrollDetails.setPayrollDate(rs.getDate("payroll_date"));
-						payrollDetails.setPaidDays(rs.getDouble("paid_days"));
-						payrollDetails.setUnpaidDays(rs.getDouble("unpaid_day"));
-						payrollDetails.setAmount(rs.getDouble("amount"));
-						payrollDetails.setPayrollLocked(rs.getString("payroll_locked").charAt(0));
-						
-						int month_id = rs.getInt("month_id");
-						String monthID = ""+month_id;
-						String month = getMonthNameFromMonthMaster(monthID); 
-						
-						
-						MonthMasterDetailsBO monthMasterDetailsBO = new MonthMasterDetailsBO();
-						monthMasterDetailsBO.setMonthId(month_id);
-						monthMasterDetailsBO.setMonthName(month);
-						
-						payrollDetails.setPayrollMonth(monthMasterDetailsBO);
-						
-						
-						
-						
-						userPayrollDetailsMap.put(academicID, payrollDetails);
+						List<PayrollDetailsBO> listPayrollDetailsBO = new ArrayList();
+						listPayrollDetailsBO.add(payrollDetails);
+						userPayrollDetailsMap.put(academicID, listPayrollDetailsBO);
 					}
 					
 				}
@@ -512,11 +482,11 @@ public class UsersService {
 	public UserAdvanceDetailsBO getUsersAdvanceDetails(String userId)
 	{
 		
-		populateInheritedEntriesofUserAdvanceDetailsBO(getBasicDetailsOfOneUser(userId));
-		singleUserAdvanceDetailsBO.setUserAcademicDetails(getAcademicDetailsOfOneUser(userId));
-		singleUserAdvanceDetailsBO.setUserManagerDetails(getManagerDetailsOfOneUser(userId));
-		singleUserAdvanceDetailsBO.setUserSalaryDetails(getSalaryDetailsOfOneUser(userId));
-		singleUserAdvanceDetailsBO.setUserPayrollDetails(getPayrollDetailsOfOneUser(userId));
-	    return singleUserAdvanceDetailsBO;
+		getUserBasicDetails(userId);
+		userAdvanceDetailsBO.setUserAcademicDetails(getUserAcademicDetails(userId));
+		userAdvanceDetailsBO.setUserManagerDetails(getUserManagerDetails(userId));
+		userAdvanceDetailsBO.setUserSalaryDetails(getSalaryDetailsOfOneUser(userId));
+		userAdvanceDetailsBO.setUserPayrollDetails(getUserPayrollDetails(userId));
+	    return userAdvanceDetailsBO;
 	}
 }

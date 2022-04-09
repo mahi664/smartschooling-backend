@@ -11,7 +11,7 @@ public class UserAdvanceDetailsBO extends UserBasicDetailsBO {
 	private Map<String, UserAcademicDetailsBO> userAcademicDetails; // Map of Academic id to Academic Details
 	private List<LeaveDetailsBO> userApplicableLeaves;
 	private List<UserManagerDetailsBO> userManagerDetails;
-	private Map<String, PayrollDetailsBO> userPayrollDetails; // Map of Academic Id to Payroll details
+	private Map<String, List<PayrollDetailsBO>> userPayrollDetails; // Map of Academic Id to Payroll details
 	private List<SalaryDetailsBO> userSalaryDetails;
 	
 	public Map<String, UserAcademicDetailsBO> getUserAcademicDetails() {
@@ -32,10 +32,10 @@ public class UserAdvanceDetailsBO extends UserBasicDetailsBO {
 	public void setUserManagerDetails(List<UserManagerDetailsBO> userManagerDetails) {
 		this.userManagerDetails = userManagerDetails;
 	}
-	public Map<String, PayrollDetailsBO> getUserPayrollDetails() {
+	public Map<String, List<PayrollDetailsBO>> getUserPayrollDetails() {
 		return userPayrollDetails;
 	}
-	public void setUserPayrollDetails(Map<String, PayrollDetailsBO> userPayrollDetails) {
+	public void setUserPayrollDetails(Map<String, List<PayrollDetailsBO>> userPayrollDetails) {
 		this.userPayrollDetails = userPayrollDetails;
 	}
 	public List<SalaryDetailsBO> getUserSalaryDetails() {
@@ -46,7 +46,7 @@ public class UserAdvanceDetailsBO extends UserBasicDetailsBO {
 	}
 	public UserAdvanceDetailsBO(Map<String, UserAcademicDetailsBO> userAcademicDetails,
 			List<LeaveDetailsBO> userApplicableLeaves, List<UserManagerDetailsBO> userManagerDetails,
-			Map<String, PayrollDetailsBO> userPayrollDetails, List<SalaryDetailsBO> userSalaryDetails) {
+			Map<String, List<PayrollDetailsBO>> userPayrollDetails, List<SalaryDetailsBO> userSalaryDetails) {
 		super();
 		this.userAcademicDetails = userAcademicDetails;
 		this.userApplicableLeaves = userApplicableLeaves;
