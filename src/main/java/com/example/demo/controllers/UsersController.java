@@ -33,10 +33,8 @@ public class UsersController {
 		return usersService.getUsers();
 	}
 	
-	@GetMapping(path = "/users/{userId}")
-	public UserAdvanceDetailsBO getUsersAdvanceDetails(@PathVariable String userId)
-	//public UserBasicDetailsBO getUsersAdvanceDetails(@PathVariable String userId)
-	{
+	@GetMapping(path = "/{userId}")
+	public UserAdvanceDetailsBO getUsersAdvanceDetails(@PathVariable String userId) {
 		return usersService.getUsersAdvanceDetails(userId);
 	}
 }

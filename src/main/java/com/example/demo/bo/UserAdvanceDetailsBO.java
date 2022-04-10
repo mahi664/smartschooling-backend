@@ -13,7 +13,15 @@ public class UserAdvanceDetailsBO extends UserBasicDetailsBO {
 	private List<UserManagerDetailsBO> userManagerDetails;
 	private Map<String, List<PayrollDetailsBO>> userPayrollDetails; // Map of Academic Id to Payroll details
 	private List<SalaryDetailsBO> userSalaryDetails;
+	private List<RoleDetailsBO> userRoles;
 	
+	
+	public List<RoleDetailsBO> getUserRoles() {
+		return userRoles;
+	}
+	public void setUserRoles(List<RoleDetailsBO> userRoles) {
+		this.userRoles = userRoles;
+	}
 	public Map<String, UserAcademicDetailsBO> getUserAcademicDetails() {
 		return userAcademicDetails;
 	}
@@ -61,7 +69,7 @@ public class UserAdvanceDetailsBO extends UserBasicDetailsBO {
 	public String toString() {
 		return "UserAdvanceDetailsBO [userAcademicDetails=" + userAcademicDetails + ", userApplicableLeaves="
 				+ userApplicableLeaves + ", userManagerDetails=" + userManagerDetails + ", userPayrollDetails="
-				+ userPayrollDetails + ", userSalaryDetails=" + userSalaryDetails + "]";
+				+ userPayrollDetails + ", userSalaryDetails=" + userSalaryDetails + ", userRoles=" + userRoles + "]";
 	}
 	
 	
