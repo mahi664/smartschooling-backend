@@ -122,8 +122,7 @@ CREATE TABLE smartschoolingdev.student_details (
 	caste varchar(100) NULL,
 	transport CHAR NOT NULL,
 	nationality varchar(100) NULL,
-	CONSTRAINT student_details_pk PRIMARY KEY (stud_id),
-	CONSTRAINT student_details_un UNIQUE KEY (adhar)
+	CONSTRAINT student_details_pk PRIMARY KEY (stud_id)
 );
 
 CREATE TABLE smartschoolingdev.student_fees_details (
