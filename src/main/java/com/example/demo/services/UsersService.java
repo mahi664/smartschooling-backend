@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -25,9 +26,12 @@ import com.example.demo.bo.RoleDetailsBO;
 import com.example.demo.bo.SalaryDetailsBO;
 import com.example.demo.bo.SubjectDetailsBO;
 import com.example.demo.bo.UserAcademicDetailsBO;
+import com.example.demo.bo.UserAcademicDetailsDto;
 import com.example.demo.bo.UserAdvanceDetailsBO;
 import com.example.demo.bo.UserBasicDetailsBO;
 import com.example.demo.bo.UserManagerDetailsBO;
+import com.example.demo.services.helper.UserServiceHelper;
+import com.example.demo.utils.CommonUtils;
 import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
 
@@ -42,6 +46,9 @@ public class UsersService {
 
 	@Autowired
 	UserAdvanceDetailsBO userAdvanceDetailsBO;
+	
+	@Autowired
+	private UserServiceHelper userServiceHelper;
 
 	@Transactional
 	public UserBasicDetailsBO addNewUser(UserBasicDetailsBO userBasicDetailsBO) {
@@ -379,6 +386,58 @@ public class UsersService {
 					roles.add(roleDetailsBO);
 				}
 				return roles;
+			}
+		});
+	}
+
+	@Transactional
+	public Map<String, UserAcademicDetailsBO> addUserAcademicDetails(String userId, Map<String, UserAcademicDetailsBO> usreAcademicDetails) {
+		try {
+			deleteUserAcademicDetails(userId, usreAcademicDetails);
+			insertUserAcademicDetails(userId, userServiceHelper.populateUserAcademicDetailsDto(usreAcademicDetails));
+		} catch (Exception e) {
+			System.out.println("Error while saving user academic details");
+			return null;
+		}
+		return usreAcademicDetails;
+	}
+
+	private int[] insertUserAcademicDetails(String userId, List<UserAcademicDetailsDto> userAcademicDetailsDTOs) {
+		String query = "INSERT INTO user_academic_details "
+				+ "(user_id, academic_id, class_id, sub_id, last_update_time, last_user) "
+				+ "VALUES(?, ?, ?, ?, ?, ?)";
+		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				// TODO Auto-generated method stub
+				ps.setString(1, userId);
+				ps.setString(2, userAcademicDetailsDTOs.get(i).getAcademicId());
+				ps.setString(3, userAcademicDetailsDTOs.get(i).getClassId());
+				ps.setString(4, userAcademicDetailsDTOs.get(i).getSubjectId());
+				ps.setDate(5, DateUtils.getSqlDate(new Date()));
+				ps.setString(6, "Mahesh");
+			}
+			
+			@Override
+			public int getBatchSize() {
+				return userAcademicDetailsDTOs.size();
+			}
+		});
+	}
+
+	private void deleteUserAcademicDetails(String userId, Map<String, UserAcademicDetailsBO> usreAcademicDetails) {
+		String query = "delete from user_academic_details where user_id=? and academic_id in ";
+		query = CommonUtils.populateInClause(query, new ArrayList<>(usreAcademicDetails.keySet()));
+		jdbcTemplate.update(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				int i=1;
+				ps.setString(i++, userId);
+				for(String academicId : usreAcademicDetails.keySet()) {
+					ps.setString(i++, academicId);
+				}
 			}
 		});
 	}
