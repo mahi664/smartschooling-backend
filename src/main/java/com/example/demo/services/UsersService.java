@@ -4,11 +4,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -272,8 +275,8 @@ public class UsersService {
 					UserManagerDetailsBO userManagerDetailsBO = new UserManagerDetailsBO();
 					userManagerDetailsBO.setUserId(rs.getString("reports_to"));
 					userManagerDetailsBO.setName(rs.getString("reportee_name"));
-					userManagerDetailsBO.setEffDate(rs.getDate("eff_date"));
-					userManagerDetailsBO.setEndDate(rs.getDate("end_date"));
+					userManagerDetailsBO.setEffDate(DateUtils.getDate(rs.getDate("eff_date")));
+					userManagerDetailsBO.setEndDate(DateUtils.getDate(rs.getDate("end_date")));
 
 					userManagerDetailsBOs.add(userManagerDetailsBO);
 				}
@@ -438,6 +441,77 @@ public class UsersService {
 				for(String academicId : usreAcademicDetails.keySet()) {
 					ps.setString(i++, academicId);
 				}
+			}
+		});
+	}
+
+	@Transactional
+	public List<RoleDetailsBO> addUserRoleDetails(String userId, List<RoleDetailsBO> userRoles) {
+		deleteUserRoleDetails(userId);
+		updateUserRoleBOs(userRoles);
+		int res[] = insertUserRoleDetails(userId,userRoles);
+		if(res.length<0) {
+			System.out.println("Error while adding user role details");
+			return null;
+		}
+		return userRoles;
+	}
+
+	private void updateUserRoleBOs(List<RoleDetailsBO> userRoles) {
+		userRoles.stream().forEach(t -> {
+			if (t.getEffDate() == null)
+				t.setEffDate(new Date());
+			if (t.getEndDate() == null)
+				t.setEndDate(Constants.MAX_DATE);
+		});
+
+		userRoles.sort(new Comparator<RoleDetailsBO>() {
+
+			@Override
+			public int compare(RoleDetailsBO o1, RoleDetailsBO o2) {
+				if (o1.getEffDate().before(o2.getEffDate()))
+					return -1;
+				else
+					return 1;
+			}
+		});
+		
+		userRoles.stream().forEach(t -> {
+			int indx = userRoles.indexOf(t);
+			if(indx<userRoles.size()-1)
+				t.setEndDate(userRoles.get(indx+1).getEffDate());
+		});
+
+	}
+
+	private int[] insertUserRoleDetails(String userId, List<RoleDetailsBO> userRoles) {
+		String query = "insert into user_role_mapping values(?,?,?,?,?,?)";
+		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				ps.setString(1, userId);
+				ps.setString(2, userRoles.get(i).getRoleId());
+				ps.setDate(3, DateUtils.getSqlDate(userRoles.get(i).getEffDate()));
+				ps.setDate(4, DateUtils.getSqlDate(userRoles.get(i).getEndDate()));
+				ps.setDate(5, DateUtils.getSqlDate(new Date()));
+				ps.setString(6, "Admin");
+			}
+			
+			@Override
+			public int getBatchSize() {
+				return userRoles.size();
+			}
+		});
+	}
+
+	private void deleteUserRoleDetails(String userId) {
+		String query = "delete from user_role_mapping where user_id = ?";
+		jdbcTemplate.update(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, userId);
 			}
 		});
 	}
