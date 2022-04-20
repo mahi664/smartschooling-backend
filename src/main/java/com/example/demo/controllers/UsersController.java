@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.bo.RoleDetailsBO;
 import com.example.demo.bo.UserAcademicDetailsBO;
 import com.example.demo.bo.UserAdvanceDetailsBO;
 import com.example.demo.bo.UserBasicDetailsBO;
@@ -43,5 +44,10 @@ public class UsersController {
 	@PostMapping(path = "/{userId}/academic-details")
 	public Map<String, UserAcademicDetailsBO> addUserAcademicDetails(@PathVariable String userId, @RequestBody Map<String, UserAcademicDetailsBO> usreAcademicDetails){
 		return usersService.addUserAcademicDetails(userId, usreAcademicDetails);
+	}
+	
+	@PostMapping(path = "/{userId}/role-details")
+	public List<RoleDetailsBO> addUserRoleDetails(@PathVariable String userId, @RequestBody List<RoleDetailsBO> userRoles){
+		return usersService.addUserRoleDetails(userId, userRoles);
 	}
 }
