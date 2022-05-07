@@ -15,6 +15,7 @@ env:
   GKE_CLUSTER: smart-schooling-app    # Add your cluster name here.
   GKE_ZONE: asia-east1-a   # Add your cluster zone here.
   DEPLOYMENT_NAME: gke-test # Add your deployment name here.
+  REPOSITORY: backend-smart-schooling-dev # TODO: update to Artifact Registry docker repository
   IMAGE: static-site
 
 jobs:
