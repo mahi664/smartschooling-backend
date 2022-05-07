@@ -1,3 +1,3 @@
 FROM openjdk:8-jdk-slim
-COPY /target/smart-schooling.jar /target/smart-schooling.jar
-ENTRYPOINT ["java","-jar","/smart-schooling.jar"]
+COPY /target/demo-0.0.1-SNAPSHOT.jar.jar /target/demo-0.0.1-SNAPSHOT.jar.jar
+ENTRYPOINT ["java","-jar","/demo-0.0.1-SNAPSHOT.jar.jar"]
