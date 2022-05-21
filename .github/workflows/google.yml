@@ -16,7 +16,7 @@ env:
   GKE_CLUSTER: smart-schooling-app    # Add your cluster name here.
   GKE_ZONE: asia-east1-a   # Add your cluster zone here.
   DEPLOYMENT_NAME: gke-test # Add your deployment name here.
-  REPOSITORY: backend-smart-schooling-dev # TODO: update to Artifact Registry docker repository
+  REPOSITORY: smartschoolingdev # TODO: update to Artifact Registry docker repository
   IMAGE: static-site
 
 jobs:
@@ -51,7 +51,7 @@ jobs:
     - name: Build
       run: |-
         docker build .
-          --tag "${{ env.GAR_LOCATION}}-docker.pkg.dev/${{ secrets.GKE_PROJECT }}/${{ env.REPOSITORY}}/${{ env.IMAGE}}:$GITHUB_SHA" \
+          --tag "${{ env.GAR_LOCATION}}-docker.pkg.dev/${{ secrets.GKE_PROJECT }}/${{ env.REPOSITORY}}/${{ env.IMAGE}}" \
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
