@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.bo.LoginRequest;
 import com.example.demo.bo.LoginResponse;
 import com.example.demo.bo.QuickUserRegistrationRequest;
-import com.example.demo.services.AuthenticationService;
+import com.example.demo.service.AuthenticationService;
 
 @RestController
 @RequestMapping("/auth")

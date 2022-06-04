@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.bo.FeesDetailsBO;
-import com.example.demo.services.FeesService;
+import com.example.demo.service.FeesService;
 
 @RestController
 @CrossOrigin(origins="*")
