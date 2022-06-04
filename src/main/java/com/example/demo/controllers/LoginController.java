@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.services.UserLogInService;
+import com.example.demo.service.UserLogInService;
 
 @RestController(value="UserLogin")
 public class LoginController {

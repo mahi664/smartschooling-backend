@@ -26,8 +26,12 @@ public class DateUtils {
 		return sqlDate;
 	}
 	
+	/**
+	 * 
+	 * @param date
+	 * @return
+	 */
 	public static Date getDate(java.sql.Date date) {
-		Date javaDate = new Date(date.getTime());
-		return javaDate;
+		return date == null ? null : new Date(date.getTime());
 	}
 }

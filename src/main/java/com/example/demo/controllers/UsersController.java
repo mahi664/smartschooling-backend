@@ -16,7 +16,7 @@ import com.example.demo.bo.RoleDetailsBO;
 import com.example.demo.bo.UserAcademicDetailsBO;
 import com.example.demo.bo.UserAdvanceDetailsBO;
 import com.example.demo.bo.UserBasicDetailsBO;
-import com.example.demo.services.UsersService;
+import com.example.demo.service.UsersService;
 
 @RestController
 @RequestMapping(value = "/users")

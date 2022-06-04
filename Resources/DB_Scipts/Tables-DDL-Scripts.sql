@@ -106,6 +106,25 @@ CREATE TABLE smartschoolingdev.class_subject_details (
 	CONSTRAINT class_subject_details_fk_1 FOREIGN KEY (sub_id) REFERENCES smartschoolingdev.subjects(sub_id)
 );
 
+CREATE TABLE smartschoolingdev.general_register (
+	reg_no BIGINT NOT NULL,
+	book_no INT NOT NULL,
+	stud_id varchar(100) NOT NULL,
+	admission_std varchar(100) NOT NULL,
+	admission_date DATETIME NULL,
+	prev_school VARCHAR(500) NULL,
+	school_leaving_date DATETIME NULL,
+	school_leaving_reason varchar(100) NULL,
+	new_school varchar(500) NULL,
+	CONSTRAINT general_register_pk PRIMARY KEY (reg_no),
+	CONSTRAINT general_register_fk FOREIGN KEY (stud_id) REFERENCES smartschoolingdev.student_details(stud_id),
+	CONSTRAINT general_register_fk_1 FOREIGN KEY (admission_std) REFERENCES smartschoolingdev.classes(class_id)
+);
+
+ALTER TABLE smartschoolingdev.general_register ADD academic_id varchar(100) NOT NULL;
+ALTER TABLE smartschoolingdev.general_register ADD CONSTRAINT general_register_fk_2 FOREIGN KEY (academic_id) REFERENCES smartschoolingdev.academic_details(academic_id);
+
+
 CREATE TABLE smartschoolingdev.student_details (
 	stud_id varchar(100) NOT NULL,
 	first_name varchar(100) NOT NULL,
