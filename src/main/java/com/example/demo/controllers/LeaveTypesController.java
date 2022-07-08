@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.bo.LeaveDetailsBO;
-import com.example.demo.services.LeaveTypeService;
+import com.example.demo.service.LeaveTypeService;
 
 @RestController
 @RequestMapping(value = "/Leave-Types")

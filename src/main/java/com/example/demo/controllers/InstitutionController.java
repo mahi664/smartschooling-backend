@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.bo.InstituteDetailsBO;
-import com.example.demo.services.InstituteService;
+import com.example.demo.service.InstituteService;
 
 @RestController
 public class InstitutionController {

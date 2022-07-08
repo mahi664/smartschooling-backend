@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.bo.AccountsDetailsBO;
-import com.example.demo.services.AccountsService;
+import com.example.demo.service.AccountsService;
 
 @RestController
 @CrossOrigin(origins = "*")

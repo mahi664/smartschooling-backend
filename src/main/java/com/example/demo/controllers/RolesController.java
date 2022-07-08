@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.bo.LeaveDetailsBO;
 import com.example.demo.bo.RoleDetailsBO;
 import com.example.demo.bo.SubjectDetailsBO;
-import com.example.demo.services.RoleDetailsService;
+import com.example.demo.service.RoleDetailsService;
 
 @RestController
 @RequestMapping(value = "/roles")

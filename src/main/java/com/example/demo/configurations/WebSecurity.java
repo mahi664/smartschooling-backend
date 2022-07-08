@@ -14,7 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.example.demo.services.CustomUserDetailsService;
+import com.example.demo.service.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
@@ -38,6 +38,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
 			.cors().disable()
 			.authorizeRequests()
 			.antMatchers("/swagger-ui/**").permitAll()
+			.antMatchers("/swagger-ui.html").permitAll()
 			.antMatchers("/auth/**").permitAll()
 			.antMatchers("/v3/api-docs/**").permitAll()
 			.antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
