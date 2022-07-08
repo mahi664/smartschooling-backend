@@ -11,7 +11,7 @@ public class Constants {
 	public static final		String		STUDENT_ID_PREFIX 	= 	"SCHNAME-";
 	public static final 	String 		YES					= 	"Y";
 	public static final 	String 		NO					= 	"N";
-	public static final 	String 		BLANK_STRING		= 	" ";
+	public static final 	String 		BLANK_STRING		= 	"";
 	public static final     int         APPEND_CHARACTERS   =    8;
 	public static final		String 		DEFAULT_PASSWORD 	= 	"New@123";
 }

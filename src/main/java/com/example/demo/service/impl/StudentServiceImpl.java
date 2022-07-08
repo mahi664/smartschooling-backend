@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -24,6 +31,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.bo.AccountsDetailsBO;
 import com.example.demo.bo.ClassDetaislBO;
@@ -47,19 +55,25 @@ import com.example.demo.data.repository.StudentClassDetailsRepository;
 import com.example.demo.data.repository.StudentDetailsRepository;
 import com.example.demo.data.repository.StudentFeesDetailsRepository;
 import com.example.demo.data.repository.StudentTransportDetailsRepository;
+import com.example.demo.exception.FileStorageException;
 import com.example.demo.exception.StudentException;
 import com.example.demo.service.StudentService;
 import com.example.demo.service.UtilService;
 import com.example.demo.service.adapter.StudentServiceAdapter;
 import com.example.demo.service.dto.FetchStudentsResponseDto;
 import com.example.demo.service.dto.StudentDetailsForRegNoResponseDto;
+import com.example.demo.service.dto.StudentImportData;
+import com.example.demo.service.dto.StudentImportResponseDto;
+import com.example.demo.service.dto.StudentListRequestDto;
 import com.example.demo.service.dto.StudentRegistrationDto;
 import com.example.demo.service.dto.StudentRegistrationResponseDto;
+import com.example.demo.service.helper.FileStorageService;
 import com.example.demo.service.validator.StudentValidator;
 import com.example.demo.utils.CommonUtils;
 import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
 import com.example.demo.utils.DefaultAccountsTypes;
+import com.example.demo.utils.FileUtils;
 import com.example.demo.utils.ReferenceTableTypes;
 import com.example.demo.utils.TransactionTypes;
 
@@ -99,6 +113,12 @@ public class StudentServiceImpl implements StudentService {
 	
 	@Autowired
 	private StudentFeesDetailsRepository studentFeesDetailsRepository;
+	
+	@Autowired
+	private FileStorageService fileStorageService;
+	
+	@Autowired
+	private FileUtils fileUtils;
 
 	@Transactional
 	public StudentDetailsBO addNewStudent(StudentDetailsBO studentDetailsBO) {
@@ -999,12 +1019,12 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public FetchStudentsResponseDto getStudentList(String academicYear, int page, int size)
+	public FetchStudentsResponseDto getStudentList(String academicYear, int page, int size, StudentListRequestDto studentListRequestDto)
 			throws StudentException {
 		log.info("Fetching student list for academic year {}, page {} and size {}", academicYear, page, size);
 		PageRequest pageable = PageRequest.of(page, size);
 		Page<StudentBasicDetails> pagedStudentData = Optional
-				.ofNullable(studentDetailsRepository.getStudentDetails(academicYear, pageable))
+				.ofNullable(studentDetailsRepository.getStudentDetails(academicYear, pageable, studentListRequestDto))
 				.orElseThrow(() -> new StudentException(ErrorDetails.STUDENT_DETAILS_NOT_FOUND));
 		return studentServiceAdapter.getFetchStudentResponseDto(pagedStudentData);
 	}
@@ -1040,5 +1060,53 @@ public class StudentServiceImpl implements StudentService {
 			}
 		}
 		return studentServiceAdapter.getStudentDetailsForRegNoResponseDto(generalRegisterDetails, studentBasicDetails, studentTransportDetails);
+	}
+
+	@Override
+	@Transactional(rollbackFor = {StudentException.class, Exception.class})
+	public List<StudentImportResponseDto> importStudentDetailsFromFile(MultipartFile file) throws StudentException {
+		@Valid List<StudentRegistrationDto> studentRegistrationDtoList = null;
+		try {
+			log.info("Reading content of file {}", file.getOriginalFilename());
+			studentRegistrationDtoList = fileUtils.readStudentImportFile(file.getInputStream());
+		} catch (FileStorageException ex) {
+			log.error("Error while reading content of uploaded file", ex.getMessage());
+			throw new StudentException(ErrorDetails.FILE_UPLOAD_ERROR, ex);
+		} catch (IOException ex) {
+			log.error("Error while geting input stream of uploaded file", ex.getMessage());
+			throw new StudentException(ErrorDetails.FILE_READ_ERROR, ex);
+		}
+		if (studentRegistrationDtoList == null || studentRegistrationDtoList.isEmpty()) {
+			log.info("No data present in excel");
+			throw new StudentException(ErrorDetails.BLANK_FILE_ERROR);
+		}
+		List<String> errorMessages = studentValidator.validateStudentImportData(studentRegistrationDtoList);
+		if(errorMessages!=null && !errorMessages.isEmpty()) {
+			log.info("Student import validation failed {}", errorMessages.toString());
+			throw new StudentException(ErrorDetails.BAD_REQUEST, errorMessages);
+		}
+		return registerStudentDetails(studentRegistrationDtoList);
+	}
+
+	/**
+	 * 
+	 * @param studentRegistrationDtoList
+	 * @return
+	 * @throws StudentException
+	 */
+	public List<StudentImportResponseDto> registerStudentDetails(@Valid List<StudentRegistrationDto> studentRegistrationDtoList) throws StudentException {
+		log.info("new student registration for {} students", studentRegistrationDtoList.size());
+		String nextStudentId = Integer.toString(studentDetailsRepository.getMaxStudentId() + 1);
+		Map<String, String> feeName2IdMap = feeTypesRepository.getFeeTypes().stream()
+				.collect(Collectors.toMap(FeeTypes::getFeeName, FeeTypes::getFeeId));
+		StudentImportData studentImportData = studentServiceAdapter.getStudentRegistrationDetails(nextStudentId, studentRegistrationDtoList, feeName2IdMap);
+		studentDetailsRepository.addStudentBasicDeails(studentImportData.getStudentBasicDetailsList());
+		generalRegisterRepository.addNewStudentInGeneralRegister(studentImportData.getGeneralRegisterList());
+		studentClassDetailsRepository.addStudentClassDetails(studentImportData.getStudentClassDetailsList());
+		if(!studentImportData.getStudentTransportDetailsList().isEmpty()) {
+			studentTransportDetailsRepository.addSudentTransportDetails(studentImportData.getStudentTransportDetailsList());
+		}
+		studentFeesDetailsRepository.addNewStudentFeesDetails(studentImportData.getStudentFeesDetailsList());
+		return studentServiceAdapter.getStudentRegistrationResponse(studentImportData);
 	}
 }

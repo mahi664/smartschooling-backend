@@ -1,9 +1,7 @@
 package com.example.demo.exception;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +23,12 @@ public class StudentExceptionHandler extends ResponseEntityExceptionHandler{
 
 	@ExceptionHandler(StudentException.class)
 	protected ResponseEntity<ResponseDto> handleStudentException(StudentException ex) {
+		logger.error("Handling student exception {}", ex);
+		return ResponseUtil.populateErrorResponse(ex.getErrorDetails(), ex.getErrorMessages());
+	}
+	
+	@ExceptionHandler(FileStorageException.class)
+	protected ResponseEntity<ResponseDto> handleFileStorageException(StudentException ex) {
 		logger.error("Handling student exception {}", ex);
 		return ResponseUtil.populateErrorResponse(ex.getErrorDetails(), ex.getErrorMessages());
 	}

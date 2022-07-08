@@ -3,6 +3,7 @@ package com.example.demo.data.repository;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,12 @@ public class ClassDetailsRespository {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
+	/**
+	 * 
+	 * @param classId
+	 * @return
+	 * @throws StudentException
+	 */
 	public ClassDetails getClassDetails(String classId) throws StudentException {
 		log.info("Fetching class details for {}", classId);
 		String query = "select * from classes where class_id = ?";
@@ -54,5 +61,35 @@ public class ClassDetailsRespository {
 			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR, ex);
 		}
 		return classDetails;
+	}
+
+	/**
+	 * 
+	 * @return
+	 * @throws StudentException
+	 */
+	public List<ClassDetails> getClassDetails() throws StudentException {
+		log.info("Fetching classes details");
+		String query = "select * from classes";
+		log.info("query {}", query);
+		List<ClassDetails> classesDetailsList;
+		try {
+			classesDetailsList = jdbcTemplate.query(query, (rs, rowNum) -> getClassDetailsRowMapper(rs));
+		} catch (Exception ex) {
+			log.error("Error while fetching classes details");
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR, ex);
+		}
+		return classesDetailsList;
+	}
+
+	/**
+	 * 
+	 * @param rs
+	 * @return
+	 * @throws SQLException 
+	 */
+	private ClassDetails getClassDetailsRowMapper(ResultSet rs) throws SQLException {
+		log.info("Mapping result set to classes details entity");
+		return ClassDetails.builder().classId(rs.getString("class_id")).className(rs.getString("class_name")).build();
 	}
 }
