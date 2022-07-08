@@ -439,6 +439,18 @@ ALTER TABLE smartschoolingdev.user_login_details ADD password_update_time DATETI
 ALTER TABLE smartschoolingdev.user_basic_details ADD gender varchar(100) NOT NULL;
 ALTER TABLE smartschoolingdev.user_basic_details ADD alternate_mobile varchar(100) NULL;
 
+CREATE TABLE smartschoolingdev.religion (
+	id INT NOT NULL,
+	code varchar(100) NOT NULL,
+	description varchar(100) NULL,
+	CONSTRAINT religion_pk PRIMARY KEY (id)
+);
+
+CREATE TABLE smartschoolingdev.caste (
+	id int auto_increment NOT NULL,
+	caste varchar(100) NOT NULL,
+	CONSTRAINT caste_pk PRIMARY KEY (id)
+);
 
 
 

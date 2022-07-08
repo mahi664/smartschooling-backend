@@ -15,7 +15,7 @@ public class AcademicDetails {
 
 	private String academicId;
 	private String academicYear;
-	private String displayNae;
+	private String displayName;
 	private Date academicStartDate;
 	private Date academicEndDate;
 	private Date lastUpdateTime;

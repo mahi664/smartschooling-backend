@@ -9,6 +9,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Repository;
@@ -103,5 +104,39 @@ public class StudentTransportDetailsRepository {
 		ps.setString(1, studentId);
 		ps.setDate(2, DateUtils.getSqlDate(new Date()));
 		ps.setDate(3, DateUtils.getSqlDate(new Date()));
+	}
+
+	/**
+	 * 
+	 * @param studentTransportDetailsList
+	 * @throws StudentException
+	 */
+	public void addSudentTransportDetails(List<StudentTransportDetails> studentTransportDetailsList)
+			throws StudentException {
+		log.info("Inserting record into student transport details for {} students", studentTransportDetailsList.size());
+		String query = "INSERT INTO STUDENT_TRANSPORT_DETAILS VALUES(?,?,?,?,?,?)";
+		log.info("query {}", query);
+		try {
+			jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
+
+				@Override
+				public void setValues(PreparedStatement ps, int i) throws SQLException {
+					ps.setString(1, studentTransportDetailsList.get(i).getStudentId());
+					ps.setString(2, studentTransportDetailsList.get(i).getRouteId());
+					ps.setDate(3, DateUtils.getSqlDate(new Date()));
+					ps.setDate(4, DateUtils.getSqlDate(Constants.MAX_DATE));
+					ps.setDate(5, DateUtils.getSqlDate(new Date()));
+					ps.setString(6, ServiceConstants.ADMIN);
+				}
+
+				@Override
+				public int getBatchSize() {
+					return studentTransportDetailsList.size();
+				}
+			});
+		} catch (Exception ex) {
+			log.error("Error while adding student transport details in batch mode", ex.getMessage());
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR, ex);
+		}
 	}
 }

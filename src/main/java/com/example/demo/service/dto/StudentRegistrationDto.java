@@ -39,7 +39,7 @@ public class StudentRegistrationDto {
 	@NotBlank(message = "Mobile Number must not be null or blank")
 	private String mobileNumber;
 	private String email;
-	private String alternateMobile;
+	private String alternateMobileNumber;
 	@NotBlank(message = "Address must not be null or blank")
 	private String address;
 	@NotBlank(message = "Religion must not be null or blank")
