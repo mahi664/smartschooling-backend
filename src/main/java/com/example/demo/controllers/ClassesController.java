@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.bo.ClassDetaislBO;
 import com.example.demo.bo.SubjectDetailsBO;
-import com.example.demo.services.ClassesService;
+import com.example.demo.service.ClassesService;
 
 @RestController
 @CrossOrigin(origins="*")
