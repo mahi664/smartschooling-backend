@@ -115,9 +115,6 @@ public class StudentServiceImpl implements StudentService {
 	private StudentFeesDetailsRepository studentFeesDetailsRepository;
 	
 	@Autowired
-	private FileStorageService fileStorageService;
-	
-	@Autowired
 	private FileUtils fileUtils;
 
 	@Transactional
