@@ -74,6 +74,7 @@ public class AuthenticationService {
 				ps.setDate(5, DateUtils.getSqlDate(quickUserRegistrationRequest.getBirthDate()));
 				ps.setString(6, quickUserRegistrationRequest.getMaritalStatus());
 				ps.setString(7, quickUserRegistrationRequest.getAddress());
+				ps.setString(8, "Male");
 			}
 		});
 		
