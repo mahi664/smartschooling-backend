@@ -61,8 +61,8 @@ public class AuthenticationService {
 
 	@Transactional
 	public String addDefaultUserRegistration(QuickUserRegistrationRequest quickUserRegistrationRequest) {
-		String query = "INSERT INTO user_basic_details (user_id,first_name,last_name,mobile,birth_date, marital_status, address) "
-				+ "VALUES(?,?,?,?,?,?,?)";
+		String query = "INSERT INTO user_basic_details (user_id,first_name,last_name,mobile,birth_date, marital_status, address, gender) "
+				+ "VALUES(?,?,?,?,?,?,?,?)";
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 			
 			@Override
