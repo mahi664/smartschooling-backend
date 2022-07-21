@@ -79,7 +79,7 @@ public class AuthenticationService {
 		});
 		
 		if(res>0) {
-			query = "INSERT INTO user_login_details VALUES (?,?,?,?,?)";
+			query = "INSERT INTO user_login_details VALUES (?,?,?,?,?,?)";
 			res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 				
 				@Override
@@ -89,6 +89,7 @@ public class AuthenticationService {
 					ps.setString(3, bCryptPasswordEncoder.encode("admin"));
 					ps.setDate(4, DateUtils.getSqlDate(new Date()));
 					ps.setString(5, "BASE");
+					ps.setDate(6, DateUtils.getSqlDate(new Date()));
 				}
 			});
 		}
