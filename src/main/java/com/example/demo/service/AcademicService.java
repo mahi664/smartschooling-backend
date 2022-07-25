@@ -26,7 +26,7 @@ public class AcademicService {
 	public List<AcademicDetailsBO> getAcademicDetails() {
 		// TODO Auto-generated method stub
 		try {
-			String query = "SELECT * FROM ACADEMIC_DETAILS";
+			String query = "SELECT * FROM academic_details";
 			return jdbcTemplate.query(query, new ResultSetExtractor<List<AcademicDetailsBO>>() {
 
 				@Override
@@ -35,11 +35,11 @@ public class AcademicService {
 					List<AcademicDetailsBO> academicList = new ArrayList<AcademicDetailsBO>();
 					while(rs.next()) {
 						AcademicDetailsBO academicDetailsBO = new AcademicDetailsBO();
-						academicDetailsBO.setAcademicId(rs.getString("ACADEMIC_ID"));
-						academicDetailsBO.setAcademicYear(rs.getString("ACADEMIC_YEAR"));
-						academicDetailsBO.setDisplayName(rs.getString("DISPLAY_NAME"));
-						academicDetailsBO.setAcademicStartDate(DateUtils.getDate(rs.getDate("ACADEMIC_START_DATE")));
-						academicDetailsBO.setAcademicEndDate(DateUtils.getDate(rs.getDate("ACADEMIC_END_DATE")));
+						academicDetailsBO.setAcademicId(rs.getString("academic_id"));
+						academicDetailsBO.setAcademicYear(rs.getString("academic_year"));
+						academicDetailsBO.setDisplayName(rs.getString("display_name"));
+						academicDetailsBO.setAcademicStartDate(DateUtils.getDate(rs.getDate("academic_start_date")));
+						academicDetailsBO.setAcademicEndDate(DateUtils.getDate(rs.getDate("academic_end_date")));
 						academicList.add(academicDetailsBO);
 					}
 					return academicList;
@@ -54,7 +54,7 @@ public class AcademicService {
 	
 	public List<AcademicDetailsBO> addNewAcademicDetails(List<AcademicDetailsBO> academicDetailsBOs){
 		try {
-			String query = "INSERT INTO ACADEMIC_DETAILS VALUES(?,?,?,?,?,?,?)";
+			String query = "INSERT INTO academic_details VALUES(?,?,?,?,?,?,?)";
 			int ret[] =  jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 				
 				@Override

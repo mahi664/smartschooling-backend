@@ -61,8 +61,8 @@ public class AuthenticationService {
 
 	@Transactional
 	public String addDefaultUserRegistration(QuickUserRegistrationRequest quickUserRegistrationRequest) {
-		String query = "INSERT INTO USER_BASIC_DETAILS (USER_ID,FIRST_NAME,LAST_NAME,MOBILE,BIRTH_DATE, MARITAL_STATUS, ADDRESS) "
-				+ "VALUES(?,?,?,?,?,?,?)";
+		String query = "INSERT INTO user_basic_details (user_id,first_name,last_name,mobile,birth_date, marital_status, address, gender) "
+				+ "VALUES(?,?,?,?,?,?,?,?)";
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 			
 			@Override
@@ -74,11 +74,12 @@ public class AuthenticationService {
 				ps.setDate(5, DateUtils.getSqlDate(quickUserRegistrationRequest.getBirthDate()));
 				ps.setString(6, quickUserRegistrationRequest.getMaritalStatus());
 				ps.setString(7, quickUserRegistrationRequest.getAddress());
+				ps.setString(8, "Male");
 			}
 		});
 		
 		if(res>0) {
-			query = "INSERT INTO USER_LOGIN_DETAILS VALUES (?,?,?,?,?)";
+			query = "INSERT INTO user_login_details  VALUES (?,?,?,?,?,?)";
 			res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 				
 				@Override
@@ -88,12 +89,13 @@ public class AuthenticationService {
 					ps.setString(3, bCryptPasswordEncoder.encode("admin"));
 					ps.setDate(4, DateUtils.getSqlDate(new Date()));
 					ps.setString(5, "BASE");
+					ps.setDate(6, DateUtils.getSqlDate(new Date()));
 				}
 			});
 		}
 		
 		if(res>0) {
-			query = "INSERT INTO USER_ROLE_MAPPING VALUES(?,?,?,?,?,?)";
+			query = "INSERT INTO user_role_mapping  VALUES(?,?,?,?,?,?)";
 			res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 				
 				@Override
