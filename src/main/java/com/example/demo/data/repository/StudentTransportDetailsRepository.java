@@ -36,7 +36,7 @@ public class StudentTransportDetailsRepository {
 	 */
 	public void addSudentTransportDetails(StudentTransportDetails studentTransportDetails) throws StudentException {
 		log.info("Inserting record into student transport details for {}", studentTransportDetails.toString());
-		String query = "INSERT INTO STUDENT_TRANSPORT_DETAILS VALUES(?,?,?,?,?,?)";
+		String query = "INSERT INTO student_transport_details VALUES(?,?,?,?,?,?)";
 		log.info("query {}", query);
 		try {
 			jdbcTemplate.update(query, new PreparedStatementSetter() {
@@ -114,7 +114,7 @@ public class StudentTransportDetailsRepository {
 	public void addSudentTransportDetails(List<StudentTransportDetails> studentTransportDetailsList)
 			throws StudentException {
 		log.info("Inserting record into student transport details for {} students", studentTransportDetailsList.size());
-		String query = "INSERT INTO STUDENT_TRANSPORT_DETAILS VALUES(?,?,?,?,?,?)";
+		String query = "INSERT INTO student_transport_details VALUES(?,?,?,?,?,?)";
 		log.info("query {}", query);
 		try {
 			jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
