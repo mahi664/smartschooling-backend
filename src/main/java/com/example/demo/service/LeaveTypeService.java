@@ -29,7 +29,7 @@ public class LeaveTypeService {
 	public LeaveDetailsBO addNewLeaveType(LeaveDetailsBO leaveDetailsBO) {
 		String nextLeaveId = getNextUsabelLeaveId();
 		leaveDetailsBO.setLeaveId(nextLeaveId);
-		String query = "INSERT INTO LEAVE_TYPES VALUES(?,?,?,?,?)";
+		String query = "INSERT INTO leave_types VALUES(?,?,?,?,?)";
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 			
 			@Override
@@ -43,7 +43,7 @@ public class LeaveTypeService {
 		});
 		
 		if(res>0) {
-			query = "INSERT INTO LEAVE_ACCRUAL_DETAILS VALUES(?,?,?,?,?,?,?,?)";
+			query = "INSERT INTO leave_accrual_details VALUES(?,?,?,?,?,?,?,?)";
 			res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 				
 				@Override
@@ -70,7 +70,7 @@ public class LeaveTypeService {
 	}
 
 	private int getMaxLeaveId() {
-		String query = "SELECT COUNT(*) AS MAX_LEAVE_ID FROM LEAVE_TYPES";
+		String query = "SELECT COUNT(*) AS MAX_LEAVE_ID FROM leave_types";
 		return jdbcTemplate.query(query, new ResultSetExtractor<Integer>() {
 
 			@Override
@@ -110,7 +110,7 @@ public class LeaveTypeService {
 	}
 
 	public List<String> getAccrualFrequencies() {
-		String query = "SELECT * FROM ACCRUAL_FREQUENCY";
+		String query = "SELECT * FROM accrual_frequency";
 		return jdbcTemplate.query(query, new ResultSetExtractor<List<String>>() {
 
 			@Override

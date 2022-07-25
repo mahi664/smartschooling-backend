@@ -25,7 +25,7 @@ public class SubjectService {
 
 	public List<SubjectDetailsBO> addNewSubjects(List<SubjectDetailsBO> subjectDetailsBOs) {
 		try {
-			String query = "INSERT INTO SUBJECTS VALUES(?,?,?,?)";
+			String query = "INSERT INTO subjects VALUES(?,?,?,?)";
 			int res[] = jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 				
 				@Override
@@ -58,7 +58,7 @@ public class SubjectService {
 
 	public List<SubjectDetailsBO> getSubjects() {
 		try {
-			String query = "SELECT * FROM SUBJECTS";
+			String query = "SELECT * FROM subjects";
 			List<SubjectDetailsBO> subjectDetailsBOs = jdbcTemplate.query(query, new ResultSetExtractor<List<SubjectDetailsBO>>() {
 
 				@Override
@@ -67,8 +67,8 @@ public class SubjectService {
 					List<SubjectDetailsBO> subjects = new ArrayList<SubjectDetailsBO>();
 					while(rs.next()) {
 						SubjectDetailsBO subjectDetailsBO = new SubjectDetailsBO();
-						subjectDetailsBO.setSubjectId(rs.getString("SUB_ID"));
-						subjectDetailsBO.setSubjectName(rs.getString("SUB_NAME"));
+						subjectDetailsBO.setSubjectId(rs.getString("sub_id"));
+						subjectDetailsBO.setSubjectName(rs.getString("sub_name"));
 						subjects.add(subjectDetailsBO);
 					}
 					return subjects;

@@ -29,7 +29,7 @@ public class RoutesService {
 		// TODO Auto-generated method stub
 		try {
 //			int nextRouteId = getMaxRouteId() + 1;
-			String query = "INSERT INTO ROUTES VALUES(?,?,?,?,?,?)";
+			String query = "INSERT INTO routes VALUES(?,?,?,?,?,?)";
 			int res[] = jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 //				int rid = nextRouteId;
 				@Override
@@ -62,7 +62,7 @@ public class RoutesService {
 	}
 
 	private int getMaxRouteId() {
-		String query = "SELECT MAX(ROUTE_ID) as MAX_ROUTE_ID FROM ROUTES";
+		String query = "SELECT MAX(route_id) as MAX_ROUTE_ID FROM routes";
 		int maxRouteId = jdbcTemplate.query(query, new ResultSetExtractor<Integer>() {
 
 			@Override
@@ -81,7 +81,7 @@ public class RoutesService {
 	public List<RouteDetailsBO> getRoutes() {
 		// TODO Auto-generated method stub
 		try {
-			String query = "SELECT * FROM ROUTES";
+			String query = "SELECT * FROM routes";
 			List<RouteDetailsBO> routes = jdbcTemplate.query(query, new ResultSetExtractor<List<RouteDetailsBO>>() {
 
 				@Override
@@ -89,10 +89,10 @@ public class RoutesService {
 					List<RouteDetailsBO> routes = new ArrayList<RouteDetailsBO>();
 					while(rs.next()) {
 						RouteDetailsBO routeDetailsBO = new RouteDetailsBO();
-						routeDetailsBO.setRouteId(rs.getString("ROUTE_ID"));
-						routeDetailsBO.setSource(rs.getString("SOURCE"));
-						routeDetailsBO.setDestination(rs.getString("DESTINATION"));
-						routeDetailsBO.setDistance(rs.getDouble("DISTANCE"));
+						routeDetailsBO.setRouteId(rs.getString("route_id"));
+						routeDetailsBO.setSource(rs.getString("source"));
+						routeDetailsBO.setDestination(rs.getString("destination"));
+						routeDetailsBO.setDistance(rs.getDouble("distance"));
 						routes.add(routeDetailsBO);
 					}
 					return routes;

@@ -31,7 +31,7 @@ public class FeesService {
 		try {
 			
 			int nextFeeId = getMaxFeeId() + 1;
-			String query = "INSERT INTO FEE_TYPES VALUES(?,?,?,?,?)";
+			String query = "INSERT INTO fee_types VALUES(?,?,?,?,?)";
 			int res[] = jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 				
 				int feeId = nextFeeId;
@@ -66,7 +66,7 @@ public class FeesService {
 	}
 
 	private int getMaxFeeId() {
-		String query = "SELECT COUNT(FEE_ID) AS MAX_FEE_ID FROM FEE_TYPES";
+		String query = "SELECT COUNT(fee_id) AS max_fee_id FROM fee_types";
 		int maxFeeId = jdbcTemplate.query(query, new ResultSetExtractor<Integer>() {
 
 			@Override
@@ -74,7 +74,7 @@ public class FeesService {
 				// TODO Auto-generated method stub
 				int maxFeeId = 0;
 				while(rs.next()) {
-					maxFeeId = rs.getInt("MAX_FEE_ID");
+					maxFeeId = rs.getInt("max_fee_id");
 				}
 				return maxFeeId;
 			}
@@ -86,7 +86,7 @@ public class FeesService {
 	public List<FeesDetailsBO> getFeeTypes() {
 		try {
 			
-			String query = "SELECT * FROM FEE_TYPES";
+			String query = "SELECT * FROM fee_types";
 			List<FeesDetailsBO> feeTypes = jdbcTemplate.query(query, new ResultSetExtractor<List<FeesDetailsBO>>() {
 
 				@Override
@@ -95,9 +95,9 @@ public class FeesService {
 					List<FeesDetailsBO> feeTypes = new ArrayList<FeesDetailsBO>();
 					while(rs.next()) {
 						FeesDetailsBO feesDetailsBO = new FeesDetailsBO();
-						feesDetailsBO.setFeeId(rs.getString("FEE_ID"));
-						feesDetailsBO.setFeeName(rs.getString("FEE_NAME"));
-						feesDetailsBO.setFeeDiscription(rs.getString("FEE_DISCRIPTION"));
+						feesDetailsBO.setFeeId(rs.getString("fee_id"));
+						feesDetailsBO.setFeeName(rs.getString("fee_name"));
+						feesDetailsBO.setFeeDiscription(rs.getString("fee_description"));
 						feeTypes.add(feesDetailsBO);
 					}
 					return feeTypes;
@@ -122,7 +122,7 @@ public class FeesService {
 		// TODO Auto-generated method stub
 		try {
 			
-			String query = "INSERT INTO FEE_DETAILS VALUES(?,?,?,?,?,?)";
+			String query = "INSERT INTO fee_details VALUES(?,?,?,?,?,?)";
 			int res[] = jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 				
 				@Override
@@ -158,7 +158,7 @@ public class FeesService {
 
 	public List<FeesDetailsBO> getFeeDetails(String feeId) {
 		// TODO Auto-generated method stub
-		String query = "SELECT * FROM FEE_DETAILS ";
+		String query = "SELECT * FROM fee_details ";
 		if(feeId!=null) {
 			query += "WHERE FEE_ID = ?";
 		}
@@ -178,12 +178,12 @@ public class FeesService {
 				List<FeesDetailsBO> feeDetailsList = new ArrayList<>();
 				while(rs.next()) {
 					FeesDetailsBO feesDetailsBO = new FeesDetailsBO();
-					feesDetailsBO.setFeeId(rs.getString("FEE_ID"));
-					feesDetailsBO.setClassId(rs.getString("CLASS_ID"));
-					feesDetailsBO.setRouteId(rs.getString("ROUTE_ID"));
-					feesDetailsBO.setAmount(rs.getDouble("AMOUNT"));
-					feesDetailsBO.setEffDate(DateUtils.getDate(rs.getDate("EFF_DATE")));
-					feesDetailsBO.setEndDate(DateUtils.getDate(rs.getDate("END_DATE")));
+					feesDetailsBO.setFeeId(rs.getString("fee_id"));
+					feesDetailsBO.setClassId(rs.getString("class_id"));
+					feesDetailsBO.setRouteId(rs.getString("route_id"));
+					feesDetailsBO.setAmount(rs.getDouble("amount"));
+					feesDetailsBO.setEffDate(DateUtils.getDate(rs.getDate("eff_date")));
+					feesDetailsBO.setEndDate(DateUtils.getDate(rs.getDate("end_date")));
 					
 					feeDetailsList.add(feesDetailsBO);
 				}
