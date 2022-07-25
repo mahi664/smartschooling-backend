@@ -106,24 +106,6 @@ CREATE TABLE smartschoolingdev.class_subject_details (
 	CONSTRAINT class_subject_details_fk_1 FOREIGN KEY (sub_id) REFERENCES smartschoolingdev.subjects(sub_id)
 );
 
-CREATE TABLE smartschoolingdev.general_register (
-	reg_no BIGINT NOT NULL,
-	book_no INT NOT NULL,
-	stud_id varchar(100) NOT NULL,
-	admission_std varchar(100) NOT NULL,
-	admission_date DATETIME NULL,
-	prev_school VARCHAR(500) NULL,
-	school_leaving_date DATETIME NULL,
-	school_leaving_reason varchar(100) NULL,
-	new_school varchar(500) NULL,
-	CONSTRAINT general_register_pk PRIMARY KEY (reg_no),
-	CONSTRAINT general_register_fk FOREIGN KEY (stud_id) REFERENCES smartschoolingdev.student_details(stud_id),
-	CONSTRAINT general_register_fk_1 FOREIGN KEY (admission_std) REFERENCES smartschoolingdev.classes(class_id)
-);
-
-ALTER TABLE smartschoolingdev.general_register ADD academic_id varchar(100) NOT NULL;
-ALTER TABLE smartschoolingdev.general_register ADD CONSTRAINT general_register_fk_2 FOREIGN KEY (academic_id) REFERENCES smartschoolingdev.academic_details(academic_id);
-
 
 CREATE TABLE smartschoolingdev.student_details (
 	stud_id varchar(100) NOT NULL,
@@ -143,6 +125,24 @@ CREATE TABLE smartschoolingdev.student_details (
 	nationality varchar(100) NULL,
 	CONSTRAINT student_details_pk PRIMARY KEY (stud_id)
 );
+
+CREATE TABLE smartschoolingdev.general_register (
+	reg_no BIGINT NOT NULL,
+	book_no INT NOT NULL,
+	stud_id varchar(100) NOT NULL,
+	admission_std varchar(100) NOT NULL,
+	admission_date DATETIME NULL,
+	prev_school VARCHAR(500) NULL,
+	school_leaving_date DATETIME NULL,
+	school_leaving_reason varchar(100) NULL,
+	new_school varchar(500) NULL,
+	CONSTRAINT general_register_pk PRIMARY KEY (reg_no),
+	CONSTRAINT general_register_fk FOREIGN KEY (stud_id) REFERENCES smartschoolingdev.student_details(stud_id),
+	CONSTRAINT general_register_fk_1 FOREIGN KEY (admission_std) REFERENCES smartschoolingdev.classes(class_id)
+);
+
+ALTER TABLE smartschoolingdev.general_register ADD academic_id varchar(100) NOT NULL;
+ALTER TABLE smartschoolingdev.general_register ADD CONSTRAINT general_register_fk_2 FOREIGN KEY (academic_id) REFERENCES smartschoolingdev.academic_details(academic_id);
 
 CREATE TABLE smartschoolingdev.student_fees_details (
 	stud_id varchar(100) NOT NULL,
@@ -251,7 +251,7 @@ CREATE TABLE smartschoolingdev.roles (
 	role_description varchar(500) NULL,
 	last_update_time DATETIME NOT NULL,
 	last_user varchar(100) NOT NULL,
-	CONSTRAINT roles_pk PRIMARY KEY (roll_id)
+	CONSTRAINT roles_pk PRIMARY KEY (role_id)
 );
 
 CREATE TABLE smartschoolingdev.leave_types (

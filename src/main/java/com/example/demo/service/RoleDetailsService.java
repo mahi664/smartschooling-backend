@@ -29,7 +29,7 @@ public class RoleDetailsService {
 
 	@Transactional
 	public RoleDetailsBO addNewRoleDetails(RoleDetailsBO roleDetailsBO) {
-		String query = "INSERT INTO ROLES VALUES(?,?,?,?,?)";
+		String query = "INSERT INTO roles VALUES(?,?,?,?,?)";
 		String nextRoleId = getNextUsableRoleId();
 		roleDetailsBO.setRoleId(nextRoleId);
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
@@ -51,7 +51,7 @@ public class RoleDetailsService {
 	}
 
 	public List<RoleDetailsBO> getRolesDetails() {
-		String query = "SELECT * FROM ROLES";
+		String query = "SELECT * FROM roles";
 		return jdbcTemplate.query(query, new ResultSetExtractor<List<RoleDetailsBO>>() {
 
 			@Override
@@ -59,9 +59,9 @@ public class RoleDetailsService {
 				List<RoleDetailsBO> roleDetailsBOs = new ArrayList<>();
 				while (rs.next()) {
 					RoleDetailsBO role = new RoleDetailsBO();
-					role.setRoleId(rs.getString("ROLE_ID"));
-					role.setRoleName(rs.getString("ROLE_NAME"));
-					role.setRoleDescription(rs.getString("ROLE_DESCRIPTION"));
+					role.setRoleId(rs.getString("role_id"));
+					role.setRoleName(rs.getString("role_name"));
+					role.setRoleDescription(rs.getString("role_description"));
 					roleDetailsBOs.add(role);
 				}
 				return roleDetailsBOs;
@@ -75,7 +75,7 @@ public class RoleDetailsService {
 	}
 
 	private int getMaxRoleId() {
-		String query = "SELECT COUNT(*) AS MAX_ROLE_ID FROM ROLES";
+		String query = "SELECT COUNT(*) AS MAX_ROLE_ID FROM roles";
 		return jdbcTemplate.query(query, new ResultSetExtractor<Integer>() {
 
 			@Override
@@ -101,7 +101,7 @@ public class RoleDetailsService {
 	}
 
 	private int[] addRoleApplicableLeaveTypes(String roleId, List<LeaveDetailsBO> leaveTypes) {
-		String query = "INSERT INTO ROLE_APPLICABLE_LEAVES VALUES (?,?,?,?,?,?)";
+		String query = "INSERT INTO role_applicable_leaves VALUES (?,?,?,?,?,?)";
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 			
 			@Override
@@ -122,7 +122,7 @@ public class RoleDetailsService {
 	}
 
 	private void deleteRoleApplicableLeaveTypes(String roleId) {
-		String query = "DELETE FROM ROLE_APPLICABLE_LEAVES WHERE ROLE_ID=?";
+		String query = "DELETE FROM role_applicable_leaves WHERE ROLE_ID=?";
 		jdbcTemplate.update(query, new PreparedStatementSetter() {
 
 			@Override

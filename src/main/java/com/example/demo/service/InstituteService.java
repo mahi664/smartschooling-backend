@@ -67,7 +67,7 @@ public class InstituteService {
 	public InstituteDetailsBO getInstituteDetails() {
 		try {
 			
-			String query = "SELECT * FROM INSTITUTE_DET";
+			String query = "SELECT * FROM institute_det";
 			InstituteDetailsBO instituteDetailsBO = jdbcTemplate.query(query, new ResultSetExtractor<InstituteDetailsBO>() {
 
 				@Override
@@ -75,10 +75,10 @@ public class InstituteService {
 					// TODO Auto-generated method stub
 					InstituteDetailsBO instituteDetailsBO = new InstituteDetailsBO();
 					while(rs.next()) {
-						instituteDetailsBO.setInstituteId(rs.getString("INSTITUTE_ID"));
-						instituteDetailsBO.setInstituteName(rs.getString("INSTITUTE_NAME"));
-						instituteDetailsBO.setInstituteFoundationDate(DateUtils.getDate(rs.getDate("FOUNDATION_DATE")));
-						instituteDetailsBO.setInstituteAddress(rs.getString("ADDRESS"));
+						instituteDetailsBO.setInstituteId(rs.getString("institute_id"));
+						instituteDetailsBO.setInstituteName(rs.getString("institute_name"));
+						instituteDetailsBO.setInstituteFoundationDate(DateUtils.getDate(rs.getDate("foundation_date")));
+						instituteDetailsBO.setInstituteAddress(rs.getString("address"));
 					}
 					return instituteDetailsBO;
 				}

@@ -31,7 +31,7 @@ public class ClassesService {
 	
 	public ClassDetaislBO addNewClass(ClassDetaislBO classDetaislBO) {
 		try {			
-			String query = "INSERT INTO CLASSES VALUES(?,?,?,?)";
+			String query = "INSERT INTO classes VALUES(?,?,?,?)";
 			int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 				
 				@Override
@@ -59,7 +59,7 @@ public class ClassesService {
 	public List<ClassDetaislBO> addNewClasses(List<ClassDetaislBO> classDetaislBOs) {
 		try {
 			
-			String query = "INSERT INTO CLASSES VALUES(?,?,?,?)";
+			String query = "INSERT INTO classes VALUES(?,?,?,?)";
 			int res[] = jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 				
 				@Override
@@ -94,7 +94,7 @@ public class ClassesService {
 
 	public List<ClassDetaislBO> getClassesDetails() {
 		try {
-			String query = "SELECT * FROM CLASSES";
+			String query = "SELECT * FROM classes";
 			List<ClassDetaislBO> classDetaislBOs = jdbcTemplate.query(query, new ResultSetExtractor<List<ClassDetaislBO>>() {
 
 				@Override
@@ -103,8 +103,8 @@ public class ClassesService {
 					List<ClassDetaislBO> classes = new ArrayList<ClassDetaislBO>();
 					while(rs.next()) {
 						ClassDetaislBO classDetailsBO = new ClassDetaislBO();
-						classDetailsBO.setClassId(rs.getString("CLASS_ID"));
-						classDetailsBO.setClassName(rs.getString("CLASS_NAME"));
+						classDetailsBO.setClassId(rs.getString("class_id"));
+						classDetailsBO.setClassName(rs.getString("class_name"));
 						classes.add(classDetailsBO);
 					}
 					return classes;
@@ -142,7 +142,7 @@ public class ClassesService {
 	@Transactional(rollbackFor=Exception.class)
 	public List<SubjectDetailsBO> addClassSubject(String classId, List<SubjectDetailsBO> subjectIds) {
 		try {
-			String query = "INSERT INTO CLASS_SUBJECT_DETAILS VALUES(?,?,?,?,?,?)";
+			String query = "INSERT INTO class_subject_details VALUES(?,?,?,?,?,?)";
 			int res[] = jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 				
 				@Override
@@ -177,8 +177,8 @@ public class ClassesService {
 	}
 
 	public List<SubjectDetailsBO> getClassesSubjects(String classId){
-		String query = "SELECT A.SUB_ID, B.SUB_NAME FROM CLASS_SUBJECT_DETAILS A, SUBJECTS B "+
-						"WHERE A.SUB_ID = B.SUB_ID AND A.CLASS_ID=?";
+		String query = "SELECT A.sub_id, B.sub_name FROM class_subject_details A, subjects B "+
+						"WHERE A.sub_id = B.sub_id AND A.class_id=?";
 		return jdbcTemplate.query(query, new PreparedStatementSetter() {
 			
 			@Override
@@ -205,7 +205,7 @@ public class ClassesService {
 	}
 	
 	public List<SubjectDetailsBO> deleteClassSubjects(String classId, List<SubjectDetailsBO> subjectIds){
-		String query = "DELETE FROM CLASS_SUBJECT_DETAILS WHERE CLASS_ID=?";
+		String query = "DELETE FROM class_subject_details WHERE CLASS_ID=?";
 		int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 			
 			@Override
