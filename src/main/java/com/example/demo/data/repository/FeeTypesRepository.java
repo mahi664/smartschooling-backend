@@ -29,7 +29,7 @@ public class FeeTypesRepository {
 	 */
 	public List<FeeTypes> getFeeTypes() throws StudentException {
 		log.info("Fetching fee types");
-		String query = "SELECT * FROM FEE_TYPES";
+		String query = "SELECT * FROM fee_types";
 		log.info("query {}", query);
 		try {
 			return jdbcTemplate.query(query, (rs, rowNum) -> feeTypesMapper(rs));

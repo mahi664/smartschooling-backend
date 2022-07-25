@@ -36,7 +36,7 @@ public class StudentFeesDetailsRepository {
 	public boolean addNewStudentFeesDetails(StudentFeesDetails studentFeesDetails) throws StudentException {
 		log.info("Adding student fee record for stud id {} and fee id{}", studentFeesDetails.getStudentId(),
 				studentFeesDetails.getFeeId());
-		String query = "INSERT INTO STUDENT_FEES_DETAILS VALUES(?,?,?,?,?)";
+		String query = "INSERT INTO student_fees_details VALUES(?,?,?,?,?)";
 		log.info("query {}", query);
 		int res = 0;
 		try {
@@ -66,7 +66,7 @@ public class StudentFeesDetailsRepository {
 	 */
 	public boolean addNewStudentFeesDetails(List<StudentFeesDetails> studentFeesDetailsList) throws StudentException {
 		log.info("Adding student fee record for {}", studentFeesDetailsList);
-		String query = "INSERT INTO STUDENT_FEES_DETAILS VALUES(?,?,?,?,?)";
+		String query = "INSERT INTO student_fees_details VALUES(?,?,?,?,?)";
 		log.info("query {}", query);
 		int res[] = null;
 		try {

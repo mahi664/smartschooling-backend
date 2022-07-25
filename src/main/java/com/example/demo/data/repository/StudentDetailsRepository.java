@@ -46,7 +46,7 @@ public class StudentDetailsRepository {
 	 */
 	public void addStudentBasicDeails(StudentBasicDetails studentBasicDetails) throws StudentException {
 		log.info("Inserting studnet basic details for {}", studentBasicDetails.toString());
-		String query = "INSERT INTO STUDENT_DETAILS VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		String query = "INSERT INTO student_details VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		log.info("query {}", query);
 		try {
 			jdbcTemplate.update(query, new PreparedStatementSetter() {
@@ -82,7 +82,7 @@ public class StudentDetailsRepository {
 	 */
 	public int getMaxStudentId() {
 		log.info("getting max student id");
-		String query = "SELECT COUNT(STUD_ID) as MAX_STUDENT_ID FROM STUDENT_DETAILS";
+		String query = "SELECT COUNT(stud_id) as MAX_STUDENT_ID FROM student_details";
 		int maxStudId = jdbcTemplate.query(query, new ResultSetExtractor<Integer>() {
 
 			@Override
@@ -253,7 +253,7 @@ public class StudentDetailsRepository {
 	 */
 	public void addStudentBasicDeails(List<StudentBasicDetails> studentBasicDetailsList) throws StudentException {
 		log.info("adding student basic details for {} students", studentBasicDetailsList.size());
-		String query = "INSERT INTO STUDENT_DETAILS VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		String query = "INSERT INTO student_details VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		log.info("query {}", query);
 		try {
 			jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
