@@ -34,7 +34,7 @@ public class StudentClassDetailsRepository {
 	 */
 	public void addStudentClassDetails(StudentClassDetails studentClassDetails) throws StudentException {
 		log.info("Inserting record into student class details for {}", studentClassDetails.toString());
-		String query = "INSERT INTO STUDENT_CLASS_DETAILS VALUES(?,?,?,?,?)";
+		String query = "INSERT INTO student_class_details VALUES(?,?,?,?,?)";
 		log.info("query {}", query);
 		try {
 			jdbcTemplate.update(query, new PreparedStatementSetter() {
@@ -60,7 +60,7 @@ public class StudentClassDetailsRepository {
 	 */
 	public void addStudentClassDetails(List<StudentClassDetails> studentClassDetailsList) throws StudentException {
 		log.info("Inserting record into student class details for {} students", studentClassDetailsList.size());
-		String query = "INSERT INTO STUDENT_CLASS_DETAILS VALUES(?,?,?,?,?)";
+		String query = "INSERT INTO student_class_details VALUES(?,?,?,?,?)";
 		log.info("query {}", query);
 		try {
 			jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {

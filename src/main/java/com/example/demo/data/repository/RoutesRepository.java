@@ -33,7 +33,7 @@ public class RoutesRepository {
 	 */
 	public Routes getRoute(String routeId) throws StudentException {
 		log.info("Fetching route details for route id {}", routeId);
-		String query = "SELECT * FROM ROUTES WHERE ROUTE_ID = ?";
+		String query = "SELECT * FROM routes WHERE route_id = ?";
 		log.info("query {}", query);
 		Routes route = null;
 		try {
@@ -71,7 +71,7 @@ public class RoutesRepository {
 	 */
 	public List<Routes> getRoutes(List<String>routeIDs) throws StudentException{
 		log.info("Fetching route details for route id {}", routeIDs.toString());
-		String query = "SELECT * FROM ROUTES WHERE ROUTE_ID in ("+getInClauseForRouteDetails(routeIDs)+")";
+		String query = "SELECT * FROM routes WHERE route_id in ("+getInClauseForRouteDetails(routeIDs)+")";
 		log.info("query {}", query);
 		List<Routes> routes;
 		try {
