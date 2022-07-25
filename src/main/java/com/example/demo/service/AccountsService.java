@@ -23,7 +23,7 @@ public class AccountsService {
 
 	public List<AccountsDetailsBO> getAccountDetails() {
 		try {
-			String query = "SELECT * FROM ACCOUNTS";
+			String query = "SELECT * FROM accounts";
 			return jdbcTemplate.query(query, new ResultSetExtractor<List<AccountsDetailsBO>>() {
 
 				@Override
@@ -31,10 +31,10 @@ public class AccountsService {
 					List<AccountsDetailsBO> accountsDetailBOs = new ArrayList<>();
 					while(rs.next()) {
 						AccountsDetailsBO accountsDetailsBO = new AccountsDetailsBO();
-						accountsDetailsBO.setAccountId(rs.getString("ACCOUNT_ID"));
-						accountsDetailsBO.setAccountName(rs.getString("ACCOUNT_NAME"));
-						accountsDetailsBO.setBankName(rs.getString("BANK_NAME"));
-						accountsDetailsBO.setBankAccountNumber(rs.getString("BANK_ACCOUNT_NUMBER"));
+						accountsDetailsBO.setAccountId(rs.getString("account_id"));
+						accountsDetailsBO.setAccountName(rs.getString("account_name"));
+						accountsDetailsBO.setBankName(rs.getString("bank_name"));
+						accountsDetailsBO.setBankAccountNumber(rs.getString("bank_account_number"));
 						accountsDetailBOs.add(accountsDetailsBO);
 					}
 					return accountsDetailBOs;
@@ -50,7 +50,7 @@ public class AccountsService {
 	
 	public AccountsDetailsBO addNewAccountDetails(AccountsDetailsBO accountsDetailsBO) {
 		try {
-			String query = "INSERT INTO ACCOUNTS VALUES(?,?,?,?)";
+			String query = "INSERT INTO accounts VALUES(?,?,?,?)";
 			int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 				
 				@Override

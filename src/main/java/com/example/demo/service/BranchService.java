@@ -27,7 +27,7 @@ public class BranchService {
 		try {
 			
 			int nextBranchId = getMaxBranchId() + 1;
-			String query = "INSERT INTO INSTITUTE_BRANCH_DET VALUES(?,?,?,?,?,?,?)";
+			String query = "INSERT INTO institute_branch_det VALUES(?,?,?,?,?,?,?)";
 			int res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 				
 				@Override
@@ -58,7 +58,7 @@ public class BranchService {
 	}
 
 	private int getMaxBranchId() {
-		String query = "SELECT MAX(BRANCH_ID) as MAX_BRANCH_ID FROM INSTITUTE_BRANCH_DET";
+		String query = "SELECT MAX(branch_id) as MAX_BRANCH_ID FROM institute_branch_det";
 		int maxBranchId = jdbcTemplate.query(query, new ResultSetExtractor<Integer>() {
 
 			@Override
@@ -77,7 +77,7 @@ public class BranchService {
 		// TODO Auto-generated method stub
 		try {
 			
-			String query = "SELECT * FROM INSTITUTE_BRANCH_DET";
+			String query = "SELECT * FROM institute_branch_det";
 			List<BranchDetailsBO> branches = jdbcTemplate.query(query, new ResultSetExtractor<List<BranchDetailsBO>>() {
 
 				@Override
@@ -85,10 +85,10 @@ public class BranchService {
 					List<BranchDetailsBO> branches = new ArrayList<BranchDetailsBO>();
 					while(rs.next()) {
 						BranchDetailsBO branchDetailsBO = new BranchDetailsBO();
-						branchDetailsBO.setBranchId(rs.getString("BRANCH_ID"));
-						branchDetailsBO.setBranchName(rs.getString("BRANCH_NAME"));
-						branchDetailsBO.setFoundationDate(DateUtils.getDate(rs.getDate("FOUNDATION_DATE")));
-						branchDetailsBO.setBranchAddress(rs.getString("ADDRESS"));
+						branchDetailsBO.setBranchId(rs.getString("branch_id"));
+						branchDetailsBO.setBranchName(rs.getString("branch_name"));
+						branchDetailsBO.setFoundationDate(DateUtils.getDate(rs.getDate("foundation_date")));
+						branchDetailsBO.setBranchAddress(rs.getString("address"));
 						branches.add(branchDetailsBO);
 					}
 					return branches;

@@ -79,7 +79,7 @@ public class AuthenticationService {
 		});
 		
 		if(res>0) {
-			query = "INSERT INTO user_login_details VALUES (?,?,?,?,?,?)";
+			query = "INSERT INTO user_login_details  VALUES (?,?,?,?,?,?)";
 			res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 				
 				@Override
@@ -95,7 +95,7 @@ public class AuthenticationService {
 		}
 		
 		if(res>0) {
-			query = "INSERT INTO user_role_mapping VALUES(?,?,?,?,?,?)";
+			query = "INSERT INTO user_role_mapping  VALUES(?,?,?,?,?,?)";
 			res = jdbcTemplate.update(query, new PreparedStatementSetter() {
 				
 				@Override
