@@ -82,13 +82,13 @@ public class GeneralRegisterRepository {
 					GeneralRegister generalRegister = null;
 					while (rs.next()) {
 						generalRegister = GeneralRegister.builder()
-								.admissionDate(DateUtils.getDate(rs.getDate("ADMISSION_DATE")))
-								.admissionStd(rs.getString("ADMISSION_STD")).bookNo(rs.getInt("BOOK_NO"))
-								.newSchool(rs.getString("NEW_SCHOOL")).previousSchool(rs.getString("PREV_SCHOOL"))
-								.regNo(rs.getInt("REG_NO"))
-								.schoolLeavingDate(DateUtils.getDate(rs.getDate("SCHOOL_LEAVING_DATE")))
-								.schoolLeavingReason(rs.getString("SCHOOL_LEAVING_REASON"))
-								.studentId(rs.getString("STUD_ID")).academicYear(rs.getString("ACADEMIC_ID")).build();
+								.admissionDate(DateUtils.getDate(rs.getDate("admission_date")))
+								.admissionStd(rs.getString("admission_std")).bookNo(rs.getInt("book_no"))
+								.newSchool(rs.getString("new_school")).previousSchool(rs.getString("prev_school"))
+								.regNo(rs.getInt("reg_no"))
+								.schoolLeavingDate(DateUtils.getDate(rs.getDate("school_leaving_date")))
+								.schoolLeavingReason(rs.getString("school_leaving_reason"))
+								.studentId(rs.getString("stud_id")).academicYear(rs.getString("academic_id")).build();
 					}
 					return generalRegister;
 				}
@@ -161,12 +161,12 @@ public class GeneralRegisterRepository {
 	 * @throws SQLException
 	 */
 	private GeneralRegister generalRegisterMapper(ResultSet rs) throws SQLException {
-		return GeneralRegister.builder().admissionDate(DateUtils.getDate(rs.getDate("ADMISSION_DATE")))
-				.admissionStd(rs.getString("ADMISSION_STD")).bookNo(rs.getInt("BOOK_NO"))
-				.newSchool(rs.getString("NEW_SCHOOL")).previousSchool(rs.getString("PREV_SCHOOL"))
-				.regNo(rs.getInt("REG_NO")).schoolLeavingDate(DateUtils.getDate(rs.getDate("SCHOOL_LEAVING_DATE")))
-				.schoolLeavingReason(rs.getString("SCHOOL_LEAVING_REASON")).studentId(rs.getString("STUD_ID"))
-				.academicYear(rs.getString("ACADEMIC_ID")).build();
+		return GeneralRegister.builder().admissionDate(DateUtils.getDate(rs.getDate("admission_date")))
+				.admissionStd(rs.getString("admission_std")).bookNo(rs.getInt("book_no"))
+				.newSchool(rs.getString("new_school")).previousSchool(rs.getString("prev_school"))
+				.regNo(rs.getInt("reg_no")).schoolLeavingDate(DateUtils.getDate(rs.getDate("school_leaving_date")))
+				.schoolLeavingReason(rs.getString("school_leaving_reason")).studentId(rs.getString("stud_id"))
+				.academicYear(rs.getString("academic_id")).build();
 	}
 
 	/**

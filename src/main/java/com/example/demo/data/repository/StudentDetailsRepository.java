@@ -333,6 +333,11 @@ public class StudentDetailsRepository {
 				}
 				filteredQuery += "?) ";
 			}
+			if(!StringUtils.isEmpty(studentListRequestDto.getFilterDto().getQuickSearchText())) {
+				log.info("Filter for quick search for {}", studentListRequestDto.getFilterDto().getQuickSearchText());
+				filteredQuery += "and (A.first_name like (?) or A.middle_name like(?) or A.last_name like(?) or"
+						+ " A.address like(?)) ";
+			}
 		}
 		if (CollectionUtils.isEmpty(studentListRequestDto.getSortOrders())) {
 			log.info("Setting order by reg no");
@@ -379,6 +384,12 @@ public class StudentDetailsRepository {
 				for (String route : studentListRequestDto.getFilterDto().getRouteIds()) {
 					ps.setString(indx++, route);
 				}
+			}
+			if(!StringUtils.isEmpty(studentListRequestDto.getFilterDto().getQuickSearchText())) {
+				ps.setString(indx++, "%"+studentListRequestDto.getFilterDto().getQuickSearchText()+"%");
+				ps.setString(indx++, "%"+studentListRequestDto.getFilterDto().getQuickSearchText()+"%");
+				ps.setString(indx++, "%"+studentListRequestDto.getFilterDto().getQuickSearchText()+"%");
+				ps.setString(indx++, "%"+studentListRequestDto.getFilterDto().getQuickSearchText()+"%");
 			}
 		}
 		if (pageable != null) {
