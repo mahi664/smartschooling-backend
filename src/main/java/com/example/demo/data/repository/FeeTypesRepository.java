@@ -46,7 +46,7 @@ public class FeeTypesRepository {
 	 * @throws SQLException
 	 */
 	private FeeTypes feeTypesMapper(ResultSet rs) throws SQLException {
-		return FeeTypes.builder().feeDescription(rs.getString("FEE_DISCRIPTION")).feeId(rs.getString("FEE_ID"))
-				.feeName(rs.getString("FEE_NAME")).build();
+		return FeeTypes.builder().feeDescription(rs.getString("fee_description")).feeId(rs.getString("fee_id"))
+				.feeName(rs.getString("fee_name")).build();
 	}
 }

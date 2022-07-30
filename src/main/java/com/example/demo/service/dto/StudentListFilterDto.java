@@ -19,4 +19,5 @@ public class StudentListFilterDto {
 	private List<String> castes;
 	private List<String> religions;
 	private List<String> routeIds;
+	private String quickSearchText;
 }

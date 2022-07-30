@@ -63,12 +63,14 @@ public class StudentController {
 			@RequestParam(value = "religion", required = false) List<String> religions,
 			@RequestParam(required = false) String gender, @RequestParam(required = false) Boolean transportOpted,
 			@RequestParam(value = "route", required = false) List<String> routes,
-			@RequestParam(value = "sortBy", required = false) List<SortFields> sortOrder) throws StudentException {
+			@RequestParam(value = "sortBy", required = false) List<SortFields> sortOrder,
+			@RequestParam(value = "quickSearch", required = false) String quickSearchText) throws StudentException {
 		log.info("Fetching student list for academic year {}, page {} and size {}", academicYear, page, size);
 		FetchStudentsResponseDto fetchStudentsResponseDto = studentService.getStudentList(academicYear, page, size,
 				StudentListRequestDto.builder()
 						.filterDto(StudentListFilterDto.builder().classIds(classIds).castes(castes).gender(gender)
-								.religions(religions).transportOpted(transportOpted).routeIds(routes).build())
+								.religions(religions).transportOpted(transportOpted).routeIds(routes)
+								.quickSearchText(quickSearchText).build())
 						.sortOrders(sortOrder).build());
 		return responseUtil.populateSuccessResponseWithMessageAndPagination(
 				fetchStudentsResponseDto.getStudentDetailsList(), fetchStudentsResponseDto.getTotalItems(),
