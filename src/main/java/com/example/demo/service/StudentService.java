@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.exception.StudentException;
+import com.example.demo.service.dto.FeeReceivablesResponseDto;
+import com.example.demo.service.dto.FeeReceivablesStatsDto;
 import com.example.demo.service.dto.FetchStudentsResponseDto;
 import com.example.demo.service.dto.StudentDetailsForRegNoResponseDto;
 import com.example.demo.service.dto.StudentImportResponseDto;
@@ -48,4 +50,23 @@ public interface StudentService {
 	 * @throws StudentException 
 	 */
 	public List<StudentImportResponseDto> importStudentDetailsFromFile(MultipartFile file) throws StudentException;
+
+	/**
+	 * Get Fee Receivables
+	 * @param quickSearchText 
+	 * @param size 
+	 * @param page 
+	 * 
+	 * @return
+	 * @throws StudentException 
+	 */
+	public FeeReceivablesResponseDto getFeeReceivables(int page, int size, String quickSearchText) throws StudentException;
+
+	/**
+	 * Get Fee Receivables Statistics
+	 * 
+	 * @return
+	 * @throws StudentException 
+	 */
+	public FeeReceivablesStatsDto getFeeReceivablesStatistics() throws StudentException;
 }

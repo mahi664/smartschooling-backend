@@ -14,15 +14,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.constant.FeeTypes;
-import com.example.demo.constant.ServiceConstants;
 import com.example.demo.data.entity.AcademicDetails;
 import com.example.demo.data.entity.ClassDetails;
+import com.example.demo.data.entity.FeeReceivableDetails;
+import com.example.demo.data.entity.FeesPaidAmnt;
+import com.example.demo.data.entity.FeesTotalReceivableAmnt;
 import com.example.demo.data.entity.GeneralRegister;
 import com.example.demo.data.entity.StudentBasicDetails;
 import com.example.demo.data.entity.StudentClassDetails;
+import com.example.demo.data.entity.StudentFeePaidDetails;
 import com.example.demo.data.entity.StudentFeesDetails;
 import com.example.demo.data.entity.StudentTransportDetails;
 import com.example.demo.service.dto.ClassDto;
+import com.example.demo.service.dto.FeeReceivableDetailsDto;
+import com.example.demo.service.dto.FeeReceivablesStatsDto;
 import com.example.demo.service.dto.FetchStudentsResponseDto;
 import com.example.demo.service.dto.StudentDetailsDto;
 import com.example.demo.service.dto.StudentDetailsForRegNoResponseDto;
@@ -267,5 +272,45 @@ public class StudentServiceAdapter {
 
 		}
 		return studentDetailsDtoList;
+	}
+
+	
+	/**
+	 * Get Receivable receivables stats dto
+	 * 
+	 * @param totalReceivableAmnt
+	 * @param totalPaidAmnt
+	 * @return
+	 */
+	public FeeReceivablesStatsDto getFeeReceivableStatsDto(FeesTotalReceivableAmnt totalReceivableAmnt,
+			FeesPaidAmnt totalPaidAmnt) {
+		log.info("Populating Fee receivable stats dto for total amnt {} and paid amount {}",
+				totalReceivableAmnt.getTotalAmnt(), totalPaidAmnt.getTotalAmnt());
+		return FeeReceivablesStatsDto.builder().totalAmnt(totalReceivableAmnt.getTotalAmnt())
+				.paidAmnt(totalPaidAmnt.getTotalAmnt())
+				.dueAmnt(totalReceivableAmnt.getTotalAmnt() - totalPaidAmnt.getTotalAmnt()).build();
+	}
+
+	/**
+	 * @param feeReceivableDetailsPagedData
+	 * @param studentId2FeePaidMap 
+	 * @return
+	 */
+	public List<FeeReceivableDetailsDto> getFeeReceivableDetailsDto(
+			Page<FeeReceivableDetails> feeReceivableDetailsPagedData,
+			Map<String, StudentFeePaidDetails> studentId2FeePaidMap) {
+		return feeReceivableDetailsPagedData.getContent().stream().map(feeReceivableDetail -> {
+			double feesPaid = studentId2FeePaidMap != null
+					&& studentId2FeePaidMap.get(feeReceivableDetail.getStudentId()) != null
+							? studentId2FeePaidMap.get(feeReceivableDetail.getStudentId()).getFeesPaid()
+							: 0;
+			return FeeReceivableDetailsDto.builder().firstName(feeReceivableDetail.getFirstName())
+					.genRegNo(feeReceivableDetail.getGenRegNo()).lastName(feeReceivableDetail.getLastName())
+					.middleName(feeReceivableDetail.getMiddleName()).mobileNumber(feeReceivableDetail.getMobileNumber())
+					.studentId(feeReceivableDetail.getStudentId()).totalAmnt(feeReceivableDetail.getTotalFee())
+					.paidAmnt(feesPaid).dueAmnt(feeReceivableDetail.getTotalFee() - feesPaid)
+					.address(feeReceivableDetail.getAddress())
+					.build();
+		}).collect(Collectors.toList());
 	}
 }
