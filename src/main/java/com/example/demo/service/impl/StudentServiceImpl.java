@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.validation.Valid;
 
@@ -21,9 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -43,10 +41,14 @@ import com.example.demo.bo.StudentsFeesTransactionDetailsBO;
 import com.example.demo.bo.TransactionBO;
 import com.example.demo.bo.TransactionDetailsBO;
 import com.example.demo.constant.ErrorDetails;
+import com.example.demo.data.entity.FeeReceivableDetails;
 import com.example.demo.data.entity.FeeTypes;
+import com.example.demo.data.entity.FeesPaidAmnt;
+import com.example.demo.data.entity.FeesTotalReceivableAmnt;
 import com.example.demo.data.entity.GeneralRegister;
 import com.example.demo.data.entity.StudentBasicDetails;
 import com.example.demo.data.entity.StudentClassDetails;
+import com.example.demo.data.entity.StudentFeePaidDetails;
 import com.example.demo.data.entity.StudentFeesDetails;
 import com.example.demo.data.entity.StudentTransportDetails;
 import com.example.demo.data.repository.FeeTypesRepository;
@@ -60,6 +62,9 @@ import com.example.demo.exception.StudentException;
 import com.example.demo.service.StudentService;
 import com.example.demo.service.UtilService;
 import com.example.demo.service.adapter.StudentServiceAdapter;
+import com.example.demo.service.dto.FeeReceivableDetailsDto;
+import com.example.demo.service.dto.FeeReceivablesResponseDto;
+import com.example.demo.service.dto.FeeReceivablesStatsDto;
 import com.example.demo.service.dto.FetchStudentsResponseDto;
 import com.example.demo.service.dto.StudentDetailsForRegNoResponseDto;
 import com.example.demo.service.dto.StudentImportData;
@@ -67,7 +72,6 @@ import com.example.demo.service.dto.StudentImportResponseDto;
 import com.example.demo.service.dto.StudentListRequestDto;
 import com.example.demo.service.dto.StudentRegistrationDto;
 import com.example.demo.service.dto.StudentRegistrationResponseDto;
-import com.example.demo.service.helper.FileStorageService;
 import com.example.demo.service.validator.StudentValidator;
 import com.example.demo.utils.CommonUtils;
 import com.example.demo.utils.Constants;
@@ -1105,5 +1109,29 @@ public class StudentServiceImpl implements StudentService {
 		}
 		studentFeesDetailsRepository.addNewStudentFeesDetails(studentImportData.getStudentFeesDetailsList());
 		return studentServiceAdapter.getStudentRegistrationResponse(studentImportData);
+	}
+
+	@Override
+	public FeeReceivablesResponseDto getFeeReceivables(int page, int size, String quickSearch) throws StudentException {
+		log.info("Getting fee receivables");
+		Pageable pageRequest = PageRequest.of(page, size);
+		Page<FeeReceivableDetails> feeReceivableDetailsPagedData = studentDetailsRepository
+				.getFeeReceivables(quickSearch, pageRequest);
+		Map<String, StudentFeePaidDetails> studentId2FeePaidMap = studentDetailsRepository.getStudentsFeesPaidAmount()
+				.stream().collect(Collectors.toMap(StudentFeePaidDetails::getStudentId, Function.identity()));
+		List<FeeReceivableDetailsDto> feeReceivableDetailsDtoList = studentServiceAdapter
+				.getFeeReceivableDetailsDto(feeReceivableDetailsPagedData, studentId2FeePaidMap);
+		return FeeReceivablesResponseDto.builder().currentPage(feeReceivableDetailsPagedData.getNumber())
+				.feeReceivableDetails(feeReceivableDetailsDtoList)
+				.totalItems(feeReceivableDetailsPagedData.getTotalElements())
+				.totalPages(feeReceivableDetailsPagedData.getTotalPages()).build();
+	}
+
+	@Override
+	public FeeReceivablesStatsDto getFeeReceivablesStatistics() throws StudentException {
+		log.info("Getting fee receivables statistics");
+		FeesTotalReceivableAmnt totalReceivableAmnt = studentDetailsRepository.getTotalReceivableAmount();
+		FeesPaidAmnt totalPaidAmnt = studentDetailsRepository.getTotalPaidAmount();
+		return studentServiceAdapter.getFeeReceivableStatsDto(totalReceivableAmnt, totalPaidAmnt);
 	}
 }

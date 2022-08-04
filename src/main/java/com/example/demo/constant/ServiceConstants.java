@@ -57,4 +57,8 @@ public class ServiceConstants {
 	public static String INVALID_ALTERNATE_MOBILE_NUMBER = "Invalid Alternate Mobile Number";
 	
 	public static String INVALID_ADHAR_NUMBER = "Invalid Adhar Number";
+	
+	public static String RECEIVABLES_FETCHED_SUCCESSFULLY = "Receivables Fetched Successfully";
+	
+	public static String RECEIVABLES_STATS_FETCHED_SUCCESSFULLY = "Receivable Statistics Fetched Successfully";
 }
