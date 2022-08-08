@@ -46,15 +46,21 @@ import com.example.demo.data.entity.FeeTypes;
 import com.example.demo.data.entity.FeesPaidAmnt;
 import com.example.demo.data.entity.FeesTotalReceivableAmnt;
 import com.example.demo.data.entity.GeneralRegister;
+import com.example.demo.data.entity.RefTableDetails;
 import com.example.demo.data.entity.StudentBasicDetails;
 import com.example.demo.data.entity.StudentClassDetails;
+import com.example.demo.data.entity.StudentFeeCollectionTransaction;
+import com.example.demo.data.entity.StudentFeeCollectionTransactionDetails;
 import com.example.demo.data.entity.StudentFeePaidDetails;
+import com.example.demo.data.entity.StudentFeesAssignedDetails;
 import com.example.demo.data.entity.StudentFeesDetails;
+import com.example.demo.data.entity.StudentFeesPaidDetails;
 import com.example.demo.data.entity.StudentTransportDetails;
 import com.example.demo.data.repository.FeeTypesRepository;
 import com.example.demo.data.repository.GeneralRegisterRepository;
 import com.example.demo.data.repository.StudentClassDetailsRepository;
 import com.example.demo.data.repository.StudentDetailsRepository;
+import com.example.demo.data.repository.StudentFeeCollectionRepository;
 import com.example.demo.data.repository.StudentFeesDetailsRepository;
 import com.example.demo.data.repository.StudentTransportDetailsRepository;
 import com.example.demo.exception.FileStorageException;
@@ -67,6 +73,13 @@ import com.example.demo.service.dto.FeeReceivablesResponseDto;
 import com.example.demo.service.dto.FeeReceivablesStatsDto;
 import com.example.demo.service.dto.FetchStudentsResponseDto;
 import com.example.demo.service.dto.StudentDetailsForRegNoResponseDto;
+import com.example.demo.service.dto.StudentFeesAssignedDetailsDto;
+import com.example.demo.service.dto.StudentFeesDueDetailsDto;
+import com.example.demo.service.dto.StudentFeesPaidDetailsWrapperDto;
+import com.example.demo.service.dto.StudentFeesPaidDetailsDto;
+import com.example.demo.service.dto.StudentFeesPaidTrxnRequestDto;
+import com.example.demo.service.dto.StudentFeesPaidTrxnResponseDto;
+import com.example.demo.service.dto.StudentFeesReceivableDetailsDto;
 import com.example.demo.service.dto.StudentImportData;
 import com.example.demo.service.dto.StudentImportResponseDto;
 import com.example.demo.service.dto.StudentListRequestDto;
@@ -120,6 +133,9 @@ public class StudentServiceImpl implements StudentService {
 	
 	@Autowired
 	private FileUtils fileUtils;
+	
+	@Autowired
+	private StudentFeeCollectionRepository studentFeeCollectionRepository;
 
 	@Transactional
 	public StudentDetailsBO addNewStudent(StudentDetailsBO studentDetailsBO) {
@@ -1133,5 +1149,77 @@ public class StudentServiceImpl implements StudentService {
 		FeesTotalReceivableAmnt totalReceivableAmnt = studentDetailsRepository.getTotalReceivableAmount();
 		FeesPaidAmnt totalPaidAmnt = studentDetailsRepository.getTotalPaidAmount();
 		return studentServiceAdapter.getFeeReceivableStatsDto(totalReceivableAmnt, totalPaidAmnt);
+	}
+
+	@Override
+	public List<StudentFeesAssignedDetailsDto> getStudentsFeesAssignedDetails(String studentId)
+			throws StudentException {
+		log.info("Getting student fees assigned details for student id {}", studentId);
+		log.info("validating student id {}", studentId);
+		Optional.ofNullable(studentDetailsRepository.getStudentDetails(studentId))
+				.orElseThrow(() -> new StudentException(ErrorDetails.STUDENT_DETAILS_NOT_FOUND));
+		List<StudentFeesAssignedDetails> studentFeeAssignedDetailsList = studentDetailsRepository
+				.getStudentFeesAssignedDetails(studentId);
+		return studentServiceAdapter.getStudentFeesAssignedDetailsDtoList(studentFeeAssignedDetailsList);
+	}
+
+	@Override
+	public List<StudentFeesPaidDetailsDto> getStudentsFeesPaidDetails(String studentId) throws StudentException {
+		log.info("Getting Fees paid details for student id {}", studentId);
+		log.info("validating student id {}", studentId);
+		Optional.ofNullable(studentDetailsRepository.getStudentDetails(studentId))
+				.orElseThrow(() -> new StudentException(ErrorDetails.STUDENT_DETAILS_NOT_FOUND));
+		List<StudentFeesPaidDetails> studentFeesPaidDetailsList = studentDetailsRepository
+				.getStudentFeesPaidDetails(studentId);
+		return studentServiceAdapter.getStudentFeesPaidDetailsDtoList(studentFeesPaidDetailsList);
+	}
+
+	@Override
+	public StudentFeesReceivableDetailsDto getStudentsFeesReceivableDetails(String studentId)
+			throws StudentException {
+		log.info("Getting studnets fees receivable details for student id {}", studentId);
+		log.info("validating student id {}", studentId);
+		Optional.ofNullable(studentDetailsRepository.getStudentDetails(studentId))
+				.orElseThrow(() -> new StudentException(ErrorDetails.STUDENT_DETAILS_NOT_FOUND));
+		List<StudentFeesAssignedDetailsDto> studentFeesAssignedDetailsDtos = studentServiceAdapter
+				.getStudentFeesAssignedDetailsDtoList(
+						studentDetailsRepository.getStudentFeesAssignedDetails(studentId));
+		List<StudentFeesPaidDetailsDto> studentFeesPaidDetailsDtos = studentServiceAdapter
+				.getStudentFeesPaidDetailsDtoList(studentDetailsRepository.getStudentFeesPaidDetails(studentId));
+		List<StudentFeesPaidDetailsWrapperDto> feesPaidWrapperDto = studentServiceAdapter.getStudentFeesPaidDetailsWrapperDto(studentFeesPaidDetailsDtos);
+		List<StudentFeesDueDetailsDto> studentFeesDueDetailsDtos = studentServiceAdapter
+				.getStudentFeesDueDetailsDtoList(studentFeesAssignedDetailsDtos, studentFeesPaidDetailsDtos);
+		return studentServiceAdapter.getStudentFeesReceivableDetailsDto(studentFeesAssignedDetailsDtos,
+				studentFeesPaidDetailsDtos, studentFeesDueDetailsDtos, feesPaidWrapperDto);
+	}
+
+	@Override
+	@Transactional(rollbackFor = {StudentException.class, Exception.class})
+	public StudentFeesPaidTrxnResponseDto addStudentFeesPaidDetails(String studentId,
+			StudentFeesPaidTrxnRequestDto feesPaidTrxnRequest) throws StudentException {
+		log.info("Saving student fees paid trxn details for student id {}", studentId);
+
+		StudentFeesReceivableDetailsDto studentFeesReceivableDetailsDto = getStudentsFeesReceivableDetails(studentId);
+		log.info("validating fees paid trxn request");
+		studentValidator.validateStudentFeesPaidDetailsRequest(studentId, feesPaidTrxnRequest,
+				studentFeesReceivableDetailsDto.getFeesDueDetails());
+
+		refTableTypesM = studentFeeCollectionRepository.getRefTableDetails().stream()
+				.collect(Collectors.toMap(RefTableDetails::getRefTableName, RefTableDetails::getRefTableType));
+
+		log.info("adding student fees collection transaction");
+		StudentFeeCollectionTransaction studentFeeCollectionTransaction = studentServiceAdapter
+				.getStudentFeeCollectionTransaction(studentId, feesPaidTrxnRequest);
+		studentFeeCollectionRepository.addStudentFeeCollection(studentFeeCollectionTransaction);
+
+		log.info("getting max trxn det id");
+		int nextTrxnDetId = studentFeeCollectionRepository.getMaxTrxnDetId() + 1;
+		List<StudentFeeCollectionTransactionDetails> studentFeeCollectionTransactionDetails = studentServiceAdapter
+				.getStudentFeeCollectionTransactionDetailsList(studentFeeCollectionTransaction.getCollectionId(),
+						feesPaidTrxnRequest.getFeesPaidTrxnDetailsDtos(), nextTrxnDetId);
+		studentFeeCollectionRepository.addStudentFeeCollectionDetails(studentFeeCollectionTransactionDetails);
+
+		return studentServiceAdapter.getStudentFeesPaidTrxnResponseDto(studentFeeCollectionTransaction,
+				studentFeeCollectionTransactionDetails);
 	}
 }

@@ -32,6 +32,8 @@ import com.example.demo.data.entity.GeneralRegister;
 import com.example.demo.data.entity.StudentBasicDetails;
 import com.example.demo.data.entity.StudentClassDetails;
 import com.example.demo.data.entity.StudentFeePaidDetails;
+import com.example.demo.data.entity.StudentFeesAssignedDetails;
+import com.example.demo.data.entity.StudentFeesPaidDetails;
 import com.example.demo.exception.StudentException;
 import com.example.demo.service.dto.StudentListRequestDto;
 import com.example.demo.utils.Constants;
@@ -665,5 +667,102 @@ public class StudentDetailsRepository {
 		log.info("Setting total receivable amount prepared statement");
 		ps.setString(1, Constants.BLANK_STRING);
 		ps.setString(2, Constants.BLANK_STRING);
+	}
+
+	/**
+	 * @param studentId
+	 * @return
+	 * @throws StudentException 
+	 */
+	public List<StudentFeesAssignedDetails> getStudentFeesAssignedDetails(String studentId) throws StudentException {
+		log.info("Fetching student fees assigned details for student id {}", studentId);
+		String query = "select B.academic_id, B.fee_id, C.fee_name, A.amount, B.last_update_time, B.last_user "
+				+ "from fee_details A, student_fees_details B, fee_types C, academic_details D "
+				+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id "
+				+ "and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id and academic_id = D.academic_id) or "
+				+ "A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id= ? and A.route_id= ?)) "
+				+ "and B.academic_id=d.academic_id and B.stud_id = ? order by B.academic_id desc";
+		log.info("query {}", query);
+		List<StudentFeesAssignedDetails> studentFeesAssignedDetailsList;
+		try {
+			studentFeesAssignedDetailsList = jdbcTemplate.query(query, ps -> setFeesAssignedDetailsPS(ps, studentId),
+					(rs, rowNum) -> getFeesAssignedDetailsRowMapper(rs));
+		} catch (Exception ex) {
+			log.error("Error while getting student fees assigned details");
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR);
+		}
+		return studentFeesAssignedDetailsList;
+	}
+
+	/**
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private StudentFeesAssignedDetails getFeesAssignedDetailsRowMapper(ResultSet rs) throws SQLException {
+		log.info("Mapping result set to student fees assigned details entity");
+		return StudentFeesAssignedDetails.builder().academicYear(rs.getString("academic_id"))
+				.amount(rs.getDouble("amount")).feeId(rs.getString("fee_id")).feeName(rs.getString("fee_name"))
+				.lastUpdateTime(DateUtils.getDate(rs.getDate("last_update_time"))).lastUser(rs.getString("last_user"))
+				.build();
+	}
+
+	/**
+	 * @param ps
+	 * @param studentId
+	 * @throws SQLException
+	 */
+	private void setFeesAssignedDetailsPS(PreparedStatement ps, String studentId) throws SQLException {
+		log.info("Setting fees assigned details prepared statement");
+		ps.setString(1, Constants.BLANK_STRING);
+		ps.setString(2, Constants.BLANK_STRING);
+		ps.setString(3, studentId);
+	}
+
+	/**
+	 * @param studentId
+	 * @return
+	 * @throws StudentException
+	 */
+	public List<StudentFeesPaidDetails> getStudentFeesPaidDetails(String studentId) throws StudentException {
+		log.info("Fetching students fees paid amount details for student id {}", studentId);
+		String query = "select A.collection_id,A.account_id,C.account_name,A.last_update_time,A.last_user, B.academic_id, B.amount, B.fee_id , D.fee_name "
+				+ "from students_fees_collection_transaction A, students_fees_collection_transaction_details B, accounts C, fee_types D "
+				+ "where A.collection_id = B.collection_id and A.account_id=C.account_id and B.fee_id = D.fee_id and A.stud_id=?";
+		log.info("query {}", query);
+		List<StudentFeesPaidDetails> feesPaidDetailsList;
+		try {
+			feesPaidDetailsList = jdbcTemplate.query(query, ps -> setFeesPaidDetailsPS(ps, studentId),
+					(rs, rowNum) -> getFeesPaidDetailsRowMapper(rs));
+		} catch (Exception ex) {
+			log.error("Error while getting student fees paid details");
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR);
+		}
+		return feesPaidDetailsList;
+	}
+
+	/**
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private StudentFeesPaidDetails getFeesPaidDetailsRowMapper(ResultSet rs) throws SQLException {
+		log.info("Mapping result set to Fees Paid details entity");
+		return StudentFeesPaidDetails.builder().academicId(rs.getString("academic_id"))
+				.accountId(rs.getString("account_id")).accountName(rs.getString("account_name"))
+				.amount(rs.getDouble("amount")).collectionId(rs.getString("collection_id"))
+				.feeId(rs.getString("fee_id")).feeName(rs.getString("fee_name"))
+				.lastUpdateTime(DateUtils.getDate(rs.getDate("last_update_time"))).lastUser(rs.getString("last_user"))
+				.build();
+	}
+
+	/**
+	 * @param ps
+	 * @param studentId
+	 * @throws SQLException
+	 */
+	private void setFeesPaidDetailsPS(PreparedStatement ps, String studentId) throws SQLException {
+		log.info("Setting fees paid details prepared statement");
+		ps.setString(1, studentId);
 	}
 }
