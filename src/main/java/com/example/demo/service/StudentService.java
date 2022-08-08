@@ -9,6 +9,11 @@ import com.example.demo.service.dto.FeeReceivablesResponseDto;
 import com.example.demo.service.dto.FeeReceivablesStatsDto;
 import com.example.demo.service.dto.FetchStudentsResponseDto;
 import com.example.demo.service.dto.StudentDetailsForRegNoResponseDto;
+import com.example.demo.service.dto.StudentFeesAssignedDetailsDto;
+import com.example.demo.service.dto.StudentFeesPaidDetailsDto;
+import com.example.demo.service.dto.StudentFeesPaidTrxnRequestDto;
+import com.example.demo.service.dto.StudentFeesPaidTrxnResponseDto;
+import com.example.demo.service.dto.StudentFeesReceivableDetailsDto;
 import com.example.demo.service.dto.StudentImportResponseDto;
 import com.example.demo.service.dto.StudentListRequestDto;
 import com.example.demo.service.dto.StudentRegistrationDto;
@@ -69,4 +74,34 @@ public interface StudentService {
 	 * @throws StudentException 
 	 */
 	public FeeReceivablesStatsDto getFeeReceivablesStatistics() throws StudentException;
+
+	/**
+	 * @param studentId
+	 * @return
+	 * @throws StudentException 
+	 */
+	public List<StudentFeesAssignedDetailsDto> getStudentsFeesAssignedDetails(String studentId) throws StudentException;
+
+	/**
+	 * @param studentId
+	 * @return
+	 * @throws StudentException 
+	 */
+	public List<StudentFeesPaidDetailsDto> getStudentsFeesPaidDetails(String studentId) throws StudentException;
+
+	/**
+	 * @param studentId
+	 * @return
+	 * @throws StudentException 
+	 */
+	public StudentFeesReceivableDetailsDto getStudentsFeesReceivableDetails(String studentId) throws StudentException;
+
+	/**
+	 * @param studentId
+	 * @param feesPaidTrxnRequest
+	 * @return
+	 * @throws StudentException 
+	 */
+	public StudentFeesPaidTrxnResponseDto addStudentFeesPaidDetails(String studentId,
+			StudentFeesPaidTrxnRequestDto feesPaidTrxnRequest) throws StudentException;
 }
