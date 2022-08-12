@@ -681,7 +681,7 @@ public class StudentDetailsRepository {
 				+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id "
 				+ "and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id and academic_id = D.academic_id) or "
 				+ "A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id= ? and A.route_id= ?)) "
-				+ "and B.academic_id=d.academic_id and B.stud_id = ? order by B.academic_id desc";
+				+ "and B.academic_id=D.academic_id and B.stud_id = ? order by B.academic_id desc";
 		log.info("query {}", query);
 		List<StudentFeesAssignedDetails> studentFeesAssignedDetailsList;
 		try {
@@ -689,7 +689,7 @@ public class StudentDetailsRepository {
 					(rs, rowNum) -> getFeesAssignedDetailsRowMapper(rs));
 		} catch (Exception ex) {
 			log.error("Error while getting student fees assigned details");
-			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR);
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR, ex);
 		}
 		return studentFeesAssignedDetailsList;
 	}
@@ -736,7 +736,7 @@ public class StudentDetailsRepository {
 					(rs, rowNum) -> getFeesPaidDetailsRowMapper(rs));
 		} catch (Exception ex) {
 			log.error("Error while getting student fees paid details");
-			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR);
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR, ex);
 		}
 		return feesPaidDetailsList;
 	}
