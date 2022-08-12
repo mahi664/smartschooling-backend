@@ -22,9 +22,16 @@ import com.example.demo.constant.SortFields;
 import com.example.demo.constant.SuccessDetails;
 import com.example.demo.exception.StudentException;
 import com.example.demo.service.StudentService;
+import com.example.demo.service.dto.FeeReceivablesResponseDto;
+import com.example.demo.service.dto.FeeReceivablesStatsDto;
 import com.example.demo.service.dto.FetchStudentsResponseDto;
 import com.example.demo.service.dto.ResponseDto;
 import com.example.demo.service.dto.StudentDetailsForRegNoResponseDto;
+import com.example.demo.service.dto.StudentFeesAssignedDetailsDto;
+import com.example.demo.service.dto.StudentFeesPaidDetailsDto;
+import com.example.demo.service.dto.StudentFeesPaidTrxnRequestDto;
+import com.example.demo.service.dto.StudentFeesPaidTrxnResponseDto;
+import com.example.demo.service.dto.StudentFeesReceivableDetailsDto;
 import com.example.demo.service.dto.StudentImportResponseDto;
 import com.example.demo.service.dto.StudentListFilterDto;
 import com.example.demo.service.dto.StudentListRequestDto;
@@ -44,6 +51,13 @@ public class StudentController {
 	@Autowired
 	private ResponseUtil<Object> responseUtil;
 
+	/**
+	 * Register new student
+	 * 
+	 * @param studentRegistrationDto
+	 * @return
+	 * @throws StudentException
+	 */
 	@PostMapping(path = "students")
 	public ResponseEntity<ResponseDto> registerNewStudent(
 			@Valid @RequestBody StudentRegistrationDto studentRegistrationDto) throws StudentException {
@@ -55,6 +69,23 @@ public class StudentController {
 				SuccessDetails.STUDENT_REGISTRATION_SUCCESSFUL);
 	}
 
+	/**
+	 * Get student list
+	 * 
+	 * @param academicYear
+	 * @param page
+	 * @param size
+	 * @param classIds
+	 * @param castes
+	 * @param religions
+	 * @param gender
+	 * @param transportOpted
+	 * @param routes
+	 * @param sortOrder
+	 * @param quickSearchText
+	 * @return
+	 * @throws StudentException
+	 */
 	@GetMapping(path = "/students")
 	public ResponseEntity<ResponseDto> getStudentList(@RequestHeader String academicYear,
 			@RequestParam(defaultValue = "0", required = false) int page, @RequestParam(defaultValue = "10") int size,
@@ -78,6 +109,13 @@ public class StudentController {
 				SuccessDetails.STUDENT_DETAILS_FETCHED_SUCCESSFULLY);
 	}
 	
+	/**
+	 * Import students from file upload
+	 * 
+	 * @param file
+	 * @return
+	 * @throws StudentException
+	 */
 	@PostMapping(path = "/students/import")
 	public ResponseEntity<ResponseDto> importStudentsFromFileUpload(@RequestParam MultipartFile file)
 			throws StudentException {
@@ -87,6 +125,13 @@ public class StudentController {
 				SuccessDetails.STUDENT_REGISTRATION_SUCCESSFUL);
 	}
 
+	/**
+	 * Get Student Details For Reg No
+	 * 
+	 * @param genRegNo
+	 * @return
+	 * @throws StudentException
+	 */
 	@GetMapping(path = "/students/general-register/{regNo}")
 	public ResponseEntity<ResponseDto> getStudentDetailsForRegNo(@PathVariable(value = "regNo") int genRegNo)
 			throws StudentException {
@@ -94,6 +139,99 @@ public class StudentController {
 		StudentDetailsForRegNoResponseDto studentDetails = studentService.getStudentDetailsForRegNo(genRegNo);
 		return responseUtil.populateSuccessResponseWithMessage(studentDetails,
 				SuccessDetails.STUDENT_DETAILS_FETCHED_SUCCESSFULLY);
+	}
+	
+	/**
+	 * @param page
+	 * @param size
+	 * @param quickSearchText
+	 * @return
+	 * @throws StudentException
+	 */
+	@GetMapping(path = "/students/receivables")
+	public ResponseEntity<ResponseDto> getFeeReceivables(@RequestParam(defaultValue = "0", required = false) int page, 
+			@RequestParam(defaultValue = "10") int size,
+			@RequestParam(value = "quickSearch", required = false) String quickSearchText) throws StudentException {
+		log.info("Getting Student's Fee Receivables");
+		FeeReceivablesResponseDto feeReceivablesResponseDto = studentService.getFeeReceivables(page, size,
+				quickSearchText);
+		return responseUtil.populateSuccessResponseWithMessageAndPagination(
+				feeReceivablesResponseDto.getFeeReceivableDetails(), feeReceivablesResponseDto.getTotalItems(),
+				feeReceivablesResponseDto.getTotalPages(), feeReceivablesResponseDto.getCurrentPage(),
+				SuccessDetails.RECEIVABLES_FETCHED_SUCCESSFULLY);
+	}
+	
+	/**
+	 * @return
+	 * @throws StudentException
+	 */
+	@GetMapping(path = "/students/receivables/statistics")
+	public ResponseEntity<ResponseDto> getFeeReceivableStats() throws StudentException {
+		log.info("Getting Fee Receivables Statistics");
+		FeeReceivablesStatsDto feeReceivablesStatsDto = studentService.getFeeReceivablesStatistics();
+		return responseUtil.populateSuccessResponseWithMessage(feeReceivablesStatsDto,
+				SuccessDetails.RECEIVABLES_STATS_FETCHED_SUCCESSFULLY);
+	}
+	
+	/**
+	 * @param studentId
+	 * @return
+	 * @throws StudentException 
+	 */
+	@GetMapping(path = "/students/{studentId}/fees-assigned")
+	public ResponseEntity<ResponseDto> getStudentsFeesAssignedDetails(@PathVariable String studentId)
+			throws StudentException {
+		log.info("Getting fees assigned for the student id {}", studentId);
+		List<StudentFeesAssignedDetailsDto> studentsFeesAssignedDetailsList = studentService
+				.getStudentsFeesAssignedDetails(studentId);
+		return responseUtil.populateSuccessResponseWithMessage(studentsFeesAssignedDetailsList,
+				SuccessDetails.FEES_ASSIGNED_DETAILS_FETCHED_SUCCESSFULLY);
+	}
+	
+	/**
+	 * @param studentId
+	 * @return
+	 * @throws StudentException
+	 */
+	@GetMapping(path = "/students/{studentId}/fees-paid")
+	public ResponseEntity<ResponseDto> getStudentsFeesPaidDetails(@PathVariable String studentId)
+			throws StudentException {
+		log.info("Getting fees paid details for the student id {}", studentId);
+		List<StudentFeesPaidDetailsDto> studentsFeesAssignedDetailsList = studentService
+				.getStudentsFeesPaidDetails(studentId);
+		return responseUtil.populateSuccessResponseWithMessage(studentsFeesAssignedDetailsList,
+				SuccessDetails.FEES_PAID_DETAILS_FETCHED_SUCCESSFULLY);
+	}
+	
+	/**
+	 * @param studentId
+	 * @return
+	 * @throws StudentException
+	 */
+	@GetMapping(path = "/students/{studentId}/receivables")
+	public ResponseEntity<ResponseDto> getStudentsFeesReceivables(@PathVariable String studentId)
+			throws StudentException {
+		log.info("Getting Studnet fees receivable details for the student id {}", studentId);
+		StudentFeesReceivableDetailsDto studentsFeesAssignedDetailsList = studentService
+				.getStudentsFeesReceivableDetails(studentId);
+		return responseUtil.populateSuccessResponseWithMessage(studentsFeesAssignedDetailsList,
+				SuccessDetails.STUDENT_FEES_RECEIVABLES_FETCHED_SUCCESSFULLY);
+	}
+	
+	/**
+	 * @param studentId
+	 * @param feesPaidTrxnRequest
+	 * @return
+	 * @throws StudentException
+	 */
+	@PostMapping(path = "/students/{studentId}/fees-paid")
+	public ResponseEntity<ResponseDto> addStudentsFeesPaidDetails(@PathVariable String studentId,
+			@Valid @RequestBody StudentFeesPaidTrxnRequestDto feesPaidTrxnRequest) throws StudentException {
+		log.info("Saving student fees paid details for the student id {}", studentId);
+		StudentFeesPaidTrxnResponseDto feesPaidTrxnResponseDto = studentService.addStudentFeesPaidDetails(studentId,
+				feesPaidTrxnRequest);
+		return responseUtil.populateSuccessResponseWithMessage(feesPaidTrxnResponseDto,
+				SuccessDetails.TRXN_SAVED_SUCCESSFULLY);
 	}
 
 //	
@@ -132,8 +270,4 @@ public class StudentController {
 //		return studentService.addNewStudentFeeCollectionDetails(studentId, studentsFeesTransactionDetailsBO);
 //	}
 
-//	@GetMapping(path = "/test-api")
-//	public ResponseEntity<ResponseDto> testApi(){
-//		return responseUtil.populateSuccessResponseWithMessage("Dummy Data", "hello");
-//	}
 }

@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -23,14 +25,32 @@ import org.springframework.util.StringUtils;
 
 import com.example.demo.constant.ErrorDetails;
 import com.example.demo.data.entity.ClassDetails;
+import com.example.demo.data.entity.FeeReceivableDetails;
+import com.example.demo.data.entity.FeesPaidAmnt;
+import com.example.demo.data.entity.FeesTotalReceivableAmnt;
 import com.example.demo.data.entity.GeneralRegister;
 import com.example.demo.data.entity.StudentBasicDetails;
 import com.example.demo.data.entity.StudentClassDetails;
+import com.example.demo.data.entity.StudentFeePaidDetails;
+import com.example.demo.data.entity.StudentFeesAssignedDetails;
+import com.example.demo.data.entity.StudentFeesPaidDetails;
 import com.example.demo.exception.StudentException;
 import com.example.demo.service.dto.StudentListRequestDto;
 import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
 
+/**
+ * @author MAHI GHUGE
+ *
+ */
+/**
+ * @author MAHI GHUGE
+ *
+ */
+/**
+ * @author MAHI GHUGE
+ *
+ */
 @Repository
 public class StudentDetailsRepository {
 
@@ -288,6 +308,12 @@ public class StudentDetailsRepository {
 		}
 	}
 	
+	/**
+	 * Get Filter Query
+	 * 
+	 * @param studentListRequestDto
+	 * @return
+	 */
 	private String getFilterQuery(StudentListRequestDto studentListRequestDto) {
 		log.info("Gettig filtered query for {}", studentListRequestDto.toString());
 		String filteredQuery = "";
@@ -354,6 +380,15 @@ public class StudentDetailsRepository {
 		return filteredQuery;
 	}
 	
+	/**
+	 * Prepared Statement Setter for Get Student Details
+	 * 
+	 * @param ps
+	 * @param academicYear
+	 * @param studentListRequestDto
+	 * @param pageable
+	 * @throws SQLException
+	 */
 	private void getStudentDetailsPS(PreparedStatement ps, String academicYear,
 			StudentListRequestDto studentListRequestDto, PageRequest pageable) throws SQLException {
 		int indx = 1;
@@ -396,5 +431,338 @@ public class StudentDetailsRepository {
 			ps.setInt(indx++, pageable.getPageSize());
 			ps.setLong(indx, pageable.getOffset());
 		}
+	}
+	
+	/**
+	 * Get Fee Receivables
+	 * @param pageRequest 
+	 * @param quickSearch 
+	 * 
+	 * @return
+	 * @throws StudentException
+	 */
+	public PageImpl<FeeReceivableDetails> getFeeReceivables(String quickSearch, Pageable pageRequest)
+			throws StudentException {
+		log.info("Getting Fee receivable details");
+		String query = "select D.stud_id, F.reg_no, D.first_name, D.middle_name, D.last_name, D.mobile, D.address, sum(A.amount) as total_fee "
+				+ "from fee_details A, student_fees_details B, fee_types C, student_details D, academic_details E, general_register F "
+				+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id and B.stud_id = D.stud_id and D.stud_id = F.stud_id "
+				+ "and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id and academic_id=E.academic_id) or "
+				+ "A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id=? and A.route_id=?)) "
+				+ "and B.academic_id = E.academic_id ";
+		if (!StringUtils.isEmpty(quickSearch)) {
+			query += "and (D.first_name like(?) or D.last_name like(?)) ";
+		}
+		query += "group by D.stud_id order by total_fee desc limit ? offset ?";
+		log.info("query {}", query);
+		List<FeeReceivableDetails> feeReceivableDetailsList;
+		try {
+			feeReceivableDetailsList = jdbcTemplate.query(query,
+					ps -> setFeeReceivablesPS(ps, quickSearch, pageRequest),
+					(rs, rowNum) -> getFeeReceivableRowMapper(rs));
+		} catch (Exception ex) {
+			log.error("Error while getting fee receivable details");
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR, ex);
+		}
+		return new PageImpl<>(feeReceivableDetailsList, pageRequest, getFeeReceivableCount(quickSearch));
+	}
+
+	/**
+	 * @param quickSearch
+	 * @return
+	 * @throws StudentException
+	 */
+	private long getFeeReceivableCount(String quickSearch) throws StudentException {
+		log.info("Getting Fee receivable count");
+		String query = "select D.stud_id, F.reg_no, D.first_name, D.middle_name, D.last_name, D.mobile, D.address, sum(A.amount) as total_fee "
+				+ "from fee_details A, student_fees_details B, fee_types C, student_details D, academic_details E, general_register F "
+				+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id and B.stud_id = D.stud_id and D.stud_id = F.stud_id "
+				+ "and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id and academic_id=E.academic_id) or "
+				+ "A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id=? and A.route_id=?)) "
+				+ "and B.academic_id = E.academic_id ";
+		if (!StringUtils.isEmpty(quickSearch)) {
+			query += "and (D.first_name like(?) or D.last_name like(?)) ";
+		}
+		query += "group by D.stud_id";
+		log.info("query {}", query);
+		List<FeeReceivableDetails> feeReceivableDetailsList;
+		try {
+			feeReceivableDetailsList = jdbcTemplate.query(query, ps -> setFeeReceivablesCountPS(ps, quickSearch),
+					(rs, rowNum) -> getFeeReceivableRowMapper(rs));
+		} catch (Exception ex) {
+			log.error("Error while getting fee receivable details");
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR, ex);
+		}
+
+		return new Long(feeReceivableDetailsList.size()).longValue();
+	}
+
+	/**
+	 * @param ps
+	 * @param quickSearch
+	 * @throws SQLException
+	 */
+	private void setFeeReceivablesCountPS(PreparedStatement ps, String quickSearch) throws SQLException {
+		int indx = 1;
+		ps.setString(indx++, Constants.BLANK_STRING);
+		ps.setString(indx++, Constants.BLANK_STRING);
+		if (!StringUtils.isEmpty(quickSearch)) {
+			ps.setString(indx++, "%" + quickSearch + "%");
+			ps.setString(indx++, "%" + quickSearch + "%");
+		}
+	}
+
+	/**
+	 * Map Fee Receivables Result Set
+	 * 
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private FeeReceivableDetails getFeeReceivableRowMapper(ResultSet rs) throws SQLException {
+		return FeeReceivableDetails.builder().address(rs.getString("address")).firstName(rs.getString("first_name"))
+				.genRegNo(rs.getInt("reg_no")).lastName(rs.getString("last_name"))
+				.middleName(rs.getString("middle_name")).mobileNumber(rs.getString("mobile"))
+				.studentId(rs.getString("stud_id")).totalFee(rs.getDouble("total_fee")).build();
+
+	}
+
+	/**
+	 * Set Prepare statement for Fee Receivables
+	 * 
+	 * @param ps
+	 * @param pageRequest 
+	 * @param quickSearch 
+	 * @throws SQLException
+	 */
+	private void setFeeReceivablesPS(PreparedStatement ps, String quickSearch, Pageable pageRequest) throws SQLException {
+		int indx = 1;
+		ps.setString(indx++, Constants.BLANK_STRING);
+		ps.setString(indx++, Constants.BLANK_STRING);
+		if(!StringUtils.isEmpty(quickSearch)) {
+			ps.setString(indx++, "%"+quickSearch+"%");
+			ps.setString(indx++, "%"+quickSearch+"%");
+		}
+		ps.setInt(indx++, pageRequest.getPageSize());
+		ps.setLong(indx++, pageRequest.getOffset());
+	}
+	
+	/**
+	 * Get Student Fees Paid Amount
+	 * 
+	 * @return
+	 * @throws StudentException
+	 */
+	public List<StudentFeePaidDetails> getStudentsFeesPaidAmount() throws StudentException {
+		log.info("get students fees paid amount");
+		String query = "select A.stud_id, sum(B.amount) as fees_paid "
+				+ "from students_fees_collection_transaction A, students_fees_collection_transaction_details B "
+				+ "where A.collection_id = B.collection_id group by A.stud_id";
+		log.info("query {}", query);
+		List<StudentFeePaidDetails> studentFeePaidDetailsList;
+		try {
+			studentFeePaidDetailsList = jdbcTemplate.query(query, (rs, rowNum) -> getStudentFeesPaidDetailsMapper(rs));
+		} catch (Exception ex) {
+			log.error("Error while getting student fees paid details");
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR, ex);
+		}
+		return studentFeePaidDetailsList;
+	}
+
+	/**
+	 * Get Student Fees Paid details mapper
+	 * 
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private StudentFeePaidDetails getStudentFeesPaidDetailsMapper(ResultSet rs) throws SQLException {
+		return StudentFeePaidDetails.builder().studentId(rs.getString("stud_id")).feesPaid(rs.getDouble("fees_paid"))
+				.build();
+	}
+
+	/**
+	 * Get total paid amount
+	 * 
+	 * @return
+	 * @throws StudentException 
+	 */
+	public FeesPaidAmnt getTotalPaidAmount() throws StudentException {
+		log.info("Getting total fees paid amount");
+		String query = "select sum(B.amount) as fees_paid "
+				+ "from students_fees_collection_transaction A, students_fees_collection_transaction_details B "
+				+ "where A.collection_id = B.collection_id";
+		log.info("query {}", query);
+		List<FeesPaidAmnt> feesPaidAmntList;
+		try {
+			feesPaidAmntList = jdbcTemplate.query(query, (rs, rowNum) -> getTotalPaidAmntRowMapper(rs));
+		} catch (Exception ex) {
+			log.error("Error while getting total fees paid amount");
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR, ex);
+		}
+		Optional<FeesPaidAmnt> feePaidAmntOptional = feesPaidAmntList.stream().findFirst();
+		if (!feePaidAmntOptional.isPresent()) {
+			log.error("Failed to get total receivable amount");
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR);
+		}
+		return feePaidAmntOptional.get();
+	}
+	
+	/**
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private FeesPaidAmnt getTotalPaidAmntRowMapper(ResultSet rs) throws SQLException {
+		log.info("Mapping total paid amount result set to entity");
+		return FeesPaidAmnt.builder().totalAmnt(rs.getDouble("fees_paid")).build();
+	}
+
+	/**
+	 * Get Total receivable amount
+	 * 
+	 * @return
+	 * @throws StudentException 
+	 */
+	public FeesTotalReceivableAmnt getTotalReceivableAmount() throws StudentException {
+		log.info("Getting total receivable amount");
+		String query = "select sum(A.amount) as total_fee "
+				+ "from fee_details A, student_fees_details B, fee_types C, student_details D, academic_details E, general_register F "
+				+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id and B.stud_id = D.stud_id and D.stud_id = F.stud_id "
+				+ "and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id and academic_id=E.academic_id) or A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id=? and A.route_id=?)) "
+				+ "and B.academic_id = E.academic_id";
+		log.info("query {}", query);
+		List<FeesTotalReceivableAmnt> feesTotalReceivableAmnt;
+		try {
+			feesTotalReceivableAmnt = jdbcTemplate.query(query, ps -> setTotalReceivableAmntPS(ps),
+					(rs, rowNum) -> getTotalReceivableAmntRowMapper(rs));
+		} catch (Exception ex) {
+			log.error("Error while getting total receivable amount");
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR, ex);
+		}
+		Optional<FeesTotalReceivableAmnt> feeTotalReceivableAmntOptional = feesTotalReceivableAmnt.stream().findFirst();
+		if (!feeTotalReceivableAmntOptional.isPresent()) {
+			log.error("Failed to get total receivable amount");
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR);
+		}
+		return feeTotalReceivableAmntOptional.get();
+	}
+
+	/**
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private FeesTotalReceivableAmnt getTotalReceivableAmntRowMapper(ResultSet rs) throws SQLException {
+		log.info("Mapping result set to fee total receivables entity");
+		return FeesTotalReceivableAmnt.builder().totalAmnt(rs.getDouble("total_fee")).build();
+	}
+
+	
+	/**
+	 * @param ps
+	 * @throws SQLException
+	 */
+	private void setTotalReceivableAmntPS(PreparedStatement ps) throws SQLException {
+		log.info("Setting total receivable amount prepared statement");
+		ps.setString(1, Constants.BLANK_STRING);
+		ps.setString(2, Constants.BLANK_STRING);
+	}
+
+	/**
+	 * @param studentId
+	 * @return
+	 * @throws StudentException 
+	 */
+	public List<StudentFeesAssignedDetails> getStudentFeesAssignedDetails(String studentId) throws StudentException {
+		log.info("Fetching student fees assigned details for student id {}", studentId);
+		String query = "select B.academic_id, B.fee_id, C.fee_name, A.amount, B.last_update_time, B.last_user "
+				+ "from fee_details A, student_fees_details B, fee_types C, academic_details D "
+				+ "where A.fee_id = B.fee_id and A.fee_id=C.fee_id and B.fee_id=C.fee_id "
+				+ "and (A.class_id in (select distinct(class_id) from student_class_details where stud_id=B.stud_id and academic_id = D.academic_id) or "
+				+ "A.route_id in (select distinct(route_id) from student_transport_details where stud_id=B.stud_id) or (A.class_id= ? and A.route_id= ?)) "
+				+ "and B.academic_id=d.academic_id and B.stud_id = ? order by B.academic_id desc";
+		log.info("query {}", query);
+		List<StudentFeesAssignedDetails> studentFeesAssignedDetailsList;
+		try {
+			studentFeesAssignedDetailsList = jdbcTemplate.query(query, ps -> setFeesAssignedDetailsPS(ps, studentId),
+					(rs, rowNum) -> getFeesAssignedDetailsRowMapper(rs));
+		} catch (Exception ex) {
+			log.error("Error while getting student fees assigned details");
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR);
+		}
+		return studentFeesAssignedDetailsList;
+	}
+
+	/**
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private StudentFeesAssignedDetails getFeesAssignedDetailsRowMapper(ResultSet rs) throws SQLException {
+		log.info("Mapping result set to student fees assigned details entity");
+		return StudentFeesAssignedDetails.builder().academicYear(rs.getString("academic_id"))
+				.amount(rs.getDouble("amount")).feeId(rs.getString("fee_id")).feeName(rs.getString("fee_name"))
+				.lastUpdateTime(DateUtils.getDate(rs.getDate("last_update_time"))).lastUser(rs.getString("last_user"))
+				.build();
+	}
+
+	/**
+	 * @param ps
+	 * @param studentId
+	 * @throws SQLException
+	 */
+	private void setFeesAssignedDetailsPS(PreparedStatement ps, String studentId) throws SQLException {
+		log.info("Setting fees assigned details prepared statement");
+		ps.setString(1, Constants.BLANK_STRING);
+		ps.setString(2, Constants.BLANK_STRING);
+		ps.setString(3, studentId);
+	}
+
+	/**
+	 * @param studentId
+	 * @return
+	 * @throws StudentException
+	 */
+	public List<StudentFeesPaidDetails> getStudentFeesPaidDetails(String studentId) throws StudentException {
+		log.info("Fetching students fees paid amount details for student id {}", studentId);
+		String query = "select A.collection_id,A.account_id,C.account_name,A.last_update_time,A.last_user, B.academic_id, B.amount, B.fee_id , D.fee_name "
+				+ "from students_fees_collection_transaction A, students_fees_collection_transaction_details B, accounts C, fee_types D "
+				+ "where A.collection_id = B.collection_id and A.account_id=C.account_id and B.fee_id = D.fee_id and A.stud_id=?";
+		log.info("query {}", query);
+		List<StudentFeesPaidDetails> feesPaidDetailsList;
+		try {
+			feesPaidDetailsList = jdbcTemplate.query(query, ps -> setFeesPaidDetailsPS(ps, studentId),
+					(rs, rowNum) -> getFeesPaidDetailsRowMapper(rs));
+		} catch (Exception ex) {
+			log.error("Error while getting student fees paid details");
+			throw new StudentException(ErrorDetails.INTERNAL_SERVER_ERROR);
+		}
+		return feesPaidDetailsList;
+	}
+
+	/**
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private StudentFeesPaidDetails getFeesPaidDetailsRowMapper(ResultSet rs) throws SQLException {
+		log.info("Mapping result set to Fees Paid details entity");
+		return StudentFeesPaidDetails.builder().academicId(rs.getString("academic_id"))
+				.accountId(rs.getString("account_id")).accountName(rs.getString("account_name"))
+				.amount(rs.getDouble("amount")).collectionId(rs.getString("collection_id"))
+				.feeId(rs.getString("fee_id")).feeName(rs.getString("fee_name"))
+				.lastUpdateTime(DateUtils.getDate(rs.getDate("last_update_time"))).lastUser(rs.getString("last_user"))
+				.build();
+	}
+
+	/**
+	 * @param ps
+	 * @param studentId
+	 * @throws SQLException
+	 */
+	private void setFeesPaidDetailsPS(PreparedStatement ps, String studentId) throws SQLException {
+		log.info("Setting fees paid details prepared statement");
+		ps.setString(1, studentId);
 	}
 }

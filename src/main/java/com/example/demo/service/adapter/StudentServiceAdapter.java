@@ -1,8 +1,10 @@
 package com.example.demo.service.adapter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -17,15 +19,34 @@ import com.example.demo.constant.FeeTypes;
 import com.example.demo.constant.ServiceConstants;
 import com.example.demo.data.entity.AcademicDetails;
 import com.example.demo.data.entity.ClassDetails;
+import com.example.demo.data.entity.FeeReceivableDetails;
+import com.example.demo.data.entity.FeesPaidAmnt;
+import com.example.demo.data.entity.FeesTotalReceivableAmnt;
 import com.example.demo.data.entity.GeneralRegister;
 import com.example.demo.data.entity.StudentBasicDetails;
 import com.example.demo.data.entity.StudentClassDetails;
+import com.example.demo.data.entity.StudentFeeCollectionTransaction;
+import com.example.demo.data.entity.StudentFeeCollectionTransactionDetails;
+import com.example.demo.data.entity.StudentFeePaidDetails;
+import com.example.demo.data.entity.StudentFeesAssignedDetails;
 import com.example.demo.data.entity.StudentFeesDetails;
+import com.example.demo.data.entity.StudentFeesPaidDetails;
 import com.example.demo.data.entity.StudentTransportDetails;
+import com.example.demo.data.entity.Transaction;
 import com.example.demo.service.dto.ClassDto;
+import com.example.demo.service.dto.FeeReceivableDetailsDto;
+import com.example.demo.service.dto.FeeReceivablesStatsDto;
 import com.example.demo.service.dto.FetchStudentsResponseDto;
 import com.example.demo.service.dto.StudentDetailsDto;
 import com.example.demo.service.dto.StudentDetailsForRegNoResponseDto;
+import com.example.demo.service.dto.StudentFeesAssignedDetailsDto;
+import com.example.demo.service.dto.StudentFeesDueDetailsDto;
+import com.example.demo.service.dto.StudentFeesPaidDetailsDto;
+import com.example.demo.service.dto.StudentFeesPaidDetailsWrapperDto;
+import com.example.demo.service.dto.StudentFeesPaidTrxnDetailsDto;
+import com.example.demo.service.dto.StudentFeesPaidTrxnRequestDto;
+import com.example.demo.service.dto.StudentFeesPaidTrxnResponseDto;
+import com.example.demo.service.dto.StudentFeesReceivableDetailsDto;
 import com.example.demo.service.dto.StudentImportData;
 import com.example.demo.service.dto.StudentImportResponseDto;
 import com.example.demo.service.dto.StudentRegistrationDto;
@@ -268,4 +289,259 @@ public class StudentServiceAdapter {
 		}
 		return studentDetailsDtoList;
 	}
+
+	
+	/**
+	 * Get Receivable receivables stats dto
+	 * 
+	 * @param totalReceivableAmnt
+	 * @param totalPaidAmnt
+	 * @return
+	 */
+	public FeeReceivablesStatsDto getFeeReceivableStatsDto(FeesTotalReceivableAmnt totalReceivableAmnt,
+			FeesPaidAmnt totalPaidAmnt) {
+		log.info("Populating Fee receivable stats dto for total amnt {} and paid amount {}",
+				totalReceivableAmnt.getTotalAmnt(), totalPaidAmnt.getTotalAmnt());
+		return FeeReceivablesStatsDto.builder().totalAmnt(totalReceivableAmnt.getTotalAmnt())
+				.paidAmnt(totalPaidAmnt.getTotalAmnt())
+				.dueAmnt(totalReceivableAmnt.getTotalAmnt() - totalPaidAmnt.getTotalAmnt()).build();
+	}
+
+	/**
+	 * @param feeReceivableDetailsPagedData
+	 * @param studentId2FeePaidMap 
+	 * @return
+	 */
+	public List<FeeReceivableDetailsDto> getFeeReceivableDetailsDto(
+			Page<FeeReceivableDetails> feeReceivableDetailsPagedData,
+			Map<String, StudentFeePaidDetails> studentId2FeePaidMap) {
+		return feeReceivableDetailsPagedData.getContent().stream().map(feeReceivableDetail -> {
+			double feesPaid = studentId2FeePaidMap != null
+					&& studentId2FeePaidMap.get(feeReceivableDetail.getStudentId()) != null
+							? studentId2FeePaidMap.get(feeReceivableDetail.getStudentId()).getFeesPaid()
+							: 0;
+			return FeeReceivableDetailsDto.builder().firstName(feeReceivableDetail.getFirstName())
+					.genRegNo(feeReceivableDetail.getGenRegNo()).lastName(feeReceivableDetail.getLastName())
+					.middleName(feeReceivableDetail.getMiddleName()).mobileNumber(feeReceivableDetail.getMobileNumber())
+					.studentId(feeReceivableDetail.getStudentId()).totalAmnt(feeReceivableDetail.getTotalFee())
+					.paidAmnt(feesPaid).dueAmnt(feeReceivableDetail.getTotalFee() - feesPaid)
+					.address(feeReceivableDetail.getAddress())
+					.build();
+		}).collect(Collectors.toList());
+	}
+
+	/**
+	 * @param studentFeeAssignedDetailsList
+	 * @return
+	 */
+	public List<StudentFeesAssignedDetailsDto> getStudentFeesAssignedDetailsDtoList(
+			List<StudentFeesAssignedDetails> studentFeeAssignedDetailsList) {
+		log.info("Getting students fees assigned details dto list");
+		return studentFeeAssignedDetailsList.stream()
+				.map(feeAssignedDetails -> getStudentFeeAssignedDetailsDto(feeAssignedDetails))
+				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * @param feesAssignedDetails
+	 * @return
+	 */
+	public StudentFeesAssignedDetailsDto getStudentFeeAssignedDetailsDto(
+			StudentFeesAssignedDetails feesAssignedDetails) {
+		log.info("Populating Student Fee Assigned Details DTO");
+		return StudentFeesAssignedDetailsDto.builder().academicYear(feesAssignedDetails.getAcademicYear())
+				.amount(feesAssignedDetails.getAmount()).assignedBy(feesAssignedDetails.getLastUser())
+				.assignedDate(feesAssignedDetails.getLastUpdateTime()).feeId(feesAssignedDetails.getFeeId())
+				.feeName(feesAssignedDetails.getFeeName()).build();
+	}
+
+	/**
+	 * @param studentFeesPaidDetailsList
+	 * @return
+	 */
+	public List<StudentFeesPaidDetailsDto> getStudentFeesPaidDetailsDtoList(
+			List<StudentFeesPaidDetails> studentFeesPaidDetailsList) {
+		log.info("Getting Student fees paid details dto list");
+		return studentFeesPaidDetailsList.stream().map(feesPaidDetail -> getStudentFeesPaidDetailsDto(feesPaidDetail))
+				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * @param feesPaidDetails
+	 * @return
+	 */
+	public StudentFeesPaidDetailsDto getStudentFeesPaidDetailsDto(StudentFeesPaidDetails feesPaidDetails) {
+		log.info("populating student fees paid details dto");
+		return StudentFeesPaidDetailsDto.builder().accountId(feesPaidDetails.getAccountId())
+				.accountName(feesPaidDetails.getAccountName()).academicYear(feesPaidDetails.getAcademicId())
+				.amount(feesPaidDetails.getAmount()).feeId(feesPaidDetails.getFeeId())
+				.feeName(feesPaidDetails.getFeeName()).receivedBy(feesPaidDetails.getLastUser())
+				.receivedDate(feesPaidDetails.getLastUpdateTime()).transactionId(feesPaidDetails.getCollectionId())
+				.build();
+	}
+
+	/**
+	 * @param studentFeesAssignedDetailsDtos
+	 * @param studentFeesPaidDetailsDtos
+	 * @return
+	 */
+	public List<StudentFeesDueDetailsDto> getStudentFeesDueDetailsDtoList(
+			List<StudentFeesAssignedDetailsDto> studentFeesAssignedDetailsDtos,
+			List<StudentFeesPaidDetailsDto> studentFeesPaidDetailsDtos) {
+		log.info("populating student fees receivable details deto");
+
+		Map<String, Map<String, Double>> academicId2FeeId2FeesAssignedDetails = studentFeesAssignedDetailsDtos.stream()
+				.collect(Collectors.groupingBy(StudentFeesAssignedDetailsDto::getAcademicYear, Collectors
+						.toMap(StudentFeesAssignedDetailsDto::getFeeId, StudentFeesAssignedDetailsDto::getAmount)));
+
+		studentFeesPaidDetailsDtos.forEach(feesPaidDetailsDto -> {
+			if (academicId2FeeId2FeesAssignedDetails.containsKey(feesPaidDetailsDto.getAcademicYear())
+					&& academicId2FeeId2FeesAssignedDetails.get(feesPaidDetailsDto.getAcademicYear())
+							.containsKey(feesPaidDetailsDto.getFeeId())) {
+				double feeAssignedAmount = academicId2FeeId2FeesAssignedDetails
+						.get(feesPaidDetailsDto.getAcademicYear()).get(feesPaidDetailsDto.getFeeId());
+//				List<StudentFeesAssignedDetailsDto> feesAssignedDtoL = ;
+//				StudentFeesAssignedDetailsDto feesAssignedDto = feesAssignedDtoL.stream().findFirst().get();
+//				feesAssignedDto.setAmount(feesAssignedDto.getAmount() - feesPaidDetailsDto.getAmount());
+				academicId2FeeId2FeesAssignedDetails.get(feesPaidDetailsDto.getAcademicYear())
+						.put(feesPaidDetailsDto.getFeeId(), feeAssignedAmount - feesPaidDetailsDto.getAmount());
+			}
+		});
+
+		return studentFeesAssignedDetailsDtos.stream().map(feesAssignedDto -> {
+//			List<StudentFeesAssignedDetailsDto> updatedFeesDtos = ;
+			return getStudentFeesDueDetailsDto(feesAssignedDto, academicId2FeeId2FeesAssignedDetails
+					.get(feesAssignedDto.getAcademicYear()).get(feesAssignedDto.getFeeId()));
+		}).collect(Collectors.toList());
+	}
+	
+	/**
+	 * @param feesAssignedDto
+	 * @param amount
+	 * @return
+	 */
+	private StudentFeesDueDetailsDto getStudentFeesDueDetailsDto(StudentFeesAssignedDetailsDto feesAssignedDto,
+			double amount) {
+		log.info("Populating studnets fees due details dto");
+		return StudentFeesDueDetailsDto.builder().academicYear(feesAssignedDto.getAcademicYear()).amount(amount)
+				.feeId(feesAssignedDto.getFeeId()).feeName(feesAssignedDto.getFeeName()).build();
+	}
+
+	/**
+	 * @param studentFeesAssignedDetailsDtos
+	 * @param studentFeesPaidDetailsDtos
+	 * @param studentFeesDueDetailsDtos
+	 * @param feesPaidWrapperDto 
+	 * @return
+	 */
+	public StudentFeesReceivableDetailsDto getStudentFeesReceivableDetailsDto(
+			List<StudentFeesAssignedDetailsDto> studentFeesAssignedDetailsDtos,
+			List<StudentFeesPaidDetailsDto> studentFeesPaidDetailsDtos,
+			List<StudentFeesDueDetailsDto> studentFeesDueDetailsDtos,
+			List<StudentFeesPaidDetailsWrapperDto> feesPaidWrapperDto) {
+		double totalFeesAmnt = studentFeesAssignedDetailsDtos.stream().map(StudentFeesAssignedDetailsDto::getAmount)
+				.reduce(Double.valueOf(0), Double::sum);
+		double totalPaidAmnt = studentFeesPaidDetailsDtos.stream().map(StudentFeesPaidDetailsDto::getAmount)
+				.reduce(Double.valueOf(0), Double::sum);
+		return StudentFeesReceivableDetailsDto.builder().feesAssignedDetails(studentFeesAssignedDetailsDtos)
+				.feesDueDetails(studentFeesDueDetailsDtos).feesPaidDetails(feesPaidWrapperDto)
+				.totalFeeAmnt(totalFeesAmnt).totalPaidAmnt(totalPaidAmnt).totalDueAmnt(totalFeesAmnt - totalPaidAmnt)
+				.build();
+	}
+
+	/**
+	 * @param studentId
+	 * @param feesPaidTrxnRequest
+	 * @return
+	 */
+	public StudentFeeCollectionTransaction getStudentFeeCollectionTransaction(String studentId,
+			StudentFeesPaidTrxnRequestDto feesPaidTrxnRequest) {
+		log.info("Getting student fee collection entity for student id {}", studentId);
+		return StudentFeeCollectionTransaction.builder().accountId(feesPaidTrxnRequest.getAccountId())
+				.collectionId(UUID.randomUUID().toString()).lastUpdateTime(new Date()).lastUser(ServiceConstants.ADMIN)
+				.studentId(studentId).transactionDate(new Date()).build();
+	}
+
+	/**
+	 * @param collectionId
+	 * @param feesPaidTrxnDetailsDtos
+	 * @param nextTrxnDetId 
+	 * @return
+	 */
+	public List<StudentFeeCollectionTransactionDetails> getStudentFeeCollectionTransactionDetailsList(
+			String collectionId, List<StudentFeesPaidTrxnDetailsDto> feesPaidTrxnDetailsDtos, int nextTrxnDetId) {
+		log.info("Getting student fee collection transaction details dto list");
+		List<StudentFeeCollectionTransactionDetails> feeCollectionDetails = feesPaidTrxnDetailsDtos.stream().map(
+				feePaidTrxnDetailDto -> getStudentFeeCollectionTransactionDetails(collectionId, feePaidTrxnDetailDto))
+				.collect(Collectors.toList());
+		for (StudentFeeCollectionTransactionDetails studentFeeCollectionTransactionDetails : feeCollectionDetails) {
+			studentFeeCollectionTransactionDetails.setTrxnDetId(Integer.toString(nextTrxnDetId++));
+		}
+		return feeCollectionDetails;
+	}
+	
+	/**
+	 * @param collectionId
+	 * @param feePaidTrxnDetailDto
+	 * @param nextTrxnDetId 
+	 * @return
+	 */
+	public StudentFeeCollectionTransactionDetails getStudentFeeCollectionTransactionDetails(String collectionId,
+			StudentFeesPaidTrxnDetailsDto feePaidTrxnDetailDto) {
+		log.info("populating student fee collection trnasaction details");
+		return StudentFeeCollectionTransactionDetails.builder().academicId(feePaidTrxnDetailDto.getAcademicId())
+				.amount(feePaidTrxnDetailDto.getAmount()).collectionId(collectionId)
+				.feeId(feePaidTrxnDetailDto.getFeeId()).build();
+	}
+
+	/**
+	 * @param feesPaidTrxnRequest
+	 * @return
+	 */
+	public Transaction getTransactionEntity(StudentFeesPaidTrxnRequestDto feesPaidTrxnRequest) {
+		log.info("getting transaction entity");
+		return Transaction.builder().transactionDate(feesPaidTrxnRequest.getTrxnDate())
+				.transactionId(UUID.randomUUID().toString()).amount(feesPaidTrxnRequest.getFeesPaidTrxnDetailsDtos()
+						.stream().map(StudentFeesPaidTrxnDetailsDto::getAmount).reduce(Double.valueOf(0), Double::sum))
+				.build();
+	}
+
+	/**
+	 * @param studentFeeCollectionTransaction
+	 * @param studentFeeCollectionTransactionDetails
+	 * @return
+	 */
+	public StudentFeesPaidTrxnResponseDto getStudentFeesPaidTrxnResponseDto(
+			StudentFeeCollectionTransaction studentFeeCollectionTransaction,
+			List<StudentFeeCollectionTransactionDetails> studentFeeCollectionTransactionDetails) {
+		return StudentFeesPaidTrxnResponseDto.builder()
+				.amount(studentFeeCollectionTransactionDetails.stream()
+						.map(StudentFeeCollectionTransactionDetails::getAmount).reduce(Double.valueOf(0), Double::sum))
+				.transactionId(studentFeeCollectionTransaction.getCollectionId())
+				.trxnDate(studentFeeCollectionTransaction.getTransactionDate()).build();
+	}
+
+	/**
+	 * @param studentFeesPaidDetailsDtos
+	 * @return
+	 */
+	public List<StudentFeesPaidDetailsWrapperDto> getStudentFeesPaidDetailsWrapperDto(
+			List<StudentFeesPaidDetailsDto> studentFeesPaidDetailsDtos) {
+		log.info("populating students fees paid wrapper details dto");
+		List<StudentFeesPaidDetailsWrapperDto> feesPaidWrapperDetails = new ArrayList<>();
+		Map<String, List<StudentFeesPaidDetailsDto>> trxnId2FeesPaidDetailsMap = studentFeesPaidDetailsDtos.stream()
+				.collect(Collectors.groupingBy(StudentFeesPaidDetailsDto::getTransactionId));
+		for (Map.Entry<String, List<StudentFeesPaidDetailsDto>> entry : trxnId2FeesPaidDetailsMap.entrySet()) {
+			String key = entry.getKey();
+			StudentFeesPaidDetailsDto value = entry.getValue().stream().findFirst().get();
+			feesPaidWrapperDetails.add(StudentFeesPaidDetailsWrapperDto.builder().accountId(value.getAccountId())
+					.accountName(value.getAccountName())
+					.amount(entry.getValue().stream().map(StudentFeesPaidDetailsDto::getAmount)
+							.reduce(Double.valueOf(0), Double::sum))
+					.receivedBy(value.getReceivedBy()).receivedDate(value.getReceivedDate()).transactionId(key)
+					.studentFeesPaidDetails(entry.getValue()).build());
+		}
+		return feesPaidWrapperDetails;
+	}
 }
+

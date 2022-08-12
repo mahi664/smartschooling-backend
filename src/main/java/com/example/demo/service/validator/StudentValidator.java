@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +26,17 @@ import com.example.demo.data.entity.GeneralRegister;
 import com.example.demo.data.entity.Religion;
 import com.example.demo.data.entity.Routes;
 import com.example.demo.data.repository.AcademicDetailsRepository;
+import com.example.demo.data.repository.AccountsRepository;
 import com.example.demo.data.repository.CasteRepository;
 import com.example.demo.data.repository.ClassDetailsRespository;
 import com.example.demo.data.repository.GeneralRegisterRepository;
 import com.example.demo.data.repository.ReligionRepository;
 import com.example.demo.data.repository.RoutesRepository;
+import com.example.demo.data.repository.StudentDetailsRepository;
 import com.example.demo.exception.StudentException;
+import com.example.demo.service.dto.StudentFeesDueDetailsDto;
+import com.example.demo.service.dto.StudentFeesPaidTrxnDetailsDto;
+import com.example.demo.service.dto.StudentFeesPaidTrxnRequestDto;
 import com.example.demo.service.dto.StudentRegistrationDto;
 import com.example.demo.utils.Constants;
 
@@ -58,6 +64,12 @@ public class StudentValidator {
 	private AcademicDetailsRepository academicDetailsRepository;
 
 	List<String> errorMessages = null;
+	
+	@Autowired
+	private StudentDetailsRepository studentDetailsRepository;
+	
+	@Autowired
+	private AccountsRepository accountsRepository;
 
 	/**
 	 * 
@@ -423,6 +435,68 @@ public class StudentValidator {
 		} else {
 			log.info("Gen reg no can not be blank");
 			errorMessages.add("Gen Reg No " + ErrorDetails.FIELD_MUST_NOT_BLANK.getErrorDescription());
+		}
+	}
+
+	/**
+	 * @param studentId
+	 * @param feesPaidTrxnRequest
+	 * @param studentFeesDueDetails 
+	 * @throws StudentException 
+	 */
+	public void validateStudentFeesPaidDetailsRequest(String studentId,
+			StudentFeesPaidTrxnRequestDto feesPaidTrxnRequest, List<StudentFeesDueDetailsDto> studentFeesDueDetails)
+			throws StudentException {
+		log.info("validating student fees paid request for student id {}", studentId);
+		Optional.ofNullable(studentDetailsRepository.getStudentDetails(studentId))
+				.orElseThrow(() -> new StudentException(ErrorDetails.STUDENT_DETAILS_NOT_FOUND));
+
+		log.info("Validating account details for account id {}", feesPaidTrxnRequest.getAccountId());
+		accountsRepository.getAccounts(feesPaidTrxnRequest.getAccountId());
+
+		log.info("Validating academic years for fees paid trxn request");
+		List<String> academicYears = feesPaidTrxnRequest.getFeesPaidTrxnDetailsDtos().stream()
+				.map(StudentFeesPaidTrxnDetailsDto::getAcademicId).collect(Collectors.toList());
+		List<AcademicDetails> academicDetails = academicDetailsRepository.getAcademicDetails();
+		academicYears
+				.removeAll(academicDetails.stream().map(AcademicDetails::getAcademicId).collect(Collectors.toList()));
+		if (!CollectionUtils.isEmpty(academicYears)) {
+			log.error("Invalid academic years {}", academicYears);
+			throw new StudentException(ErrorDetails.ACADEMIC_DETAILS_NOT_FOUND,
+					Stream.of("Invalid Academic years " + academicYears.toString()).collect(Collectors.toList()));
+		}
+
+		if (CollectionUtils.isEmpty(studentFeesDueDetails)) {
+			log.error("No Dues found for student id {}", studentId);
+			throw new StudentException(ErrorDetails.NO_FEE_DUES_AVAILABLE);
+		}
+
+		Map<String, Map<String, List<StudentFeesDueDetailsDto>>> academicId2FeeId2DetailsMap = studentFeesDueDetails
+				.stream().collect(Collectors.groupingBy(StudentFeesDueDetailsDto::getAcademicYear,
+						Collectors.groupingBy(StudentFeesDueDetailsDto::getFeeId)));
+		errorMessages = new ArrayList<>();
+		for (StudentFeesPaidTrxnDetailsDto feesPaidTrxnDetailsDto : feesPaidTrxnRequest.getFeesPaidTrxnDetailsDtos()) {
+			if (!academicId2FeeId2DetailsMap.containsKey(feesPaidTrxnDetailsDto.getAcademicId())) {
+				errorMessages.add("No Fee Dues for academic year " + feesPaidTrxnDetailsDto.getAcademicId());
+			} else if (!academicId2FeeId2DetailsMap.get(feesPaidTrxnDetailsDto.getAcademicId())
+					.containsKey(feesPaidTrxnDetailsDto.getFeeId())) {
+				errorMessages.add("No Dues for Fee Id " + feesPaidTrxnDetailsDto.getFeeId() + " in academic year "
+						+ feesPaidTrxnDetailsDto.getAcademicId());
+			} else {
+				Optional<StudentFeesDueDetailsDto> feeDueDetailsOptional = academicId2FeeId2DetailsMap
+						.get(feesPaidTrxnDetailsDto.getAcademicId()).get(feesPaidTrxnDetailsDto.getFeeId()).stream()
+						.findFirst();
+				if (!feeDueDetailsOptional.isPresent()) {
+					errorMessages.add("No Dues for Fee Id " + feesPaidTrxnDetailsDto.getFeeId() + " in academic year "
+							+ feesPaidTrxnDetailsDto.getAcademicId());
+				} else if (feeDueDetailsOptional.get().getAmount() < feesPaidTrxnDetailsDto.getAmount()) {
+					errorMessages.add("Invalid Due amount for fee id " + feesPaidTrxnDetailsDto.getFeeId()
+							+ " in academic year " + feesPaidTrxnDetailsDto.getAcademicId());
+				}
+			}
+		}
+		if (!CollectionUtils.isEmpty(errorMessages)) {
+			throw new StudentException(ErrorDetails.FAILED_TO_VALIDATE_REQUEST_DATA, errorMessages);
 		}
 	}
 
