@@ -34,7 +34,7 @@ import com.example.demo.service.dto.StudentFeesPaidTrxnResponseDto;
 import com.example.demo.service.dto.StudentFeesReceivableDetailsDto;
 import com.example.demo.service.dto.StudentImportResponseDto;
 import com.example.demo.service.dto.StudentListFilterDto;
-import com.example.demo.service.dto.StudentListRequestDto;
+import com.example.demo.service.dto.FilterListRequestDto;
 import com.example.demo.service.dto.StudentRegistrationDto;
 import com.example.demo.service.dto.StudentRegistrationResponseDto;
 import com.example.demo.utils.ResponseUtil;
@@ -98,7 +98,7 @@ public class StudentController {
 			@RequestParam(value = "quickSearch", required = false) String quickSearchText) throws StudentException {
 		log.info("Fetching student list for academic year {}, page {} and size {}", academicYear, page, size);
 		FetchStudentsResponseDto fetchStudentsResponseDto = studentService.getStudentList(academicYear, page, size,
-				StudentListRequestDto.builder()
+				FilterListRequestDto.builder()
 						.filterDto(StudentListFilterDto.builder().classIds(classIds).castes(castes).gender(gender)
 								.religions(religions).transportOpted(transportOpted).routeIds(routes)
 								.quickSearchText(quickSearchText).build())
@@ -233,41 +233,5 @@ public class StudentController {
 		return responseUtil.populateSuccessResponseWithMessage(feesPaidTrxnResponseDto,
 				SuccessDetails.TRXN_SAVED_SUCCESSFULLY);
 	}
-
-//	
-//	@PostMapping(path="/Students/update")
-//	public StudentDetailsBO updateStudentDetails(@RequestBody StudentDetailsBO studentDetailsBO) {
-//		return studentService.updateStudentDetails(studentDetailsBO);
-//	}
-//	
-//	@PostMapping(path="/Students/delete")
-//	public boolean deleteStudentDetails(@RequestBody StudentDetailsBO studentDetailsBO) {
-//		return studentService.deleteStudentCompleteDetails(studentDetailsBO.getStudentId());
-//	}
-//	
-//	@GetMapping(path = "/Students/Receivables")
-//	public List<StudentDetailsBO> getStudentsReceivables(){
-//		return studentService.getStudentsReceivables();
-//	}
-//	
-//	@GetMapping(path = "/Students/{studentId}/Fees/Assigned")
-//	public Map<String, List<FeesDetailsBO>> getStudentsFeesAssinedDetails(@PathVariable String studentId){
-//		return studentService.getStudentFeesAssignedDetails(studentId);
-//	}
-//	
-//	@GetMapping(path = "/Students/{studentId}/Fees/Collections")
-//	public List<StudentsFeesTransactionDetailsBO> getStudentFeesCollectionsTransactions(@PathVariable String studentId){
-//		return studentService.getStudentsFeesCollectionsTransactions(studentId);
-//	}
-//	
-//	@GetMapping(path = "/Students/{studentId}/Fees/Dues")
-//	public Map<String, List<FeesDetailsBO>> getStudentFeesDueDetails(@PathVariable String studentId){
-//		return studentService.getStudentFeesDueDetails(studentId);
-//	}
-//	
-//	@PostMapping(path = "/Students/{studentId}/Fees/Collections")
-//	public StudentsFeesTransactionDetailsBO addStudentFeesCollectionsTransactions(@PathVariable String studentId, @RequestBody StudentsFeesTransactionDetailsBO studentsFeesTransactionDetailsBO){
-//		return studentService.addNewStudentFeeCollectionDetails(studentId, studentsFeesTransactionDetailsBO);
-//	}
 
 }

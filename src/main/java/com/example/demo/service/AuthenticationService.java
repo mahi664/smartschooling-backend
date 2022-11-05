@@ -118,9 +118,9 @@ public class AuthenticationService {
 	}
 
 	public UserLoinCredsAndRoles getUserDetailsByUserName(String username) {
-		String query = "select A.user_id, A.username, A.password, B.role_id, C.role_name "
-				+ "from user_login_details A, user_role_mapping B, roles C "
-				+ "where A.user_id = B.user_id and B.role_id = C.role_id and A.username = ?";
+		String query = "select A.user_id, A.username, A.password "
+				+ "from user_login_details A "
+				+ "where A.username = ?";
 		return jdbcTemplate.query(query, new PreparedStatementSetter() {
 			
 			@Override
@@ -139,8 +139,8 @@ public class AuthenticationService {
 					userLoinCredsAndRoles.setPassword(rs.getString("PASSWORD"));
 					
 					RoleDetailsBO role = new RoleDetailsBO();
-					role.setRoleId(rs.getString("ROLE_ID"));
-					role.setRoleName(rs.getString("ROLE_NAME"));
+					role.setRoleId("ADMIN");
+					role.setRoleName("Admin");
 					
 					userLoinCredsAndRoles.setRole(role);
 				}

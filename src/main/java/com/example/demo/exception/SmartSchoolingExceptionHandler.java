@@ -19,7 +19,7 @@ import com.example.demo.service.dto.ResponseDto;
 import com.example.demo.utils.ResponseUtil;
 
 @ControllerAdvice
-public class StudentExceptionHandler extends ResponseEntityExceptionHandler{
+public class SmartSchoolingExceptionHandler extends ResponseEntityExceptionHandler{
 
 	@ExceptionHandler(StudentException.class)
 	protected ResponseEntity<ResponseDto> handleStudentException(StudentException ex) {
@@ -28,7 +28,13 @@ public class StudentExceptionHandler extends ResponseEntityExceptionHandler{
 	}
 	
 	@ExceptionHandler(FileStorageException.class)
-	protected ResponseEntity<ResponseDto> handleFileStorageException(StudentException ex) {
+	protected ResponseEntity<ResponseDto> handleFileStorageException(FileStorageException ex) {
+		logger.error("Handling student exception {}", ex);
+		return ResponseUtil.populateErrorResponse(ex.getErrorDetails(), ex.getErrorMessages());
+	}
+	
+	@ExceptionHandler(StaffException.class)
+	protected ResponseEntity<ResponseDto> handleStaffExceptionException(StaffException ex) {
 		logger.error("Handling student exception {}", ex);
 		return ResponseUtil.populateErrorResponse(ex.getErrorDetails(), ex.getErrorMessages());
 	}
