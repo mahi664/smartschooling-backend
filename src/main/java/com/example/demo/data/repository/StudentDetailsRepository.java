@@ -35,7 +35,7 @@ import com.example.demo.data.entity.StudentFeePaidDetails;
 import com.example.demo.data.entity.StudentFeesAssignedDetails;
 import com.example.demo.data.entity.StudentFeesPaidDetails;
 import com.example.demo.exception.StudentException;
-import com.example.demo.service.dto.StudentListRequestDto;
+import com.example.demo.service.dto.FilterListRequestDto;
 import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
 
@@ -128,7 +128,7 @@ public class StudentDetailsRepository {
 	 * @throws StudentException
 	 */
 	public PageImpl<StudentBasicDetails> getStudentDetails(String academicYear, PageRequest pageable,
-			StudentListRequestDto studentListRequestDto) throws StudentException {
+			FilterListRequestDto studentListRequestDto) throws StudentException {
 		log.info("Fetching student details list for academic year {}, page no {}, page size {}", academicYear,
 				pageable.getPageNumber(), pageable.getPageSize());
 		String query = "select A.* , B.class_id, D.class_name, C.reg_no "
@@ -180,7 +180,7 @@ public class StudentDetailsRepository {
 	 * @return
 	 * @throws StudentException 
 	 */
-	public int studentBasicDetailsCount(String academicYear, StudentListRequestDto studentListRequestDto)
+	public int studentBasicDetailsCount(String academicYear, FilterListRequestDto studentListRequestDto)
 			throws StudentException {
 		log.info("Fetching student details count for academic year {}", academicYear);
 		String query = "select count(*) as studentsCount "
@@ -314,7 +314,7 @@ public class StudentDetailsRepository {
 	 * @param studentListRequestDto
 	 * @return
 	 */
-	private String getFilterQuery(StudentListRequestDto studentListRequestDto) {
+	private String getFilterQuery(FilterListRequestDto studentListRequestDto) {
 		log.info("Gettig filtered query for {}", studentListRequestDto.toString());
 		String filteredQuery = "";
 		if (studentListRequestDto != null && studentListRequestDto.getFilterDto() != null) {
@@ -390,7 +390,7 @@ public class StudentDetailsRepository {
 	 * @throws SQLException
 	 */
 	private void getStudentDetailsPS(PreparedStatement ps, String academicYear,
-			StudentListRequestDto studentListRequestDto, PageRequest pageable) throws SQLException {
+			FilterListRequestDto studentListRequestDto, PageRequest pageable) throws SQLException {
 		int indx = 1;
 		ps.setString(indx++, academicYear);
 		if (studentListRequestDto != null && studentListRequestDto.getFilterDto() != null) {
