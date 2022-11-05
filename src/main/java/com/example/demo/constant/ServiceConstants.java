@@ -75,4 +75,10 @@ public class ServiceConstants {
 	public static String NO_FEE_DUES_AVAILABLE = "No Fee Dues Available";
 	
 	public static String FAILED_TO_VALIDATE_REQUEST_DATA = "Failed to Validate Request Data";
+	
+	public static String STAFF_BASIC_DETAILS_ADDED_SUCCESSFULLY = "Staff basic details addedd successfully";
+	
+	public static String DUPLICATE_STAFF_DETAILS = "Staff details already exists for the user";
+	
+	public static String STAFF_DETAILS_FETCHED_SUCCESSFULLY = "Staff details fetched successfully";
 }

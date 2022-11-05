@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.example.demo.service.dto.StudentListRequestDto;
+import com.example.demo.service.dto.FilterListRequestDto;
 
 @Service
 public class StudentDetailsRepositoryAdapter {

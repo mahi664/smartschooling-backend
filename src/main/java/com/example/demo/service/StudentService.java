@@ -15,7 +15,7 @@ import com.example.demo.service.dto.StudentFeesPaidTrxnRequestDto;
 import com.example.demo.service.dto.StudentFeesPaidTrxnResponseDto;
 import com.example.demo.service.dto.StudentFeesReceivableDetailsDto;
 import com.example.demo.service.dto.StudentImportResponseDto;
-import com.example.demo.service.dto.StudentListRequestDto;
+import com.example.demo.service.dto.FilterListRequestDto;
 import com.example.demo.service.dto.StudentRegistrationDto;
 import com.example.demo.service.dto.StudentRegistrationResponseDto;
 
@@ -38,7 +38,7 @@ public interface StudentService {
 	 * @return
 	 * @throws StudentException
 	 */
-	public FetchStudentsResponseDto getStudentList(String academicYear, int page, int size, StudentListRequestDto studentListRequestDto) throws StudentException;
+	public FetchStudentsResponseDto getStudentList(String academicYear, int page, int size, FilterListRequestDto studentListRequestDto) throws StudentException;
 
 	/**
 	 * 
