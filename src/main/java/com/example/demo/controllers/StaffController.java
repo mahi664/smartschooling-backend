@@ -31,11 +31,11 @@ import com.example.demo.service.dto.StudentListFilterDto;
 import com.example.demo.utils.ResponseUtil;
 
 @RestController
-@RequestMapping(value = "/users")
+@RequestMapping(value = "/staff")
 @CrossOrigin(origins = "*")
-public class UsersController {
+public class StaffController {
 
-	private final Logger log = LoggerFactory.getLogger(UsersController.class);
+	private final Logger log = LoggerFactory.getLogger(StaffController.class);
 	
 	@Autowired
 	ResponseUtil<Object> responseUtil;
