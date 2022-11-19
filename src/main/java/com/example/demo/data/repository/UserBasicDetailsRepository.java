@@ -21,6 +21,7 @@ import com.example.demo.constant.ErrorDetails;
 import com.example.demo.data.entity.UserBasicDetails;
 import com.example.demo.exception.StaffException;
 import com.example.demo.service.dto.FilterListRequestDto;
+import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
 
 @Service
@@ -92,7 +93,7 @@ public class UserBasicDetailsRepository {
 			FilterListRequestDto filterRequestDto) throws StaffException {
 		log.info("Fetching staff details list for academic year {}, page no {}, page size {}", academicYear,
 				pageable.getPageNumber(), pageable.getPageSize());
-		String query = "select * from user_basic_details ";
+		String query = "select * from user_basic_details where first_name != ? ";
 		query += getFilterQuery(filterRequestDto) + " " + "limit ? offset ?";
 		log.info("query {}", query);
 		List<UserBasicDetails> userBasicDetailsList = null;
@@ -118,7 +119,7 @@ public class UserBasicDetailsRepository {
 	private int getStaffBasicDetailsCount(String academicYear, FilterListRequestDto filterRequestDto)
 			throws StaffException {
 		log.info("Fetching staff details count for academic year {}", academicYear);
-		String query = "select count(*) as studentsCount from user_basic_details ";
+		String query = "select count(*) as studentsCount from user_basic_details where first_name != ? ";
 		query += getFilterQuery(filterRequestDto) + " ";
 		log.info("query {}", query);
 		int staffBasicDetailsCount = 0;
@@ -170,6 +171,7 @@ public class UserBasicDetailsRepository {
 	private void setStaffDetailsPreparedStatement(PreparedStatement ps, String academicYear,
 			FilterListRequestDto filterRequestDto, PageRequest pageable) throws SQLException {
 		int indx = 1;
+		ps.setString(indx++, Constants.ADMIN);
 		if (filterRequestDto != null && filterRequestDto.getFilterDto() != null) {
 			if (!CollectionUtils.isEmpty(filterRequestDto.getFilterDto().getCastes())) {
 				for (String caste : filterRequestDto.getFilterDto().getCastes()) {

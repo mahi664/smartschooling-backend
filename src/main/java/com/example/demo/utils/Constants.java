@@ -14,4 +14,5 @@ public class Constants {
 	public static final 	String 		BLANK_STRING		= 	"";
 	public static final     int         APPEND_CHARACTERS   =    8;
 	public static final		String 		DEFAULT_PASSWORD 	= 	"New@123";
+	public static final		String 		ADMIN				= 	"Admin";
 }
